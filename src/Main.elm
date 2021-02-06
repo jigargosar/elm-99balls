@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Svg
+import Svg.Attributes as S
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 
@@ -14,8 +15,10 @@ main =
         [ T.viewBox (-w / 2) (-h / 2) w h
         , Px.width w
         , Px.height h
+        , S.fill "none"
+        , S.stroke "none"
         ]
-        [ rect w h [] [] ]
+        [ rect w h [] [ S.stroke "black" ] ]
 
 
 rect w h xf aa =
