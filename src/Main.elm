@@ -1,12 +1,56 @@
 module Main exposing (main)
 
+import Browser
+import Html exposing (Html)
 import Svg
 import Svg.Attributes as S
+import Time
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 
 
 main =
+    Browser.element
+        { init = init
+        , update = update
+        , subscriptions = subscriptions
+        , view = view
+        }
+
+
+type alias Flags =
+    ()
+
+
+type alias Model =
+    {}
+
+
+type Msg
+    = OnTick
+
+
+init : Flags -> ( Model, Cmd Msg )
+init _ =
+    ( {}, Cmd.none )
+
+
+update : Msg -> Model -> ( Model, Cmd Msg )
+update message model =
+    case message of
+        OnTick ->
+            ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    Sub.batch
+        [ Time.every (1000 / 50) (always OnTick)
+        ]
+
+
+view : Model -> Html Msg
+view _ =
     let
         ( w, h ) =
             ( 400, 400 )
