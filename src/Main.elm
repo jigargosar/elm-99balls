@@ -19,7 +19,7 @@ main =
         , S.stroke "none"
         ]
         [ rect w h [] [ S.stroke "black" ]
-        , circle 10 [] [ S.fill "black" ]
+        , circle 20 [] [ S.fill "black" ]
         ]
 
 
