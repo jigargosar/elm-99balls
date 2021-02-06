@@ -24,7 +24,7 @@ main =
 
 
 circle r xf aa =
-    Svg.rect
+    Svg.circle
         (Px.r r
             :: T.transform xf
             :: aa
