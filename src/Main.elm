@@ -18,7 +18,18 @@ main =
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ rect w h [] [ S.stroke "black" ] ]
+        [ rect w h [] [ S.stroke "black" ]
+        , circle 10 [] [ S.fill "black" ]
+        ]
+
+
+circle r xf aa =
+    Svg.rect
+        (Px.r r
+            :: T.transform xf
+            :: aa
+        )
+        []
 
 
 rect w h xf aa =
