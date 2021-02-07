@@ -75,7 +75,9 @@ edgeFromTo a b =
 
 edgeMidpoint : Edge -> Vec
 edgeMidpoint { from, to } =
-    vecFromTo from to |> vecScale 0.5
+    vecFromTo from to
+        |> vecScale 0.5
+        |> vecAdd from
 
 
 edgeNormal : Edge -> Vec
