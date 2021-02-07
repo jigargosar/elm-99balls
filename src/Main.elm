@@ -82,7 +82,12 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick ->
-            ( model, Cmd.none )
+            ( { model | balls = List.map updateBall model.balls }, Cmd.none )
+
+
+updateBall : Ball -> Ball
+updateBall ball =
+    ball
 
 
 subscriptions : Model -> Sub Msg
