@@ -72,7 +72,32 @@ type alias Edge =
 
 edgePoints : Edge -> List ( Float, Float )
 edgePoints edge =
-    [ ( edge.xa, edge.ya ), ( edge.xb, edge.yb ) ]
+    [ edgeStart edge, edgeEnd edge ]
+
+
+edgeStart : Edge -> ( Float, Float )
+edgeStart edge =
+    ( edge.xa, edge.ya )
+
+
+edgeEnd : Edge -> ( Float, Float )
+edgeEnd edge =
+    ( edge.xb, edge.yb )
+
+
+edgeMidpoint : Edge -> ( Float, Float )
+edgeMidpoint edge =
+    map2 (-) (edgeEnd edge) (edgeStart edge)
+        |> mapEach ((*) 0.5)
+        |> map2 (+) (edgeStart edge)
+
+
+edgeNormal : Edge -> ( Float, Float )
+edgeNormal edge =
+    map2 (-) (edgeEnd edge) (edgeStart edge)
+        |> toPolar
+        |> Tuple.mapBoth (always 1) ((+) (turns 0.5))
+        |> fromPolar
 
 
 edges : List Edge
@@ -125,6 +150,11 @@ updateBall ball =
 map2 : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
 map2 fn ( a, b ) ( c, d ) =
     ( fn a c, fn b d )
+
+
+mapEach : (a -> x) -> ( a, a ) -> ( x, x )
+mapEach fn =
+    Tuple.mapBoth fn fn
 
 
 dotProduct : ( number, number ) -> ( number, number ) -> number
