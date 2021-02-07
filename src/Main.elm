@@ -173,7 +173,8 @@ viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
         edgeN =
-            edgeFromWithOffset (edgeMidpoint edge)
+            edgeFromWithOffset
+                (edgeMidpoint edge)
                 (edgeNormal edge |> vecScale (sw / 4))
     in
     Svg.polyline [ T.points (List.map vecToTuple (edgePoints edgeN)), S.stroke "blue", Px.strokeWidth 5 ] []
