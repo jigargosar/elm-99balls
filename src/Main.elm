@@ -179,7 +179,11 @@ viewEdgeNormal edge =
                 edge.midpoint
                 (edge.normal |> vecScale (sw * 0.1))
     in
-    Svg.polyline [ T.points (List.map vecToTuple (edgePoints normal)), S.stroke "blue", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (edgePoints2 normal), S.stroke "blue", Px.strokeWidth 5 ] []
+
+
+edgePoints2 =
+    edgePoints >> List.map vecToTuple
 
 
 viewBall : Ball -> Svg Msg
