@@ -110,7 +110,7 @@ viewBall : Ball -> Svg Msg
 viewBall ball =
     Svg.circle
         [ Px.r ball.radius
-        , T.fill (Paint (Color.hsl ball.hue 0.5 0.5))
+        , T.fill (Paint (Color.hsl ball.hue 0.7 0.6))
         , T.transform [ Translate ball.x ball.y ]
         ]
         []
