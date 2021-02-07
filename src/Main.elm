@@ -2,11 +2,20 @@ module Main exposing (main)
 
 import Browser
 import Html exposing (Html)
+import Random exposing (Generator)
 import Svg
 import Svg.Attributes as S
 import Time
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
+
+
+w =
+    400
+
+
+h =
+    400
 
 
 main =
@@ -23,7 +32,8 @@ type alias Flags =
 
 
 type alias Model =
-    { y : Float, angle : Float }
+    { balls : List Ball
+    }
 
 
 type alias Ball =
@@ -35,13 +45,35 @@ type alias Ball =
     }
 
 
+randomBalls : Generator (List Ball)
+randomBalls =
+    Random.list 10 randomBall
+
+
+randomBall : Generator Ball
+randomBall =
+    Random.map5 Ball
+        (Random.float (-w / 2) (w / 2))
+        (Random.float (-h / 2) (h / 2))
+        (Random.float 0 (turns 1))
+        (Random.float 0 1)
+        (Random.float 10 16)
+
+
 type Msg
     = OnTick
 
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( { y = 0, angle = turns 0.25 }, Cmd.none )
+    let
+        initialSeed =
+            Random.initialSeed 0
+
+        ( balls, _ ) =
+            Random.step randomBalls initialSeed
+    in
+    ( { balls = balls }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -60,10 +92,6 @@ subscriptions _ =
 
 view : Model -> Html Msg
 view model =
-    let
-        ( w, h ) =
-            ( 400, 400 )
-    in
     Svg.svg
         [ T.viewBox (-w / 2) (-h / 2) w h
         , Px.width w
