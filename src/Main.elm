@@ -41,8 +41,7 @@ type alias Model =
 
 
 type alias Ball =
-    { x : Float
-    , y : Float
+    { position : Vec
     , angle : Float
     , speed : Float
     , hue : Float
@@ -57,9 +56,8 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map6 Ball
-        (Random.float (-sw / 2) (sw / 2))
-        (Random.float (-sh / 2) (sh / 2))
+    Random.map5 Ball
+        (Random.map2 vec (Random.float (-sw / 2) (sw / 2)) (Random.float (-sh / 2) (sh / 2)))
         (Random.float 0 (turns 1))
         (Random.float 1 2)
         (Random.float 0 1)
@@ -142,14 +140,10 @@ update message model =
 updateBall : Ball -> Ball
 updateBall ball =
     let
-        ( dx, dy ) =
-            fromPolar ( ball.speed, ball.angle )
-
-        ( nx, ny ) =
-            ( ball.x, ball.y )
-                |> map2 (+) ( dx, dy )
+        velocity =
+            vecFromRTheta ball.speed ball.angle
     in
-    { ball | x = nx, y = ny }
+    { ball | position = vecAdd ball.position velocity }
 
 
 subscriptions : Model -> Sub Msg

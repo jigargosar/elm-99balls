@@ -1,5 +1,7 @@
 module Util exposing (..)
 
+import Basics.Extra exposing (uncurry)
+
 
 type alias Vec =
     { x : Float, y : Float }
@@ -8,6 +10,63 @@ type alias Vec =
 vec : Float -> Float -> Vec
 vec a b =
     Vec a b
+
+
+vecFromTuple : ( Float, Float ) -> Vec
+vecFromTuple ( a, b ) =
+    vec a b
+
+
+vecFromTo : Vec -> Vec -> Vec
+vecFromTo a b =
+    vecSub b a
+
+
+vecFromRTheta : Float -> Float -> Vec
+vecFromRTheta r theta =
+    vecFromPolar ( r, theta )
+
+
+vecFromPolar : ( Float, Float ) -> Vec
+vecFromPolar =
+    fromPolar >> vecFromTuple
+
+
+vecMap2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
+vecMap2 fn a b =
+    vec (fn a.x b.x) (fn a.y b.y)
+
+
+vecMapEach : (Float -> Float) -> Vec -> Vec
+vecMapEach fn { x, y } =
+    vec (fn x) (fn y)
+
+
+vecAdd : Vec -> Vec -> Vec
+vecAdd =
+    vecMap2 add
+
+
+vecSub : Vec -> Vec -> Vec
+vecSub =
+    vecMap2 sub
+
+
+vecScale : Float -> Vec -> Vec
+vecScale s =
+    vecMapEach (mul s)
+
+
+add =
+    (+)
+
+
+sub =
+    (-)
+
+
+mul =
+    (*)
 
 
 map2 : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
