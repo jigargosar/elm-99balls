@@ -100,6 +100,11 @@ edgePoints { from, to } =
     [ from, to ]
 
 
+edgePoints2 : Edge -> List ( Float, Float )
+edgePoints2 =
+    edgePoints >> List.map vecToTuple
+
+
 edges : List Edge
 edges =
     let
@@ -168,7 +173,7 @@ view model =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (List.map vecToTuple (edgePoints edge)), S.stroke "red", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (edgePoints2 edge), S.stroke "red", Px.strokeWidth 5 ] []
 
 
 viewEdgeNormal : Edge -> Svg Msg
@@ -180,10 +185,6 @@ viewEdgeNormal edge =
                 (edge.normal |> vecScale (sw * 0.1))
     in
     Svg.polyline [ T.points (edgePoints2 normal), S.stroke "blue", Px.strokeWidth 5 ] []
-
-
-edgePoints2 =
-    edgePoints >> List.map vecToTuple
 
 
 viewBall : Ball -> Svg Msg
