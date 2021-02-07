@@ -106,9 +106,12 @@ update message model =
 updateBall : Ball -> Ball
 updateBall ball =
     let
+        ( dx, dy ) =
+            fromPolar ( ball.speed, ball.angle )
+
         ( nx, ny ) =
             ( ball.x, ball.y )
-                |> map2 (+) (fromPolar ( ball.speed, ball.angle ))
+                |> map2 (+) ( dx, dy )
     in
     { ball | x = nx, y = ny }
 
