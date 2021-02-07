@@ -161,7 +161,7 @@ view model =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (List.map vecToTuple [ edge.from, edge.to ]), S.stroke "red", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (List.map vecToTuple (edgePoints edge)), S.stroke "red", Px.strokeWidth 5 ] []
 
 
 viewEdgeNormal : Edge -> Svg Msg
