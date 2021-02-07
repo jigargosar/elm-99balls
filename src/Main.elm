@@ -180,8 +180,10 @@ ballEdgeCollision ball edge =
 
         projectionMagnitude =
             vecDotProduct (vecNegate velocity) edge.normal
+
+        --|> Debug.log "projectionMagnitude"
     in
-    projectionMagnitude > 0 && projectionMagnitude < ball.radius
+    abs projectionMagnitude <= ball.radius
 
 
 subscriptions : Model -> Sub Msg
