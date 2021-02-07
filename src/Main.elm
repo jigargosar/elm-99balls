@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import Basics.Extra exposing (uncurry)
 import Browser
 import Color
 import Html exposing (Html)
@@ -12,6 +11,7 @@ import Time
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
+import Util exposing (..)
 
 
 sw =
@@ -150,21 +150,6 @@ updateBall ball =
                 |> map2 (+) ( dx, dy )
     in
     { ball | x = nx, y = ny }
-
-
-map2 : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
-map2 fn ( a, b ) ( c, d ) =
-    ( fn a c, fn b d )
-
-
-mapEach : (a -> x) -> ( a, a ) -> ( x, x )
-mapEach fn =
-    Tuple.mapBoth fn fn
-
-
-dotProduct : ( number, number ) -> ( number, number ) -> number
-dotProduct a b =
-    map2 (*) a b |> uncurry (+)
 
 
 subscriptions : Model -> Sub Msg
