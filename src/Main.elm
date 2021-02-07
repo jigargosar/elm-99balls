@@ -192,7 +192,7 @@ viewBall ball =
     Svg.circle
         [ Px.r ball.radius
         , T.fill (Paint (Color.hsl ball.hue 0.7 0.6))
-        , T.transform [ Translate ball.x ball.y ]
+        , T.transform [ vecApply Translate ball.position ]
         ]
         []
 

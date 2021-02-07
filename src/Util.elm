@@ -42,6 +42,11 @@ vecMapEach fn { x, y } =
     vec (fn x) (fn y)
 
 
+vecApply : (Float -> Float -> a) -> Vec -> a
+vecApply fn { x, y } =
+    fn x y
+
+
 vecAdd : Vec -> Vec -> Vec
 vecAdd =
     vecMap2 add
