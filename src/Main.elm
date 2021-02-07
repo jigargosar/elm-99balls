@@ -23,7 +23,7 @@ type alias Flags =
 
 
 type alias Model =
-    {}
+    { y : Float, angle : Float }
 
 
 type Msg
@@ -32,14 +32,14 @@ type Msg
 
 init : Flags -> ( Model, Cmd Msg )
 init _ =
-    ( {}, Cmd.none )
+    ( { y = 0, angle = turns 0.25 }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick ->
-            ( model, Cmd.none )
+            ( { model | y = model.y + 2 }, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -50,7 +50,7 @@ subscriptions _ =
 
 
 view : Model -> Html Msg
-view _ =
+view model =
     let
         ( w, h ) =
             ( 400, 400 )
