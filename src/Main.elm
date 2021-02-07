@@ -175,13 +175,17 @@ updateBall ball =
 ballEdgeCollision : Ball -> Edge -> Bool
 ballEdgeCollision ball edge =
     let
-        --velocity =
-        --    vecFromRTheta ball.speed ball.angle
+        velocity =
+            vecFromRTheta ball.speed ball.angle
+
+        ballPosition =
+            vecAdd ball.position velocity
+
         n =
             edge.normal
 
         a =
-            vecSub edge.from ball.position
+            vecSub edge.from ballPosition
 
         c =
             vecDotProduct a n
