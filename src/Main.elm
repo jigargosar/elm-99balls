@@ -12,11 +12,11 @@ import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
 
 
-w =
+sw =
     400
 
 
-h =
+sh =
     400
 
 
@@ -55,8 +55,8 @@ randomBalls =
 randomBall : Generator Ball
 randomBall =
     Random.map5 Ball
-        (Random.float (-w / 2) (w / 2))
-        (Random.float (-h / 2) (h / 2))
+        (Random.float (-sw / 2) (sw / 2))
+        (Random.float (-sh / 2) (sh / 2))
         (Random.float 0 (turns 1))
         (Random.float 0 1)
         (Random.float 10 16)
@@ -82,7 +82,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick ->
-            ( { model | y = model.y + 2 }, Cmd.none )
+            ( model, Cmd.none )
 
 
 subscriptions : Model -> Sub Msg
@@ -95,13 +95,13 @@ subscriptions _ =
 view : Model -> Html Msg
 view model =
     Svg.svg
-        [ T.viewBox (-w / 2) (-h / 2) w h
-        , Px.width w
-        , Px.height h
+        [ T.viewBox (-sw / 2) (-sh / 2) sw sh
+        , Px.width sw
+        , Px.height sh
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ rect w h [] [ S.stroke "black" ]
+        [ rect sw sh [] [ S.stroke "black" ]
         , Svg.g [] (List.map viewBall model.balls)
         ]
 
@@ -113,15 +113,6 @@ viewBall ball =
         , T.fill (Paint (Color.hsl ball.hue 0.5 0.5))
         , T.transform [ Translate ball.x ball.y ]
         ]
-        []
-
-
-circle r xf aa =
-    Svg.circle
-        (Px.r r
-            :: T.transform xf
-            :: aa
-        )
         []
 
 
