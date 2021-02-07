@@ -156,7 +156,7 @@ view model =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (edgePoints edge), S.stroke "black", Px.strokeWidth 2 ] []
+    Svg.polyline [ T.points (edgePoints edge), S.stroke "red", Px.strokeWidth 5 ] []
 
 
 viewBall : Ball -> Svg Msg
