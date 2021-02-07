@@ -69,6 +69,7 @@ type alias Edge =
     , to : Vec
     , midpoint : Vec
     , offset : Vec
+    , normal : Vec
     }
 
 
@@ -81,7 +82,12 @@ edgeFromTo from to =
         offset =
             vecFromTo midpoint to
     in
-    Edge from to midpoint offset
+    { from = from
+    , to = to
+    , midpoint = midpoint
+    , offset = offset
+    , normal = vecNormalFromTo from to
+    }
 
 
 edgeFromWithOffset : Vec -> Vec -> Edge
@@ -92,14 +98,6 @@ edgeFromWithOffset a b =
 edgePoints : Edge -> List Vec
 edgePoints { from, to } =
     [ from, to ]
-
-
-edgeNormal : Edge -> Vec
-edgeNormal { from, to } =
-    vecFromTo from to
-        |> vecToPolar
-        |> Tuple.mapBoth (always 1) (add (turns 0.25))
-        |> vecFromPolar
 
 
 edges : List Edge
@@ -179,7 +177,7 @@ viewEdgeNormal edge =
         edgeN =
             edgeFromWithOffset
                 edge.midpoint
-                (edgeNormal edge |> vecScale (sw * 0.1))
+                (edge.normal |> vecScale (sw * 0.1))
     in
     Svg.polyline [ T.points (List.map vecToTuple (edgePoints edgeN)), S.stroke "blue", Px.strokeWidth 5 ] []
 

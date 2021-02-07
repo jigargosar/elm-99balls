@@ -49,6 +49,14 @@ vecMidpoint from to =
         |> vecAdd from
 
 
+vecNormalFromTo : Vec -> Vec -> Vec
+vecNormalFromTo from to =
+    vecFromTo from to
+        |> vecToPolar
+        |> Tuple.mapBoth (always 1) (add (turns 0.25))
+        |> vecFromPolar
+
+
 vecMap2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
 vecMap2 fn a b =
     vec (fn a.x b.x) (fn a.y b.y)
