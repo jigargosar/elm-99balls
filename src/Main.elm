@@ -190,7 +190,7 @@ ballEdgeCollision ball edge =
         c =
             vecDotProduct a n
     in
-    abs c < ball.radius
+    abs c <= ball.radius
 
 
 subscriptions : Model -> Sub Msg
