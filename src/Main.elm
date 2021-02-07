@@ -167,7 +167,7 @@ viewEdgeNormal edge =
                     (edgeNormal edge |> vecScale (sw / 4))
                 )
     in
-    Svg.polyline [ T.points (List.map vecToTuple [ edge.from, edge.to ]), S.stroke "blue", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (List.map vecToTuple [ edgeN.from, edgeN.to ]), S.stroke "blue", Px.strokeWidth 5 ] []
 
 
 viewBall : Ball -> Svg Msg
