@@ -218,7 +218,7 @@ view model =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (edgePoints2 edge), S.stroke "red", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (edgePoints2 edge), S.stroke "red", Px.strokeWidth 1 ] []
 
 
 viewEdgeNormal : Edge -> Svg Msg
@@ -246,7 +246,7 @@ viewBall ball =
         [ Svg.circle
             [ Px.r ball.radius
             , T.stroke (Paint (Color.hsl ball.hue 0.7 0.6))
-            , Px.strokeWidth 2
+            , Px.strokeWidth 1
             , T.transform [ vecApply Translate ball.position ]
             ]
             []
