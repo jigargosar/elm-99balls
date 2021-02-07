@@ -73,8 +73,8 @@ edgeFromTo a b =
     Edge a b
 
 
-edgeFromBy : Vec -> Vec -> Edge
-edgeFromBy a b =
+edgeFromWithOffset : Vec -> Vec -> Edge
+edgeFromWithOffset a b =
     edgeFromTo a (vecAdd a b)
 
 
@@ -173,7 +173,7 @@ viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
         edgeN =
-            edgeFromBy (edgeMidpoint edge)
+            edgeFromWithOffset (edgeMidpoint edge)
                 (edgeNormal edge |> vecScale (sw / 4))
     in
     Svg.polyline [ T.points (List.map vecToTuple (edgePoints edgeN)), S.stroke "blue", Px.strokeWidth 5 ] []
