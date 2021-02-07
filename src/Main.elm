@@ -90,7 +90,17 @@ update message model =
 
 updateBall : Ball -> Ball
 updateBall ball =
-    ball
+    let
+        ( nx, ny ) =
+            toPolar ( ball.x, ball.y )
+                |> map2 (+) ( ball.speed, ball.angle )
+                |> fromPolar
+    in
+    { ball | x = nx, y = ny }
+
+
+map2 fn ( a, b ) ( c, d ) =
+    ( fn a c, fn b d )
 
 
 subscriptions : Model -> Sub Msg
