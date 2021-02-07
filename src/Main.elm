@@ -165,6 +165,11 @@ updateBall ball =
     { ball | position = vecAdd ball.position velocity }
 
 
+ballEdgeCollision : Ball -> Edge -> Bool
+ballEdgeCollision ball edge =
+    Debug.todo ""
+
+
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
