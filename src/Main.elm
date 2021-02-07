@@ -175,7 +175,7 @@ viewEdgeNormal edge =
         edgeN =
             edgeFromWithOffset
                 (edgeMidpoint edge)
-                (edgeNormal edge |> vecScale (sw / 4))
+                (edgeNormal edge |> vecScale (sw * 0.1))
     in
     Svg.polyline [ T.points (List.map vecToTuple (edgePoints edgeN)), S.stroke "blue", Px.strokeWidth 5 ] []
 
