@@ -199,7 +199,11 @@ viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
         edgeN =
-            edgeFrom (edgeMidpoint edge) (map2 (+) (edgeMidpoint edge) (edgeNormal edge |> mapEach ((*) (sw / 4))))
+            edgeFrom (edgeMidpoint edge)
+                (map2 (+)
+                    (edgeMidpoint edge)
+                    (edgeNormal edge |> mapEach ((*) (sw / 4)))
+                )
     in
     Svg.polyline [ T.points (edgePoints edgeN), S.stroke "blue", Px.strokeWidth 5 ] []
 
