@@ -109,10 +109,27 @@ edges : List Edge
 edges =
     let
         ri =
-            vec (sw / 2) (sh / 2)
+            vec sw sh |> vecScale 0.5
+
+        ( hw, hh ) =
+            vecToTuple ri
+
+        leftTop =
+            vec -hw -hh
+
+        rightTop =
+            vec hw -hh
+
+        rightBottom =
+            vec hw hh
+
+        leftBottom =
+            vec -hw hh
     in
-    [ -- TopLeft -> TopRight
-      edgeFromTo (vecNegate ri) (vecMapY negate ri)
+    [ edgeFromTo leftTop rightTop
+    , edgeFromTo rightTop rightBottom
+    , edgeFromTo rightBottom leftBottom
+    , edgeFromTo leftBottom leftTop
     ]
 
 
