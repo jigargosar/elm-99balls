@@ -70,6 +70,11 @@ type alias Edge =
     { xa : Float, ya : Float, xb : Float, yb : Float }
 
 
+edgePoints : Edge -> List ( Float, Float )
+edgePoints edge =
+    [ ( edge.xa, edge.ya ), ( edge.xb, edge.yb ) ]
+
+
 edges : List Edge
 edges =
     let
@@ -145,7 +150,13 @@ view model =
         ]
         [ rect sw sh [] [ S.stroke "black" ]
         , Svg.g [] (List.map viewBall model.balls)
+        , Svg.g [] (List.map viewEdge edges)
         ]
+
+
+viewEdge : Edge -> Svg Msg
+viewEdge edge =
+    Svg.polyline [ T.points (edgePoints edge), S.stroke "black", Px.strokeWidth 2 ] []
 
 
 viewBall : Ball -> Svg Msg
