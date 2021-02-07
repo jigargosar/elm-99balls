@@ -65,12 +65,25 @@ randomBall =
 
 
 type alias Edge =
-    { from : Vec, to : Vec }
+    { from : Vec
+    , to : Vec
+    , midpoint : Vec
+    , offset : Vec
+    }
 
 
 edgeFromTo : Vec -> Vec -> Edge
-edgeFromTo a b =
-    Edge a b
+edgeFromTo from to =
+    let
+        midpoint =
+            vecFromTo from to
+                |> vecScale 0.5
+                |> vecAdd from
+
+        offset =
+            vecFromTo midpoint to
+    in
+    Edge from to midpoint offset
 
 
 edgeFromWithOffset : Vec -> Vec -> Edge
