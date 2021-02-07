@@ -1,13 +1,15 @@
 module Main exposing (main)
 
 import Browser
+import Color
 import Html exposing (Html)
 import Random exposing (Generator)
-import Svg
+import Svg exposing (Svg)
 import Svg.Attributes as S
 import Time
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
+import TypedSvg.Types exposing (Paint(..), Transform(..))
 
 
 w =
@@ -100,8 +102,18 @@ view model =
         , S.stroke "none"
         ]
         [ rect w h [] [ S.stroke "black" ]
-        , circle 20 [] [ S.fill "black" ]
+        , Svg.g [] (List.map viewBall model.balls)
         ]
+
+
+viewBall : Ball -> Svg Msg
+viewBall ball =
+    Svg.circle
+        [ Px.r ball.radius
+        , T.fill (Paint (Color.hsl ball.hue 0.5 0.5))
+        , T.transform [ Translate ball.x ball.y ]
+        ]
+        []
 
 
 circle r xf aa =
