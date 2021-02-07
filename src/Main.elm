@@ -70,6 +70,11 @@ type alias Edge =
     { xa : Float, ya : Float, xb : Float, yb : Float }
 
 
+edgeFrom : ( Float, Float ) -> ( Float, Float ) -> Edge
+edgeFrom ( a, b ) ( c, d ) =
+    Edge a b c d
+
+
 edgePoints : Edge -> List ( Float, Float )
 edgePoints edge =
     [ edgeStart edge, edgeEnd edge ]
@@ -96,7 +101,7 @@ edgeNormal : Edge -> ( Float, Float )
 edgeNormal edge =
     map2 (-) (edgeEnd edge) (edgeStart edge)
         |> toPolar
-        |> Tuple.mapBoth (always 1) ((+) (turns 0.5))
+        |> Tuple.mapBoth (always 1) ((+) (turns 0.25))
         |> fromPolar
 
 
@@ -181,12 +186,22 @@ view model =
         [ rect sw sh [] [ S.stroke "black" ]
         , Svg.g [] (List.map viewBall model.balls)
         , Svg.g [] (List.map viewEdge edges)
+        , Svg.g [] (List.map viewEdgeNormal edges)
         ]
 
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
     Svg.polyline [ T.points (edgePoints edge), S.stroke "red", Px.strokeWidth 5 ] []
+
+
+viewEdgeNormal : Edge -> Svg Msg
+viewEdgeNormal edge =
+    let
+        edgeN =
+            edgeFrom (edgeMidpoint edge) (map2 (+) (edgeMidpoint edge) (edgeNormal edge |> mapEach ((*) (sw / 4))))
+    in
+    Svg.polyline [ T.points (edgePoints edgeN), S.stroke "blue", Px.strokeWidth 5 ] []
 
 
 viewBall : Ball -> Svg Msg
