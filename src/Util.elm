@@ -42,6 +42,13 @@ vecToPolar =
     vecToTuple >> toPolar
 
 
+vecMidpoint : Vec -> Vec -> Vec
+vecMidpoint from to =
+    vecFromTo from to
+        |> vecScale 0.5
+        |> vecAdd from
+
+
 vecMap2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
 vecMap2 fn a b =
     vec (fn a.x b.x) (fn a.y b.y)
