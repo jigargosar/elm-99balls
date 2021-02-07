@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Basics.Extra exposing (uncurry)
 import Browser
 import Color
 import Html exposing (Html)
@@ -118,6 +119,11 @@ updateBall ball =
 
 map2 fn ( a, b ) ( c, d ) =
     ( fn a c, fn b d )
+
+
+dotProduct : ( number, number ) -> ( number, number ) -> number
+dotProduct a b =
+    map2 (*) a b |> uncurry (+)
 
 
 subscriptions : Model -> Sub Msg
