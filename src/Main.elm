@@ -86,7 +86,7 @@ edgeFromTo from to =
     , to = to
     , midpoint = midpoint
     , offset = offset
-    , normal = vecNormalFromTo from to
+    , normal = vecUnitNormalFromTo from to
     }
 
 
@@ -161,13 +161,27 @@ updateBall ball =
     let
         velocity =
             vecFromRTheta ball.speed ball.angle
+
+        collision =
+            List.any (ballEdgeCollision ball) edges
     in
-    { ball | position = vecAdd ball.position velocity }
+    if not collision then
+        { ball | position = vecAdd ball.position velocity }
+
+    else
+        ball
 
 
 ballEdgeCollision : Ball -> Edge -> Bool
 ballEdgeCollision ball edge =
-    Debug.todo ""
+    let
+        velocity =
+            vecFromRTheta ball.speed ball.angle
+
+        projectionMagnitude =
+            vecDotProduct (vecNegate velocity) edge.normal
+    in
+    projectionMagnitude > 0 && projectionMagnitude < ball.radius
 
 
 subscriptions : Model -> Sub Msg
