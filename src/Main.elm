@@ -4,6 +4,7 @@ import Browser
 import Color
 import Html exposing (Html)
 import Random exposing (Generator)
+import Random.Extra as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Time
@@ -42,6 +43,7 @@ type alias Ball =
     { x : Float
     , y : Float
     , angle : Float
+    , speed : Float
     , hue : Float
     , radius : Float
     }
@@ -54,10 +56,11 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 Ball
+    Random.map6 Ball
         (Random.float (-sw / 2) (sw / 2))
         (Random.float (-sh / 2) (sh / 2))
         (Random.float 0 (turns 1))
+        (Random.float 1 2)
         (Random.float 0 1)
         (Random.float 10 16)
 
