@@ -206,12 +206,29 @@ viewEdgeNormal edge =
 
 viewBall : Ball -> Svg Msg
 viewBall ball =
-    Svg.circle
-        [ Px.r ball.radius
-        , T.fill (Paint (Color.hsl ball.hue 0.7 0.6))
-        , T.transform [ vecApply Translate ball.position ]
+    let
+        p1 =
+            ball.position
+
+        p2 =
+            vecFromRTheta ball.radius ball.angle
+                |> vecAdd p1
+    in
+    Svg.g []
+        [ Svg.circle
+            [ Px.r ball.radius
+            , T.stroke (Paint (Color.hsl ball.hue 0.7 0.6))
+            , Px.strokeWidth 2
+            , T.transform [ vecApply Translate ball.position ]
+            ]
+            []
+        , Svg.polyline
+            [ T.points (List.map vecToTuple [ p1, p2 ])
+            , T.stroke (Paint (Color.hsl ball.hue 0.7 0.6))
+            , Px.strokeWidth 2
+            ]
+            []
         ]
-        []
 
 
 rect w h xf aa =
