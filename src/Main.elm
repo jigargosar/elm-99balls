@@ -65,6 +65,20 @@ randomBall =
         (Random.float 10 16)
 
 
+type alias Edge =
+    { xa : Float, ya : Float, xb : Float, yb : Float }
+
+
+edges =
+    let
+        ( hw, hh ) =
+            ( sw / 2, sh / 2 )
+    in
+    [ -- TopLeft -> TopRight
+      Edge -hw -hh hw -hh
+    ]
+
+
 type Msg
     = OnTick
 
