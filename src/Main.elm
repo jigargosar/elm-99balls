@@ -185,12 +185,12 @@ ballEdgeCollision ball edge =
             edge.normal
 
         a =
-            vecSub edge.from ballPosition
+            vecFromTo edge.from ballPosition
 
         c =
             vecDotProduct a n
     in
-    abs c <= ball.radius
+    c <= ball.radius
 
 
 subscriptions : Model -> Sub Msg
