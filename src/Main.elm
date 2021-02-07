@@ -175,15 +175,18 @@ updateBall ball =
 ballEdgeCollision : Ball -> Edge -> Bool
 ballEdgeCollision ball edge =
     let
-        velocity =
-            vecFromRTheta ball.speed ball.angle
+        --velocity =
+        --    vecFromRTheta ball.speed ball.angle
+        n =
+            edge.normal
 
-        projectionMagnitude =
-            vecDotProduct (vecNegate velocity) edge.normal
+        a =
+            vecSub edge.from ball.position
 
-        --|> Debug.log "projectionMagnitude"
+        c =
+            vecDotProduct a n
     in
-    abs projectionMagnitude <= ball.radius
+    abs c < ball.radius
 
 
 subscriptions : Model -> Sub Msg
