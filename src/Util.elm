@@ -17,6 +17,11 @@ vecFromTuple ( a, b ) =
     vec a b
 
 
+vecToTuple : Vec -> ( Float, Float )
+vecToTuple =
+    vecApply Tuple.pair
+
+
 vecFromTo : Vec -> Vec -> Vec
 vecFromTo a b =
     vecSub b a
@@ -32,6 +37,11 @@ vecFromPolar =
     fromPolar >> vecFromTuple
 
 
+vecToPolar : Vec -> ( Float, Float )
+vecToPolar =
+    vecToTuple >> toPolar
+
+
 vecMap2 : (Float -> Float -> Float) -> Vec -> Vec -> Vec
 vecMap2 fn a b =
     vec (fn a.x b.x) (fn a.y b.y)
@@ -40,6 +50,16 @@ vecMap2 fn a b =
 vecMapEach : (Float -> Float) -> Vec -> Vec
 vecMapEach fn { x, y } =
     vec (fn x) (fn y)
+
+
+vecMapBoth : (Float -> Float) -> (Float -> Float) -> Vec -> Vec
+vecMapBoth fx fy { x, y } =
+    vec (fx x) (fy y)
+
+
+vecMapY : (Float -> Float) -> Vec -> Vec
+vecMapY fn =
+    vecMapBoth identity fn
 
 
 vecApply : (Float -> Float -> a) -> Vec -> a
@@ -60,6 +80,11 @@ vecSub =
 vecScale : Float -> Vec -> Vec
 vecScale s =
     vecMapEach (mul s)
+
+
+vecNegate : Vec -> Vec
+vecNegate =
+    vecScale -1
 
 
 add =

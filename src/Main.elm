@@ -65,52 +65,35 @@ randomBall =
 
 
 type alias Edge =
-    { xa : Float, ya : Float, xb : Float, yb : Float }
+    { from : Vec, to : Vec }
 
 
-edgeFrom : ( Float, Float ) -> ( Float, Float ) -> Edge
-edgeFrom ( a, b ) ( c, d ) =
-    Edge a b c d
+edgeFromTo : Vec -> Vec -> Edge
+edgeFromTo a b =
+    Edge a b
 
 
-edgePoints : Edge -> List ( Float, Float )
-edgePoints edge =
-    [ edgeStart edge, edgeEnd edge ]
+edgeMidpoint : Edge -> Vec
+edgeMidpoint { from, to } =
+    vecFromTo from to |> vecScale 0.5
 
 
-edgeStart : Edge -> ( Float, Float )
-edgeStart edge =
-    ( edge.xa, edge.ya )
-
-
-edgeEnd : Edge -> ( Float, Float )
-edgeEnd edge =
-    ( edge.xb, edge.yb )
-
-
-edgeMidpoint : Edge -> ( Float, Float )
-edgeMidpoint edge =
-    map2 (-) (edgeEnd edge) (edgeStart edge)
-        |> mapEach ((*) 0.5)
-        |> map2 (+) (edgeStart edge)
-
-
-edgeNormal : Edge -> ( Float, Float )
-edgeNormal edge =
-    map2 (-) (edgeEnd edge) (edgeStart edge)
-        |> toPolar
-        |> Tuple.mapBoth (always 1) ((+) (turns 0.25))
-        |> fromPolar
+edgeNormal : Edge -> Vec
+edgeNormal { from, to } =
+    vecFromTo from to
+        |> vecToPolar
+        |> Tuple.mapBoth (always 1) (add (turns 0.25))
+        |> vecFromPolar
 
 
 edges : List Edge
 edges =
     let
-        ( hw, hh ) =
-            ( sw / 2, sh / 2 )
+        ri =
+            vec (sw / 2) (sh / 2)
     in
     [ -- TopLeft -> TopRight
-      Edge -hw -hh hw -hh
+      edgeFromTo (vecNegate ri) (vecMapY negate ri)
     ]
 
 
@@ -171,20 +154,20 @@ view model =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (edgePoints edge), S.stroke "red", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (List.map vecToTuple [ edge.from, edge.to ]), S.stroke "red", Px.strokeWidth 5 ] []
 
 
 viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
         edgeN =
-            edgeFrom (edgeMidpoint edge)
-                (map2 (+)
+            edgeFromTo (edgeMidpoint edge)
+                (vecAdd
                     (edgeMidpoint edge)
-                    (edgeNormal edge |> mapEach ((*) (sw / 4)))
+                    (edgeNormal edge |> vecScale (sw / 4))
                 )
     in
-    Svg.polyline [ T.points (edgePoints edgeN), S.stroke "blue", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (List.map vecToTuple [ edge.from, edge.to ]), S.stroke "blue", Px.strokeWidth 5 ] []
 
 
 viewBall : Ball -> Svg Msg
