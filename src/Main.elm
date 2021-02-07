@@ -26,6 +26,15 @@ type alias Model =
     { y : Float, angle : Float }
 
 
+type alias Ball =
+    { x : Float
+    , y : Float
+    , angle : Float
+    , hue : Float
+    , radius : Float
+    }
+
+
 type Msg
     = OnTick
 
