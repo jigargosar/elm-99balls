@@ -69,6 +69,7 @@ type alias Edge =
     { xa : Float, ya : Float, xb : Float, yb : Float }
 
 
+edges : List Edge
 edges =
     let
         ( hw, hh ) =
