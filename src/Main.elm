@@ -92,9 +92,8 @@ updateBall : Ball -> Ball
 updateBall ball =
     let
         ( nx, ny ) =
-            toPolar ( ball.x, ball.y )
-                |> map2 (+) ( ball.speed, ball.angle )
-                |> fromPolar
+            ( ball.x, ball.y )
+                |> map2 (+) (fromPolar ( ball.speed, ball.angle ))
     in
     { ball | x = nx, y = ny }
 
