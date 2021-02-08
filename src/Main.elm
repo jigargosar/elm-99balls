@@ -6,10 +6,8 @@ import Color
 import Html exposing (Html)
 import List.Extra as List
 import Random exposing (Generator)
-import Random.Extra as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
-import Time
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
@@ -22,6 +20,10 @@ sw =
 
 sh =
     400
+
+
+sri =
+    vec sw sh |> vecScale 0.5
 
 
 main =
@@ -59,11 +61,16 @@ randomBalls =
 randomBall : Generator Ball
 randomBall =
     Random.map5 Ball
-        (Random.map2 vec (Random.float (-sw / 2) (sw / 2)) (Random.float (-sh / 2) (sh / 2)))
+        (randomVecInRadii sri)
         (Random.float 0 (turns 1))
         (Random.float 1 2)
         (Random.float 0 1)
         (Random.float 10 16)
+
+
+randomVecInRadii : Vec -> Generator Vec
+randomVecInRadii ri =
+    Random.map2 vec (Random.float -ri.x ri.x) (Random.float -ri.y ri.y)
 
 
 type alias Edge =
@@ -110,11 +117,8 @@ edgePoints2 =
 edges : List Edge
 edges =
     let
-        ri =
-            vec sw sh |> vecScale 0.5
-
         ( hw, hh ) =
-            vecToTuple ri
+            vecToTuple sri
 
         leftTop =
             vec -hw -hh
