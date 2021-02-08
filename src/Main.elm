@@ -327,9 +327,9 @@ viewEdgeNormal edge =
 
 
 viewBalls balls =
-    Svg.Keyed.node "g"
+    Svg.g
         []
-        (List.indexedMap (\i ball -> ( String.fromInt i, viewBall ball )) balls)
+        (List.map viewBall balls)
 
 
 viewBallHelper x y nx ny radius hue =
