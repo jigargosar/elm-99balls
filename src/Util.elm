@@ -38,6 +38,11 @@ vecFromPolar =
     fromPolar >> vecFromTuple
 
 
+vecFromAngle : Float -> Vec
+vecFromAngle angle =
+    vecFromPolar ( 1, angle )
+
+
 vecToPolar : Vec -> ( Float, Float )
 vecToPolar =
     vecToTuple >> toPolar
@@ -65,7 +70,7 @@ vecAngle { x, y } =
 
 vecNormalize : Vec -> Vec
 vecNormalize v =
-    vecFromPolar ( 1, vecAngle v )
+    vecFromAngle (vecAngle v)
 
 
 vecScaleTo : Float -> Vec -> Vec
