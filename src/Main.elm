@@ -208,11 +208,11 @@ updateSim model =
 updateBall : Ball -> Ball
 updateBall ball =
     let
-        velocity =
-            computeNewBallVelocity ball
-
         angle =
-            vecToPolar velocity |> Tuple.second
+            computeNewBallVelocity ball |> vecAngle
+
+        velocity =
+            vecFromRTheta ball.speed angle
     in
     { ball
         | position = vecAdd ball.position velocity
@@ -235,21 +235,7 @@ computeNewBallVelocity ball =
                 n =
                     edge.normal
             in
-            vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
-
-
-
---vecComponentAlong : Vec -> Vec -> Float
---vecComponentAlong directionVec =
---    vecDotProduct (vecNormalize directionVec)
---
---
---vecAlong directionVec vec =
---    let
---        n =
---            vecNormalize directionVec
---    in
---    Debug.todo ""
+            vecSub velocity (vecScale 2 (vecAlong n velocity))
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool

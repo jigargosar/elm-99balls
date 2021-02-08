@@ -143,6 +143,18 @@ vecNegate =
     vecScale -1
 
 
+vecAlong : Vec -> Vec -> Vec
+vecAlong directionVec v =
+    let
+        n =
+            vecNormalize directionVec
+
+        mag =
+            vecDotProduct n v
+    in
+    vecScale mag n
+
+
 randomVec : Float -> Float -> Float -> Float -> Generator Vec
 randomVec a b c d =
     Random.map2 vec (Random.float a b) (Random.float c d)
