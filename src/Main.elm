@@ -15,6 +15,16 @@ import TypedSvg.Types exposing (Paint(..), Transform(..))
 import Util exposing (..)
 
 
+{-|
+
+
+# Todo
+
+  - implement TestMovingSphereSphere (RTC) and compute new ball velocity against single static ball.
+      - same with static ball list.
+  - check for ball edge tunnelling problem, since we are probably not doing continuous collision
+
+-}
 sw =
     600
 
