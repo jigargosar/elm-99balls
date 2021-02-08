@@ -8,7 +8,7 @@ import List.Extra as List
 import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
-import Svg.Lazy exposing (lazy, lazy7)
+import Svg.Lazy exposing (lazy)
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
@@ -64,12 +64,12 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 (\p a _ h r -> Ball [] p a (pps (r * 10)) h r)
+    Random.map5 (\p a _ h r -> Ball [] p a r h r)
         randomBallPosition
         --angle
         (Random.float 0 (turns 1))
         --speed
-        (Random.float (pps 20) (pps 20))
+        (Random.float 20 20)
         --hue
         (Random.float 0 1)
         --radius
@@ -195,64 +195,15 @@ init _ =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        OnTick delta ->
-            ( (if model.elapsed + delta >= frameDelay then
-                model
-                    |> traceBalls
-                    |> updateSim
-
-               else
-                model
-              )
-                |> updateFrames delta
+        OnTick _ ->
+            ( updateSim model
             , Cmd.none
             )
-
-
-fps =
-    50
-
-
-frameDelay =
-    1000 / fps
-
-
-pps rate =
-    rate * (1 / fps)
-
-
-updateFrames : Float -> Model -> Model
-updateFrames delta model =
-    let
-        elapsed =
-            model.elapsed + delta
-    in
-    { model
-        | frames = model.frames + 1
-        , elapsed =
-            (if elapsed >= frameDelay then
-                elapsed - frameDelay
-
-             else
-                elapsed
-            )
-                |> clamp 0 (frameDelay * 1.9)
-    }
 
 
 updateSim : Model -> Model
 updateSim model =
     { model | balls = List.map updateBall model.balls }
-
-
-traceBalls : Model -> Model
-traceBalls model =
-    { model | balls = List.map traceBall model.balls }
-
-
-traceBall : Ball -> Ball
-traceBall ball =
-    { ball | trace = ball.position :: ball.trace |> List.take fps }
 
 
 updateBall : Ball -> Ball
