@@ -68,6 +68,7 @@ randomBall =
         (Random.float 10 16)
 
 
+randomVec : Float -> Float -> Float -> Float -> Generator Vec
 randomVec a b c d =
     Random.map2 vec (Random.float a b) (Random.float c d)
 
