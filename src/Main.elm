@@ -8,8 +8,7 @@ import List.Extra as List
 import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
-import Svg.Keyed
-import Svg.Lazy exposing (lazy)
+import Svg.Lazy exposing (lazy, lazy7)
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
@@ -406,7 +405,7 @@ viewBall ball =
             ( ball.radius, ball.angle )
                 |> fromPolar
     in
-    viewBallHelper x y nx ny ball.radius ball.hue ball.trace
+    lazy7 viewBallHelper x y nx ny ball.radius ball.hue ball.trace
 
 
 rect w h xf aa =
