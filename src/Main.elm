@@ -61,7 +61,7 @@ randomBall =
     Random.map5 Ball
         (Random.map2 vec (Random.float (-sw / 2) (sw / 2)) (Random.float (-sh / 2) (sh / 2)))
         (Random.float 0 (turns 1))
-        (Random.float 1 10)
+        (Random.float 1 2)
         (Random.float 0 1)
         (Random.float 10 16)
 
