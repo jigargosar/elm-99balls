@@ -6,6 +6,8 @@ import Color
 import Html exposing (Html)
 import List.Extra as List
 import Random exposing (Generator)
+import Random.Extra as Random
+import Random.List
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -61,7 +63,11 @@ randomBalls =
 randomBall : Generator Ball
 randomBall =
     Random.map5 Ball
-        (randomVecInRadii sri)
+        --(randomVecInRadii sri)
+        (Random.choices
+            (randomVec (sri.x - 10) sri.x -sri.y sri.y)
+            [ randomVec -sri.x (-sri.x + 10) -sri.y sri.y ]
+        )
         (Random.float 0 (turns 1))
         (Random.float 1 2)
         (Random.float 0 1)
