@@ -154,6 +154,8 @@ edges =
 
 sqDistPointSegment : Vec -> Vec -> Vec -> Float
 sqDistPointSegment a b c =
+    -- Book: realtime collision detection
+    -- Page 130
     let
         ( ab, ac, bc ) =
             ( vecFromTo a b, vecFromTo a c, vecFromTo b c )
