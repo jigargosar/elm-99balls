@@ -9,7 +9,7 @@ import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Svg.Keyed
-import Svg.Lazy
+import Svg.Lazy exposing (lazy)
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
@@ -292,7 +292,7 @@ view model =
         ]
         [ Svg.g [ T.transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
-            , viewBalls model.balls
+            , lazy viewBalls model.balls
             , viewEdges
             ]
         ]
