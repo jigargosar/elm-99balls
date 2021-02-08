@@ -376,29 +376,13 @@ viewBallHelper x y nx ny radius hue =
         color =
             Paint (Color.hsl hue 0.7 0.6)
     in
-    Svg.g []
+    Svg.g [ T.stroke color, T.transform [ Translate x y ] ]
         [ Svg.circle
             [ Px.r radius
-            , T.transform [ Translate x y ]
-            , T.stroke color
-            , Px.strokeWidth 1
             ]
             []
-        , Svg.polyline
-            [ T.points (List.map vecToTuple [ vecZero, vec nx ny ])
-            , T.transform [ Translate x y ]
-            , T.stroke color
-            , Px.strokeWidth 1
-            ]
-            []
-
-        --, polyPoints [ T.fill color ] (List.reverse trace)
+        , Svg.polyline [ T.points (List.map vecToTuple [ vecZero, vec nx ny ]) ] []
         ]
-
-
-
---polyPoints aa pts =
---    Svg.g aa (List.map (\p -> Svg.circle [ Px.r 1, T.transform [ Translate p.x p.y ] ] []) pts)
 
 
 viewBall : Ball -> Svg Msg
@@ -406,12 +390,22 @@ viewBall ball =
     let
         ( x, y ) =
             vecToTuple ball.position
+                |> roundFloat2
 
         ( nx, ny ) =
             ( ball.radius, ball.angle )
                 |> fromPolar
+                |> roundFloat2
     in
     viewBallHelper x y nx ny ball.radius ball.hue
+
+
+roundFloat =
+    round >> toFloat
+
+
+roundFloat2 =
+    mapEach roundFloat
 
 
 rect w h xf aa =
