@@ -162,8 +162,14 @@ updateBall ball =
     let
         velocity =
             computeNewBallVelocity ball
+
+        angle =
+            vecToPolar velocity |> Tuple.second
     in
-    { ball | position = vecAdd ball.position velocity }
+    { ball
+        | position = vecAdd ball.position velocity
+        , angle = angle
+    }
 
 
 
