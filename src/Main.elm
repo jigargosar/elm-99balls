@@ -271,11 +271,17 @@ view model =
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ rect sw sh [] [ S.stroke "black" ]
-        , Svg.g [] (List.map viewBall model.balls)
-        , Svg.g [] (List.map viewEdge edges)
-        , Svg.g [] (List.map viewEdgeNormal edges)
+        [ Svg.g [ T.transform [ scale 0.9 ] ]
+            [ rect sw sh [] [ S.stroke "black" ]
+            , Svg.g [] (List.map viewBall model.balls)
+            , Svg.g [] (List.map viewEdge edges)
+            , Svg.g [] (List.map viewEdgeNormal edges)
+            ]
         ]
+
+
+scale s =
+    Scale s s
 
 
 viewEdge : Edge -> Svg Msg
