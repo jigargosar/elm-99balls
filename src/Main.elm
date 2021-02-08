@@ -252,23 +252,6 @@ updateBall ball =
     }
 
 
-
---updateBall : Ball -> Ball
---updateBall ball =
---    let
---        velocity =
---            vecFromRTheta ball.speed ball.angle
---
---        collision =
---            List.any (ballEdgeCollision ball) edges
---    in
---    if not collision then
---        { ball | position = vecAdd ball.position velocity }
---
---    else
---        ball
-
-
 computeNewBallVelocity : Ball -> Vec
 computeNewBallVelocity ball =
     let
