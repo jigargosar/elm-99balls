@@ -65,9 +65,9 @@ randomBall =
     Random.map5 Ball
         --(randomVecInRadii sri)
         (Random.choices
-            (randomVec (sri.x - 10) sri.x -sri.y sri.y)
-            [ randomVec -sri.x (-sri.x + 10) -sri.y sri.y
-            , rv (rfO sri.x) (rfSO -sri.y 10)
+            (rv (rf -sri.x (-sri.x + 10)) (rfO sri.y))
+            [ rv (rf (sri.x - 10) sri.x) (rfO sri.y)
+            , rv (rfO sri.x) (rf -sri.y (-sri.y + 10))
             , rv (rfO sri.x) (rf sri.y (sri.y - 10))
             ]
         )
@@ -93,10 +93,6 @@ rfO o =
 rfMO : Float -> Float -> Generator Float
 rfMO m o =
     rf (m - o) (m + o)
-
-
-rfSO s o =
-    rf s (s + o)
 
 
 type alias Edge =
