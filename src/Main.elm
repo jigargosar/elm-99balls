@@ -64,12 +64,12 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 Ball
+    Random.map5 (\p a _ h r -> Ball p a (pxPerSecond r) h r)
         randomBallPosition
         --angle
         (Random.float 0 (turns 1))
         --speed
-        (Random.float 1 2)
+        (Random.float (pxPerSecond 20) (pxPerSecond 20))
         --hue
         (Random.float 0 1)
         --radius
@@ -213,6 +213,18 @@ fps =
 
 frameDelay =
     1000 / fps
+
+
+deltaMilli =
+    1000 / fps
+
+
+deltaSec =
+    deltaMilli / 1000
+
+
+pxPerSecond rate =
+    rate * deltaSec
 
 
 updateFrames : Float -> Model -> Model
