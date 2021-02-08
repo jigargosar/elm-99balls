@@ -66,7 +66,10 @@ randomBall =
         --(randomVecInRadii sri)
         (Random.choices
             (randomVec (sri.x - 10) sri.x -sri.y sri.y)
-            [ randomVec -sri.x (-sri.x + 10) -sri.y sri.y ]
+            [ randomVec -sri.x (-sri.x + 10) -sri.y sri.y
+            , randomVec (sri.x - 10) sri.x -sri.y sri.y
+            , randomVec -sri.x (-sri.x + 10) -sri.y sri.y
+            ]
         )
         (Random.float 0 (turns 1))
         (Random.float 1 2)
