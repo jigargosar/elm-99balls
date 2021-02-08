@@ -63,12 +63,12 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 (\p a _ h r -> Ball p a r h r)
+    Random.map5 Ball
         randomBallPosition
         --angle
         (Random.float 0 (turns 1))
         --speed
-        (Random.float 20 20)
+        (Random.float 1 2)
         --hue
         (Random.float 0 1)
         --radius
