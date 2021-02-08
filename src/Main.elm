@@ -371,7 +371,7 @@ viewBalls balls =
     Svg.g [] (List.map viewBall balls)
 
 
-viewBallHelper x y nx ny radius hue trace =
+viewBallHelper x y nx ny radius hue =
     let
         color =
             Paint (Color.hsl hue 0.7 0.6)
@@ -391,12 +391,14 @@ viewBallHelper x y nx ny radius hue trace =
             , Px.strokeWidth 1
             ]
             []
-        , polyPoints [ T.fill color ] (List.reverse trace)
+
+        --, polyPoints [ T.fill color ] (List.reverse trace)
         ]
 
 
-polyPoints aa pts =
-    Svg.g aa (List.map (\p -> Svg.circle [ Px.r 1, T.transform [ Translate p.x p.y ] ] []) pts)
+
+--polyPoints aa pts =
+--    Svg.g aa (List.map (\p -> Svg.circle [ Px.r 1, T.transform [ Translate p.x p.y ] ] []) pts)
 
 
 viewBall : Ball -> Svg Msg
@@ -409,7 +411,7 @@ viewBall ball =
             ( ball.radius, ball.angle )
                 |> fromPolar
     in
-    lazy7 viewBallHelper x y nx ny ball.radius ball.hue ball.trace
+    viewBallHelper x y nx ny ball.radius ball.hue
 
 
 rect w h xf aa =
