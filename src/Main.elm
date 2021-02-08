@@ -63,18 +63,22 @@ randomBalls =
 randomBall : Generator Ball
 randomBall =
     Random.map5 Ball
-        --(randomVecInRadii sri)
-        (Random.choices
-            (rv (rf -sri.x (-sri.x + 10)) (rfO sri.y))
-            [ rv (rf (sri.x - 10) sri.x) (rfO sri.y)
-            , rv (rfO sri.x) (rf -sri.y (-sri.y + 10))
-            , rv (rfO sri.x) (rf sri.y (sri.y - 10))
-            ]
-        )
+        randomBallPosition
         (Random.float 0 (turns 1))
         (Random.float 1 2)
         (Random.float 0 1)
         (Random.float 10 16)
+
+
+randomBallPosition : Generator Vec
+randomBallPosition =
+    --(randomVecInRadii sri)
+    Random.choices
+        (rv (rf -sri.x (-sri.x + 10)) (rfO sri.y))
+        [ rv (rf (sri.x - 10) sri.x) (rfO sri.y)
+        , rv (rfO sri.x) (rf -sri.y (-sri.y + 10))
+        , rv (rfO sri.x) (rf sri.y (sri.y - 10))
+        ]
 
 
 rv a b =
