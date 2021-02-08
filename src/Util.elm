@@ -58,6 +58,21 @@ vecUnitNormalFromTo from to =
         |> vecFromPolar
 
 
+vecAngle : Vec -> Float
+vecAngle { x, y } =
+    atan2 y x
+
+
+vecNormalize : Vec -> Vec
+vecNormalize v =
+    v |> vecToPolar |> Tuple.mapFirst (always 1) |> vecFromPolar
+
+
+vecScaleTo : Float -> Vec -> Vec
+vecScaleTo n =
+    vecNormalize >> vecScale n
+
+
 vecDotProduct : Vec -> Vec -> Float
 vecDotProduct a b =
     vecMap2 mul a b |> vecApply add
