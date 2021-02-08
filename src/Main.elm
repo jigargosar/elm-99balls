@@ -74,7 +74,9 @@ randomBallPosition : Generator Vec
 randomBallPosition =
     let
         gen e =
-            randomPointOnEdge e
+            Random.map2 (\p offset -> vecSub p (vecScaleTo offset p))
+                (randomPointOnEdge e)
+                (Random.float 0 10)
     in
     --(randomVecInRadii sri)
     randomOneOf (List.map gen edges)
