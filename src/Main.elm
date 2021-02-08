@@ -55,7 +55,7 @@ type alias Ball =
 
 randomBalls : Generator (List Ball)
 randomBalls =
-    Random.list 150 randomBall
+    Random.list 300 randomBall
 
 
 randomBall : Generator Ball
@@ -257,14 +257,7 @@ ballEdgeCollision ball edge =
 
         n =
             edge.normal
-
-        a =
-            vecFromTo edge.from ballPosition
-
-        c =
-            vecDotProduct a n
     in
-    --c < ball.radius && (vecDotProduct velocity n < 0)
     (sqDistPointSegment edge.from edge.to ballPosition <= ball.radius ^ 2)
         && (vecDotProduct velocity n < 0)
 
