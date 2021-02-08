@@ -372,22 +372,26 @@ viewBalls balls =
 
 
 viewBallHelper x y nx ny radius hue trace =
+    let
+        color =
+            Paint (Color.hsl hue 0.7 0.6)
+    in
     Svg.g []
         [ Svg.circle
             [ Px.r radius
             , T.transform [ Translate x y ]
-            , T.stroke (Paint (Color.hsl hue 0.7 0.6))
+            , T.stroke color
             , Px.strokeWidth 1
             ]
             []
         , Svg.polyline
             [ T.points (List.map vecToTuple [ vecZero, vec nx ny ])
             , T.transform [ Translate x y ]
-            , T.stroke (Paint (Color.hsl hue 0.7 0.6))
+            , T.stroke color
             , Px.strokeWidth 1
             ]
             []
-        , polyPoints [ T.fill (Paint (Color.hsl hue 0.7 0.6)) ] (List.reverse trace)
+        , polyPoints [ T.fill color ] (List.reverse trace)
         ]
 
 
