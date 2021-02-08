@@ -43,6 +43,7 @@ type alias Flags =
 
 type alias Model =
     { balls : List Ball
+    , frames : Int
     }
 
 
@@ -187,14 +188,32 @@ init _ =
         ( balls, _ ) =
             Random.step randomBalls initialSeed
     in
-    ( { balls = balls }, Cmd.none )
+    ( { balls = balls, frames = 0 }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick ->
-            ( { model | balls = List.map updateBall model.balls }, Cmd.none )
+            ( (if modBy 2 model.frames == 0 then
+                updateSim model
+
+               else
+                model
+              )
+                |> updateFrames
+            , Cmd.none
+            )
+
+
+updateFrames : Model -> Model
+updateFrames model =
+    { model | frames = model.frames + 1 }
+
+
+updateSim : Model -> Model
+updateSim model =
+    { model | balls = List.map updateBall model.balls }
 
 
 updateBall : Ball -> Ball
