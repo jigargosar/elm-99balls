@@ -354,14 +354,12 @@ viewBall ball =
     let
         ( x, y ) =
             vecToTuple ball.position
-                |> mapEach (round >> toFloat)
 
         ( nx, ny ) =
             ( ball.radius, ball.angle )
                 |> fromPolar
-                |> mapEach (round >> toFloat)
     in
-    Svg.Lazy.lazy6 viewBallHelper x y nx ny ball.radius ball.hue
+    viewBallHelper x y nx ny ball.radius ball.hue
 
 
 rect w h xf aa =
