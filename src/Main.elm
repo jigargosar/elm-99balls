@@ -245,8 +245,17 @@ computeNewBallVelocity ball =
             vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
 
 
+vecComponentAlong : Vec -> Vec -> Float
 vecComponentAlong directionVec =
     vecDotProduct (vecNormalize directionVec)
+
+
+vecAlong directionVec vec =
+    let
+        n =
+            vecNormalize directionVec
+    in
+    Debug.todo ""
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
