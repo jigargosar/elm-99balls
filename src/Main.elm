@@ -337,7 +337,7 @@ viewBall ball =
         , Svg.polyline
             [ T.points (List.map vecToTuple [ p1, p2 ])
             , T.stroke (Paint (Color.hsl ball.hue 0.7 0.6))
-            , Px.strokeWidth 2
+            , Px.strokeWidth 1
             ]
             []
         ]
