@@ -71,7 +71,7 @@ randomBall =
         --hue
         (Random.float 0 1)
         --radius
-        (Random.float 10 16)
+        (Random.int 10 16 |> Random.map toFloat)
 
 
 randomBallPosition : Generator Vec
