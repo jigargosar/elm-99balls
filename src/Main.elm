@@ -3,6 +3,7 @@ module Main exposing (main)
 import Browser
 import Color
 import Html exposing (Html)
+import List.Extra as List
 import Random exposing (Generator)
 import Random.Extra as Random
 import Svg exposing (Svg)
@@ -172,6 +173,24 @@ updateBall ball =
         ball
 
 
+computeNewBallVelocity : Ball -> Vec
+computeNewBallVelocity ball =
+    let
+        velocity =
+            vecFromRTheta ball.speed ball.angle
+    in
+    case List.find (ballEdgeCollision ball) edges of
+        Nothing ->
+            velocity
+
+        Just edge ->
+            let
+                n =
+                    edge.normal
+            in
+            vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
+
+
 ballEdgeCollision : Ball -> Edge -> Bool
 ballEdgeCollision ball edge =
     let
@@ -189,9 +208,6 @@ ballEdgeCollision ball edge =
 
         c =
             vecDotProduct a n
-
-        newVelocity =
-            vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
     in
     c <= ball.radius
 
