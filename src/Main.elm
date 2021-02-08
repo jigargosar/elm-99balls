@@ -8,6 +8,7 @@ import List.Extra as List
 import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
+import Svg.Keyed
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
@@ -289,15 +290,22 @@ view model =
         ]
         [ Svg.g [ T.transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
-            , Svg.g [] (List.map viewBall model.balls)
-            , Svg.g [] (List.map viewEdge edges)
-            , Svg.g [] (List.map viewEdgeNormal edges)
+            , viewBalls model.balls
+            , viewEdges
             ]
         ]
 
 
 scale s =
     Scale s s
+
+
+viewEdges : Svg Msg
+viewEdges =
+    Svg.g []
+        [ Svg.g [] (List.map viewEdge edges)
+        , Svg.g [] (List.map viewEdgeNormal edges)
+        ]
 
 
 viewEdge : Edge -> Svg Msg
@@ -314,6 +322,12 @@ viewEdgeNormal edge =
                 (edge.normal |> vecScale (sw * 0.1))
     in
     Svg.polyline [ T.points (edgePoints2 normal), S.stroke "blue", Px.strokeWidth 5 ] []
+
+
+viewBalls balls =
+    Svg.Keyed.node "group"
+        []
+        (List.indexedMap (\i ball -> ( String.fromInt i, viewBall ball )) balls)
 
 
 viewBall : Ball -> Svg Msg
