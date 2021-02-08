@@ -211,7 +211,7 @@ update message model =
 
 
 fps =
-    50
+    40
 
 
 frameDelay =
