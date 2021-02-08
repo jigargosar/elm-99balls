@@ -373,10 +373,7 @@ viewBalls balls =
 
 viewBallHelper x y nx ny radius hue =
     Svg.g [ T.stroke (Paint (Color.hsl hue 0.7 0.6)), T.transform [ Translate x y ] ]
-        [ Svg.circle
-            [ Px.r radius
-            ]
-            []
+        [ Svg.circle [ Px.r radius ] []
         , Svg.polyline [ T.points (List.map vecToTuple [ vecZero, vec nx ny ]) ] []
         ]
 
