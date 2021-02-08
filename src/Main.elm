@@ -239,12 +239,9 @@ ballEdgeCollision velocity ball edge =
     let
         nextPosition =
             vecAdd ball.position velocity
-
-        n =
-            edge.normal
     in
     (sqDistSegmentPoint ( edge.from, edge.to ) nextPosition <= ball.radius ^ 2)
-        && (vecDotProduct velocity n < 0)
+        && (vecDotProduct velocity edge.normal < 0)
 
 
 subscriptions : Model -> Sub Msg
