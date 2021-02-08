@@ -49,7 +49,8 @@ type alias Model =
 
 
 type alias Ball =
-    { position : Vec
+    { trace : List Vec
+    , position : Vec
     , angle : Float
     , speed : Float
     , hue : Float
@@ -64,7 +65,7 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 (\p a _ h r -> Ball p a (pps r) h r)
+    Random.map5 (\p a _ h r -> Ball [] p a (pps r) h r)
         randomBallPosition
         --angle
         (Random.float 0 (turns 1))
@@ -197,7 +198,9 @@ update message model =
     case message of
         OnTick delta ->
             ( (if model.elapsed + delta >= frameDelay then
-                updateSim model
+                model
+                    |> traceBalls
+                    |> updateSim
 
                else
                 model
@@ -235,6 +238,16 @@ updateFrames delta model =
 updateSim : Model -> Model
 updateSim model =
     { model | balls = List.map updateBall model.balls }
+
+
+traceBalls : Model -> Model
+traceBalls model =
+    { model | balls = List.map traceBall model.balls }
+
+
+traceBall : Ball -> Ball
+traceBall ball =
+    { ball | trace = ball.position :: ball.trace |> List.take fps }
 
 
 updateBall : Ball -> Ball
@@ -353,18 +366,26 @@ viewBalls balls =
     Svg.g [] (List.map viewBall balls)
 
 
-viewBallHelper x y nx ny radius hue =
-    Svg.g [ T.transform [ Translate x y ] ]
+viewBallHelper x y nx ny radius hue trace =
+    Svg.g []
         [ Svg.circle
             [ Px.r radius
+            , T.transform [ Translate x y ]
             , T.stroke (Paint (Color.hsl hue 0.7 0.6))
             , Px.strokeWidth 1
             ]
             []
         , Svg.polyline
             [ T.points (List.map vecToTuple [ vecZero, vec nx ny ])
+            , T.transform [ Translate x y ]
             , T.stroke (Paint (Color.hsl hue 0.7 0.6))
             , Px.strokeWidth 1
+            ]
+            []
+        , Svg.polyline
+            [ T.points (List.map vecToTuple trace)
+            , T.stroke (Paint (Color.hsl hue 0.7 0.6))
+            , Px.strokeWidth 0.5
             ]
             []
         ]
@@ -380,7 +401,7 @@ viewBall ball =
             ( ball.radius, ball.angle )
                 |> fromPolar
     in
-    viewBallHelper x y nx ny ball.radius ball.hue
+    viewBallHelper x y nx ny ball.radius ball.hue ball.trace
 
 
 rect w h xf aa =
