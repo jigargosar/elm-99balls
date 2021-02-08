@@ -74,7 +74,7 @@ randomBall =
         --hue
         (Random.float 0 1)
         --radius
-        (Random.int 5 20 |> Random.map toFloat)
+        (Random.int 5 50 |> Random.map toFloat)
 
 
 randomBallPosition : Generator Vec
