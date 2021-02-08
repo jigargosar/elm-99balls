@@ -231,11 +231,7 @@ computeNewBallVelocity ball =
             velocity
 
         Just edge ->
-            let
-                n =
-                    edge.normal
-            in
-            vecSub velocity (vecScale 2 (vecAlong n velocity))
+            vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
