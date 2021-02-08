@@ -211,7 +211,7 @@ update message model =
 
 
 fps =
-    33
+    50
 
 
 frameDelay =
@@ -223,12 +223,16 @@ pps rate =
 
 
 updateFrames : Float -> Model -> Model
-updateFrames delta model =
+updateFrames rawDelta model =
+    let
+        delta =
+            clamp 0 (2 * frameDelay) rawDelta
+    in
     { model
         | frames = model.frames + 1
         , elapsed =
             if model.elapsed + delta >= frameDelay then
-                0
+                model.elapsed + delta - frameDelay
 
             else
                 model.elapsed + delta
