@@ -6,8 +6,6 @@ import Color
 import Html exposing (Html)
 import List.Extra as List
 import Random exposing (Generator)
-import Random.Extra as Random
-import Random.List
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -81,24 +79,6 @@ randomBallPosition =
     --(randomVecInRadii sri)
     randomOneOf (List.map gen edges)
         |> Random.map (Maybe.withDefault vecZero)
-
-
-rv a b =
-    Random.map2 vec a b
-
-
-rf =
-    Random.float
-
-
-rfO : Float -> Generator Float
-rfO o =
-    rfMO 0 o
-
-
-rfMO : Float -> Float -> Generator Float
-rfMO m o =
-    rf (m - o) (m + o)
 
 
 type alias Edge =
