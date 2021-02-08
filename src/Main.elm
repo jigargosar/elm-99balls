@@ -233,7 +233,7 @@ computeNewBallVelocity ball =
         velocity =
             vecFromRTheta ball.speed ball.angle
     in
-    case List.find (ballEdgeCollision ball) edges of
+    case List.find (ballEdgeCollision velocity ball) edges of
         Nothing ->
             velocity
 
@@ -245,12 +245,9 @@ computeNewBallVelocity ball =
             vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
 
 
-ballEdgeCollision : Ball -> Edge -> Bool
-ballEdgeCollision ball edge =
+ballEdgeCollision : Vec -> Ball -> Edge -> Bool
+ballEdgeCollision velocity ball edge =
     let
-        velocity =
-            vecFromRTheta ball.speed ball.angle
-
         ballPosition =
             vecAdd ball.position velocity
 
