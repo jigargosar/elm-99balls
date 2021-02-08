@@ -2,6 +2,7 @@ module Util exposing (..)
 
 import Basics.Extra exposing (uncurry)
 import Random exposing (Generator)
+import Random.Extra as Random
 
 
 type alias Vec =
@@ -140,6 +141,16 @@ randomVec a b c d =
 randomVecInRadii : Vec -> Generator Vec
 randomVecInRadii ri =
     randomVec -ri.x ri.x -ri.y ri.y
+
+
+randomOneOf : List (Generator a) -> Maybe (Generator a)
+randomOneOf xs =
+    case xs of
+        [] ->
+            Nothing
+
+        h :: t ->
+            Just (Random.choices h t)
 
 
 add =
