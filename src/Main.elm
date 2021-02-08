@@ -21,7 +21,7 @@ import Util exposing (..)
 # Todo
 
   - implement TestMovingSphereSphere (RTC) and compute new ball velocity against single static ball.
-      - same with static ball list.
+      - same with static balls list.
   - check for ball edge tunnelling problem, since we are probably not doing continuous collision
 
 -}
