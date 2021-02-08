@@ -242,7 +242,7 @@ ballEdgeCollision ball edge =
         c =
             vecDotProduct a n
     in
-    c < ball.radius
+    c < ball.radius && (vecDotProduct velocity n < 0)
 
 
 subscriptions : Model -> Sub Msg
