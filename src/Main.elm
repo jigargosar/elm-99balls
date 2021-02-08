@@ -146,8 +146,7 @@ edges =
     in
     [ edgeFromTo leftTop rightTop
     , edgeFromTo rightTop rightBottom
-
-    --, edgeFromTo rightBottom leftBottom
+    , edgeFromTo rightBottom leftBottom
     , edgeFromTo leftBottom leftTop
     ]
 
