@@ -135,6 +135,17 @@ edgePoints { from, to } =
     [ from, to ]
 
 
+randomPointOnEdge : Edge -> Generator Vec
+randomPointOnEdge edge =
+    let
+        ( a, b ) =
+            ( edge.from, edge.to )
+    in
+    Random.map2 vec
+        (Random.float (min a.x b.x) (max a.x b.x))
+        (Random.float (min a.y b.y) (max a.y b.y))
+
+
 edgePoints2 : Edge -> List ( Float, Float )
 edgePoints2 =
     edgePoints >> List.map vecToTuple
