@@ -83,9 +83,9 @@ randomBallPosition =
                 (Random.float 0 10)
                 (randomVecOnLine e.from e.to)
     in
-    --(randomVecInRadii sri)
     randomOneOf (List.map gen edges)
         |> Random.map (Maybe.withDefault vecZero)
+        |> always (randomVecInRadii sri)
 
 
 type alias Edge =
