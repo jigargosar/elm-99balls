@@ -359,9 +359,7 @@ viewEdgeNormal edge =
 
 
 viewBalls balls =
-    Svg.g
-        []
-        (List.map viewBall balls)
+    Svg.g [] (List.map viewBall balls)
 
 
 viewBallHelper x y nx ny radius hue =
