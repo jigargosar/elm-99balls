@@ -44,6 +44,7 @@ type alias Flags =
 type alias Model =
     { balls : List Ball
     , frames : Int
+    , elapsed : Float
     }
 
 
@@ -176,7 +177,7 @@ sqDistSegmentPoint ( a, b ) c =
 
 
 type Msg
-    = OnTick
+    = OnTick Float
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -188,27 +189,39 @@ init _ =
         ( balls, _ ) =
             Random.step randomBalls initialSeed
     in
-    ( { balls = balls, frames = 0 }, Cmd.none )
+    ( { balls = balls, frames = 0, elapsed = 0 }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        OnTick ->
-            ( (if modBy 2 model.frames == 0 then
+        OnTick delta ->
+            ( (if model.elapsed + delta >= frameDelay then
                 updateSim model
 
                else
                 model
               )
-                |> updateFrames
+                |> updateFrames delta
             , Cmd.none
             )
 
 
-updateFrames : Model -> Model
-updateFrames model =
-    { model | frames = model.frames + 1 }
+frameDelay =
+    1000 / 50
+
+
+updateFrames : Float -> Model -> Model
+updateFrames delta model =
+    { model
+        | frames = model.frames + 1
+        , elapsed =
+            if model.elapsed + delta >= frameDelay then
+                0
+
+            else
+                model.elapsed + delta
+    }
 
 
 updateSim : Model -> Model
@@ -296,7 +309,7 @@ ballEdgeCollision velocity ball edge =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Browser.Events.onAnimationFrameDelta (always OnTick)
+        [ Browser.Events.onAnimationFrameDelta OnTick
         ]
 
 
