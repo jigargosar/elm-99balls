@@ -60,12 +60,12 @@ type alias Ball =
 
 randomBalls : Generator (List Ball)
 randomBalls =
-    Random.list 300 randomBall
+    Random.list 10 randomBall
 
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 (\p a _ h r -> Ball [] p a (pps r) h r)
+    Random.map5 (\p a _ h r -> Ball [] p a (pps (r * 10)) h r)
         randomBallPosition
         --angle
         (Random.float 0 (turns 1))
@@ -74,7 +74,7 @@ randomBall =
         --hue
         (Random.float 0 1)
         --radius
-        (Random.int 10 16 |> Random.map toFloat)
+        (Random.int 5 20 |> Random.map toFloat)
 
 
 randomBallPosition : Generator Vec
