@@ -152,6 +152,7 @@ edges =
     ]
 
 
+sqDistPointSegment : Vec -> Vec -> Vec -> Float
 sqDistPointSegment a b c =
     let
         ( ab, ac, bc ) =
