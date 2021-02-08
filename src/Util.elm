@@ -65,7 +65,7 @@ vecAngle { x, y } =
 
 vecNormalize : Vec -> Vec
 vecNormalize v =
-    v |> vecToPolar |> Tuple.mapFirst (always 1) |> vecFromPolar
+    vecFromPolar ( 1, vecAngle v )
 
 
 vecScaleTo : Float -> Vec -> Vec
