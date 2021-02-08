@@ -53,7 +53,7 @@ type alias Ball =
 
 randomBalls : Generator (List Ball)
 randomBalls =
-    Random.list 50 randomBall
+    Random.list 150 randomBall
 
 
 randomBall : Generator Ball
