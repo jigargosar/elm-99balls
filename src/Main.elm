@@ -152,6 +152,24 @@ edges =
     ]
 
 
+sqDistPointSegment a b c =
+    let
+        ( ab, ac, bc ) =
+            ( vecFromTo a b, vecFromTo a c, vecFromTo b c )
+
+        ( e, f ) =
+            ( vecDotProduct ac ab, vecDotProduct ab ab )
+    in
+    if e <= 0 then
+        vecDotProduct ab ab
+
+    else if e >= f then
+        vecDotProduct bc bc
+
+    else
+        vecDotProduct ac ac - e * e / f
+
+
 type Msg
     = OnTick
 
