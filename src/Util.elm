@@ -54,6 +54,11 @@ vecToPolar =
     vecToTuple >> toPolar
 
 
+vecMapR : (Float -> Float) -> Vec -> Vec
+vecMapR fn =
+    vecToPolar >> Tuple.mapFirst fn >> vecFromPolar
+
+
 vecMidpoint : Vec -> Vec -> Vec
 vecMidpoint from to =
     vecFromTo from to
