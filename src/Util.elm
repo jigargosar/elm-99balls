@@ -148,6 +148,13 @@ randomVecInRadii ri =
     randomVec -ri.x ri.x -ri.y ri.y
 
 
+randomVecOnLine : Vec -> Vec -> Generator Vec
+randomVecOnLine a b =
+    Random.map2 vec
+        (Random.float (min a.x b.x) (max a.x b.x))
+        (Random.float (min a.y b.y) (max a.y b.y))
+
+
 randomOneOf : List (Generator a) -> Generator (Maybe a)
 randomOneOf xs =
     case xs of
