@@ -48,8 +48,7 @@ type alias Model =
 
 
 type alias Ball =
-    { trace : List Vec
-    , position : Vec
+    { position : Vec
     , angle : Float
     , speed : Float
     , hue : Float
@@ -64,7 +63,7 @@ randomBalls =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 (\p a _ h r -> Ball [] p a r h r)
+    Random.map5 (\p a _ h r -> Ball p a r h r)
         randomBallPosition
         --angle
         (Random.float 0 (turns 1))
