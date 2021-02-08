@@ -57,10 +57,14 @@ vecMidpoint from to =
 
 vecUnitNormalFromTo : Vec -> Vec -> Vec
 vecUnitNormalFromTo from to =
-    vecFromTo from to
-        |> vecToPolar
-        |> Tuple.mapBoth (always 1) (add (turns 0.25))
-        |> vecFromPolar
+    vecAngleFromTo from to
+        |> add (turns 0.25)
+        |> vecFromAngle
+
+
+vecAngleFromTo : Vec -> Vec -> Float
+vecAngleFromTo a b =
+    vecFromTo a b |> vecAngle
 
 
 vecAngle : Vec -> Float
