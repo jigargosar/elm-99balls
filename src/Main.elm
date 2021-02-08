@@ -9,6 +9,7 @@ import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Svg.Keyed
+import Svg.Lazy
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (Paint(..), Transform(..))
@@ -246,17 +247,18 @@ computeNewBallVelocity ball =
             vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
 
 
-vecComponentAlong : Vec -> Vec -> Float
-vecComponentAlong directionVec =
-    vecDotProduct (vecNormalize directionVec)
 
-
-vecAlong directionVec vec =
-    let
-        n =
-            vecNormalize directionVec
-    in
-    Debug.todo ""
+--vecComponentAlong : Vec -> Vec -> Float
+--vecComponentAlong directionVec =
+--    vecDotProduct (vecNormalize directionVec)
+--
+--
+--vecAlong directionVec vec =
+--    let
+--        n =
+--            vecNormalize directionVec
+--    in
+--    Debug.todo ""
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
@@ -325,27 +327,36 @@ viewEdgeNormal edge =
 
 
 viewBalls balls =
-    Svg.Keyed.node "group"
+    Svg.Keyed.node "g"
         []
-        (List.indexedMap (\i ball -> ( String.fromInt i, viewBall ball )) balls)
+        (List.indexedMap (\i ball -> ( String.fromInt i, Svg.Lazy.lazy viewBall ball )) balls)
 
 
-viewBall : Ball -> Svg Msg
-viewBall ball =
-    Svg.g [ T.transform [ vecApply Translate ball.position ] ]
+viewBallHelper x y angle radius hue =
+    Svg.g [ T.transform [ Translate x y ] ]
         [ Svg.circle
-            [ Px.r ball.radius
-            , T.stroke (Paint (Color.hsl ball.hue 0.7 0.6))
+            [ Px.r radius
+            , T.stroke (Paint (Color.hsl hue 0.7 0.6))
             , Px.strokeWidth 1
             ]
             []
         , Svg.polyline
-            [ T.points (List.map vecToTuple [ vecZero, vecFromRTheta ball.radius ball.angle ])
-            , T.stroke (Paint (Color.hsl ball.hue 0.7 0.6))
+            [ T.points (List.map vecToTuple [ vecZero, vecFromRTheta radius angle ])
+            , T.stroke (Paint (Color.hsl hue 0.7 0.6))
             , Px.strokeWidth 1
             ]
             []
         ]
+
+
+viewBall : Ball -> Svg Msg
+viewBall ball =
+    let
+        ( x, y ) =
+            vecToTuple ball.position
+                |> mapEach (round >> toFloat)
+    in
+    viewBallHelper x y ball.angle ball.radius ball.hue
 
 
 rect w h xf aa =
