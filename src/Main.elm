@@ -385,7 +385,7 @@ viewBallHelper x y nx ny radius hue trace =
         , Svg.polyline
             [ T.points (List.map vecToTuple trace)
             , T.stroke (Paint (Color.hsl hue 0.7 0.6))
-            , Px.strokeWidth 0.5
+            , Px.strokeWidth 3
             ]
             []
         ]
