@@ -329,10 +329,10 @@ viewEdgeNormal edge =
 viewBalls balls =
     Svg.Keyed.node "g"
         []
-        (List.indexedMap (\i ball -> ( String.fromInt i, Svg.Lazy.lazy viewBall ball )) balls)
+        (List.indexedMap (\i ball -> ( String.fromInt i, viewBall ball )) balls)
 
 
-viewBallHelper x y angle radius hue =
+viewBallHelper x y nx ny radius hue =
     Svg.g [ T.transform [ Translate x y ] ]
         [ Svg.circle
             [ Px.r radius
@@ -341,7 +341,7 @@ viewBallHelper x y angle radius hue =
             ]
             []
         , Svg.polyline
-            [ T.points (List.map vecToTuple [ vecZero, vecFromRTheta radius angle ])
+            [ T.points (List.map vecToTuple [ vecZero, vec nx ny ])
             , T.stroke (Paint (Color.hsl hue 0.7 0.6))
             , Px.strokeWidth 1
             ]
@@ -355,8 +355,13 @@ viewBall ball =
         ( x, y ) =
             vecToTuple ball.position
                 |> mapEach (round >> toFloat)
+
+        ( nx, ny ) =
+            ( ball.radius, ball.angle )
+                |> fromPolar
+                |> mapEach (round >> toFloat)
     in
-    viewBallHelper x y ball.angle ball.radius ball.hue
+    Svg.Lazy.lazy6 viewBallHelper x y nx ny ball.radius ball.hue
 
 
 rect w h xf aa =
