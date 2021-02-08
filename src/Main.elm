@@ -248,13 +248,13 @@ computeNewBallVelocity ball =
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
 ballEdgeCollision velocity ball edge =
     let
-        ballPosition =
+        nextPosition =
             vecAdd ball.position velocity
 
         n =
             edge.normal
     in
-    (sqDistSegmentPoint ( edge.from, edge.to ) ballPosition <= ball.radius ^ 2)
+    (sqDistSegmentPoint ( edge.from, edge.to ) nextPosition <= ball.radius ^ 2)
         && (vecDotProduct velocity n < 0)
 
 
