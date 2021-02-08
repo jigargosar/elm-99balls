@@ -207,8 +207,12 @@ update message model =
             )
 
 
+fps =
+    33
+
+
 frameDelay =
-    1000 / 33
+    1000 / fps
 
 
 updateFrames : Float -> Model -> Model
