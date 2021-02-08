@@ -15,11 +15,11 @@ import Util exposing (..)
 
 
 sw =
-    400
+    600
 
 
 sh =
-    400
+    800
 
 
 sri =
@@ -146,7 +146,8 @@ edges =
     in
     [ edgeFromTo leftTop rightTop
     , edgeFromTo rightTop rightBottom
-    , edgeFromTo rightBottom leftBottom
+
+    --, edgeFromTo rightBottom leftBottom
     , edgeFromTo leftBottom leftTop
     ]
 
@@ -261,7 +262,7 @@ view model =
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ Svg.g [ T.transform [ scale 0.9 ] ]
+        [ Svg.g [ T.transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
             , Svg.g [] (List.map viewBall model.balls)
             , Svg.g [] (List.map viewEdge edges)
