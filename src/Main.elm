@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Events
 import Color
 import Html exposing (Html)
 import List.Extra as List
@@ -231,7 +232,7 @@ ballEdgeCollision ball edge =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Time.every (1000 / 50) (always OnTick)
+        [ Browser.Events.onAnimationFrameDelta (always OnTick)
         ]
 
 
