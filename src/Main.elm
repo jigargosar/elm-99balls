@@ -382,8 +382,7 @@ viewBallHelper x y nx ny radius hue trace =
             , Px.strokeWidth 1
             ]
             []
-        , polyPoints [ T.fill (Paint (Color.hsl hue 0.7 0.6)) ]
-            trace
+        , polyPoints [ T.fill (Paint (Color.hsl hue 0.7 0.6)) ] trace
         ]
 
 
