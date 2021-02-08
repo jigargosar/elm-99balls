@@ -382,13 +382,16 @@ viewBallHelper x y nx ny radius hue trace =
             , Px.strokeWidth 1
             ]
             []
-        , Svg.polyline
-            [ T.points (List.map vecToTuple trace)
-            , T.stroke (Paint (Color.hsl hue 0.7 0.6))
-            , Px.strokeWidth 3
+        , polyPoints
+            [ T.stroke (Paint (Color.hsl hue 0.7 0.6))
+            , Px.strokeWidth 2
             ]
-            []
+            trace
         ]
+
+
+polyPoints aa pts =
+    Svg.g aa (List.map (\p -> Svg.circle [ Px.r 1, T.transform [ Translate p.x p.y ] ] []) pts)
 
 
 viewBall : Ball -> Svg Msg
