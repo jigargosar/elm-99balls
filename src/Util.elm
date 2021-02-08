@@ -14,6 +14,11 @@ vec a b =
     Vec a b
 
 
+vecZero : Vec
+vecZero =
+    vec 0 0
+
+
 vecFromTuple : ( Float, Float ) -> Vec
 vecFromTuple ( a, b ) =
     vec a b
@@ -143,14 +148,15 @@ randomVecInRadii ri =
     randomVec -ri.x ri.x -ri.y ri.y
 
 
-randomOneOf : List (Generator a) -> Maybe (Generator a)
+randomOneOf : List (Generator a) -> Generator (Maybe a)
 randomOneOf xs =
     case xs of
         [] ->
-            Nothing
+            Random.constant Nothing
 
         h :: t ->
-            Just (Random.choices h t)
+            Random.choices h t
+                |> Random.map Just
 
 
 add =

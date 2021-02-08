@@ -73,12 +73,8 @@ randomBall =
 randomBallPosition : Generator Vec
 randomBallPosition =
     --(randomVecInRadii sri)
-    Random.choices
-        (rv (rf -sri.x (-sri.x + 10)) (rfO sri.y))
-        [ rv (rf (sri.x - 10) sri.x) (rfO sri.y)
-        , rv (rfO sri.x) (rf -sri.y (-sri.y + 10))
-        , rv (rfO sri.x) (rf sri.y (sri.y - 10))
-        ]
+    randomOneOf (List.map randomPointOnEdge edges)
+        |> Random.map (Maybe.withDefault vecZero)
 
 
 rv a b =
