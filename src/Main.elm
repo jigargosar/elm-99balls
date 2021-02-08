@@ -67,14 +67,36 @@ randomBall =
         (Random.choices
             (randomVec (sri.x - 10) sri.x -sri.y sri.y)
             [ randomVec -sri.x (-sri.x + 10) -sri.y sri.y
-            , randomVec (sri.x - 10) sri.x -sri.y sri.y
-            , randomVec -sri.x (-sri.x + 10) -sri.y sri.y
+            , rv (rfO sri.x) (rfSO -sri.y 10)
+            , rv (rfO sri.x) (rf sri.y (sri.y - 10))
             ]
         )
         (Random.float 0 (turns 1))
         (Random.float 1 2)
         (Random.float 0 1)
         (Random.float 10 16)
+
+
+rv a b =
+    Random.map2 vec a b
+
+
+rf =
+    Random.float
+
+
+rfO : Float -> Generator Float
+rfO o =
+    rfMO 0 o
+
+
+rfMO : Float -> Float -> Generator Float
+rfMO m o =
+    rf (m - o) (m + o)
+
+
+rfSO s o =
+    rf s (s + o)
 
 
 type alias Edge =
