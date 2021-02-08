@@ -1,6 +1,7 @@
 module Util exposing (..)
 
 import Basics.Extra exposing (uncurry)
+import Random exposing (Generator)
 
 
 type alias Vec =
@@ -105,6 +106,16 @@ vecScale s =
 vecNegate : Vec -> Vec
 vecNegate =
     vecScale -1
+
+
+randomVec : Float -> Float -> Float -> Float -> Generator Vec
+randomVec a b c d =
+    Random.map2 vec (Random.float a b) (Random.float c d)
+
+
+randomVecInRadii : Vec -> Generator Vec
+randomVecInRadii ri =
+    randomVec -ri.x ri.x -ri.y ri.y
 
 
 add =

@@ -77,16 +77,6 @@ randomBall =
         (Random.float 10 16)
 
 
-randomVec : Float -> Float -> Float -> Float -> Generator Vec
-randomVec a b c d =
-    Random.map2 vec (Random.float a b) (Random.float c d)
-
-
-randomVecInRadii : Vec -> Generator Vec
-randomVecInRadii ri =
-    randomVec -ri.x ri.x -ri.y ri.y
-
-
 type alias Edge =
     { from : Vec
     , to : Vec
