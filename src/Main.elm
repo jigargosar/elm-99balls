@@ -223,19 +223,21 @@ pps rate =
 
 
 updateFrames : Float -> Model -> Model
-updateFrames rawDelta model =
+updateFrames delta model =
     let
-        delta =
-            clamp 0 (2 * frameDelay) rawDelta
+        elapsed =
+            model.elapsed + delta
     in
     { model
         | frames = model.frames + 1
         , elapsed =
-            if model.elapsed + delta >= frameDelay then
-                model.elapsed + delta - frameDelay
+            (if elapsed >= frameDelay then
+                elapsed - frameDelay
 
-            else
-                model.elapsed + delta
+             else
+                elapsed
+            )
+                |> clamp 0 (frameDelay * 1.9)
     }
 
 
