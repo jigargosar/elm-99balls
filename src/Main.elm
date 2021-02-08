@@ -189,6 +189,9 @@ ballEdgeCollision ball edge =
 
         c =
             vecDotProduct a n
+
+        newVelocity =
+            vecSub velocity (vecScale 2 (vecScale (vecDotProduct n velocity) n))
     in
     c <= ball.radius
 
