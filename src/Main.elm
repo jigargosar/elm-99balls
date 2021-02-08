@@ -152,8 +152,8 @@ edges =
     ]
 
 
-sqDistPointSegment : ( Vec, Vec ) -> Vec -> Float
-sqDistPointSegment ( a, b ) c =
+sqDistSegmentPoint : ( Vec, Vec ) -> Vec -> Float
+sqDistSegmentPoint ( a, b ) c =
     -- Book: realtime collision detection
     -- Page 130
     let
@@ -258,7 +258,7 @@ ballEdgeCollision ball edge =
         n =
             edge.normal
     in
-    (sqDistPointSegment ( edge.from, edge.to ) ballPosition <= ball.radius ^ 2)
+    (sqDistSegmentPoint ( edge.from, edge.to ) ballPosition <= ball.radius ^ 2)
         && (vecDotProduct velocity n < 0)
 
 
