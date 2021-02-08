@@ -215,15 +215,6 @@ frameDelay =
     1000 / fps
 
 
-
---deltaMilli =
---    1000 / fps
---
---
---deltaSec =
---    deltaMilli / 1000
-
-
 pps rate =
     rate * (1 / fps)
 
