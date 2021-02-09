@@ -259,6 +259,9 @@ updateBall ( ball, otherBalls ) =
                             if t > 1 then
                                 velocity
 
+                            else if t == 0 then
+                                velocity
+
                             else
                                 let
                                     otherPositionAtT =
