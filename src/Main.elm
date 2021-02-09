@@ -22,6 +22,8 @@ import Util exposing (..)
   - [x] implement TestMovingSphereSphere (RTC) and compute new ball velocity against single static ball.
       - [x] same with static balls list.
 
+  - fix: multiple collision i.e.
+
   - fix: ball edge tunnelling problem, since we are not doing continuous collision
 
 -}
