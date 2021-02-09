@@ -183,6 +183,83 @@ randomOneOf xs =
                 |> Random.map Just
 
 
+sqDistSegmentPoint : ( Vec, Vec ) -> Vec -> Float
+sqDistSegmentPoint ( a, b ) c =
+    -- Book: realtime collision detection
+    -- Page 130
+    let
+        ( ab, ac, bc ) =
+            ( vecFromTo a b, vecFromTo a c, vecFromTo b c )
+
+        ( e, f ) =
+            ( vecDotProduct ac ab, vecDotProduct ab ab )
+    in
+    if e <= 0 then
+        vecDotProduct ab ab
+
+    else if e >= f then
+        vecDotProduct bc bc
+
+    else
+        vecDotProduct ac ac - e * e / f
+
+
+testMovingSphereSphere : ( ( Vec, Float ), Vec ) -> ( ( Vec, Float ), Vec ) -> Maybe Float
+testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
+    -- Book: realtime collision detection
+    -- Page 223
+    let
+        s =
+            vecFromTo ac bc
+
+        r =
+            ar + br
+
+        c =
+            vecDotProduct s s - r ^ 2
+    in
+    if c < 0 then
+        -- Exit early if already colliding
+        --Just 0
+        Nothing
+        -- Mod: Ensuring that circles are approaching one another if already colliding
+        --if vecDotProduct av bv < 0 then
+        --    Just 0
+        --
+        --else
+        --    Nothing
+
+    else
+        let
+            v =
+                vecFromTo av bv
+
+            a =
+                vecDotProduct v v
+        in
+        if a < 0.001 then
+            Nothing
+
+        else
+            let
+                b =
+                    vecDotProduct v s
+            in
+            if b >= 0 then
+                Nothing
+
+            else
+                let
+                    d =
+                        b ^ 2 - a * c
+                in
+                if d < 0 then
+                    Nothing
+
+                else
+                    Just ((-b - sqrt d) / a)
+
+
 add =
     (+)
 
