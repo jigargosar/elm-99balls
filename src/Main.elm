@@ -223,15 +223,11 @@ updateBall staticBalls ball =
                             mbc =
                                 List.filterMap
                                     (\other ->
-                                        let
-                                            otherVelocity =
-                                                vecZero
-                                        in
                                         testMovingSphereSphere
                                             ( ( ball.position, ball.radius ), velocity )
-                                            ( ( other.position, other.radius ), otherVelocity )
-                                            |> Maybe.filter (\t -> t > 0 && t <= 1)
-                                            |> Maybe.map (\t -> ( t, ( other, otherVelocity ) ))
+                                            ( ( other.position, other.radius ), vecZero )
+                                            |> Maybe.filter (\t -> t >= 0 && t <= 1)
+                                            |> Maybe.map (\t -> ( t, other ))
                                     )
                                     staticBalls
                                     |> List.minimumBy Tuple.first
@@ -240,10 +236,10 @@ updateBall staticBalls ball =
                             Nothing ->
                                 Nothing
 
-                            Just ( t, ( other, otherVelocity ) ) ->
+                            Just ( t, other ) ->
                                 let
                                     otherPositionAtT =
-                                        vecAdd other.position (otherVelocity |> vecScale t)
+                                        other.position
 
                                     ballPositionAtT =
                                         vecAdd ball.position (velocity |> vecScale t)
