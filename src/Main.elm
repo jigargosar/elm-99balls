@@ -241,6 +241,46 @@ updateBall staticBalls ball =
     setBallVelocityAndUpdatePosition newVelocity ball
 
 
+type BallCollision
+    = BallEdgeCollision Edge
+    | BallStaticBallCollision Ball
+
+
+updateBall2 : List Ball -> Ball -> Ball
+updateBall2 staticBalls ball =
+    let
+        velocity =
+            ballVelocity ball
+    in
+    case detectBallCollision staticBalls velocity ball of
+        Nothing ->
+            setBallVelocityAndUpdatePosition velocity ball
+
+        Just ( t, collision ) ->
+            let
+                newVelocity =
+                    case collision of
+                        BallEdgeCollision edge ->
+                            vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
+
+                        BallStaticBallCollision other ->
+                            let
+                                ballPositionAtT =
+                                    vecAdd ball.position (velocity |> vecScale t)
+
+                                normal =
+                                    vecFromTo ballPositionAtT other.position
+                            in
+                            vecSub velocity (vecScale 2 (vecAlong normal velocity))
+            in
+            setBallVelocityAndUpdatePosition newVelocity ball
+
+
+detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
+detectBallCollision staticBalls velocity ball =
+    Debug.todo ""
+
+
 ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
 ballVelocityOnFirstStaticBallCollision staticBalls velocity ball =
     ballStaticBallsCollision staticBalls velocity ball
