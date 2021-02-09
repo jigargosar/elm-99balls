@@ -224,23 +224,6 @@ updateSim model =
     }
 
 
-updateBall1 : List Ball -> Ball -> Ball
-updateBall1 staticBalls ball =
-    let
-        velocity =
-            ballVelocity ball
-
-        newVelocity =
-            ballVelocityOnEdgesCollision velocity ball
-                |> Maybe.orElseLazy
-                    (\_ ->
-                        ballVelocityOnFirstStaticBallCollision staticBalls velocity ball
-                    )
-                |> Maybe.withDefault velocity
-    in
-    setBallVelocityAndUpdatePosition newVelocity ball
-
-
 type BallCollision
     = BallEdgeCollision Edge
     | BallStaticBallCollision Ball
@@ -306,47 +289,6 @@ detectBallEdgesCollision velocity ball =
         |> List.find (ballEdgeCollision velocity ball)
         |> Maybe.map (\e -> [ ( 0, BallEdgeCollision e ) ])
         |> Maybe.withDefault []
-
-
-ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
-ballVelocityOnFirstStaticBallCollision staticBalls velocity ball =
-    ballStaticBallsCollision staticBalls velocity ball
-        |> Maybe.map
-            (\( t, other ) ->
-                let
-                    ballPositionAtT =
-                        vecAdd ball.position (velocity |> vecScale t)
-
-                    normal =
-                        vecFromTo ballPositionAtT other.position
-                in
-                vecSub velocity (vecScale 2 (vecAlong normal velocity))
-            )
-
-
-ballStaticBallsCollision : List Ball -> Vec -> Ball -> Maybe ( Float, Ball )
-ballStaticBallsCollision staticBalls velocity ball =
-    List.filterMap
-        (\other ->
-            testMovingSphereSphere
-                ( ( ball.position, ball.radius ), velocity )
-                ( ( other.position, other.radius ), vecZero )
-                |> Maybe.filter (\t -> t >= 0 && t <= 1)
-                |> Maybe.map (\t -> ( t, other ))
-        )
-        staticBalls
-        |> List.minimumBy Tuple.first
-
-
-ballVelocityOnEdgesCollision : Vec -> Ball -> Maybe Vec
-ballVelocityOnEdgesCollision velocity ball =
-    let
-        newVelocityHelp edge =
-            vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
-    in
-    edges
-        |> List.find (ballEdgeCollision velocity ball)
-        |> Maybe.map newVelocityHelp
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
