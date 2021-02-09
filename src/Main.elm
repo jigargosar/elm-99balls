@@ -190,6 +190,60 @@ sqDistSegmentPoint ( a, b ) c =
         vecDotProduct ac ac - e * e / f
 
 
+testMovingSphereSphere : ( ( Vec, Float ), Vec ) -> ( ( Vec, Float ), Vec ) -> Maybe Float
+testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
+    let
+        s =
+            vecFromTo ac bc
+
+        r =
+            ar + br
+
+        c =
+            vecDotProduct s s - r ^ 2
+    in
+    if c < 0 then
+        -- Exit early if already colliding
+        --Just 0
+        Nothing
+        -- Mod: Ensuring that circles are approaching one another if already colliding
+        --if vecDotProduct av bv < 0 then
+        --    Just 0
+        --
+        --else
+        --    Nothing
+
+    else
+        let
+            v =
+                vecFromTo av bv
+
+            a =
+                vecDotProduct v v
+        in
+        if a < 0.001 then
+            Nothing
+
+        else
+            let
+                b =
+                    vecDotProduct v s
+            in
+            if b >= 0 then
+                Nothing
+
+            else
+                let
+                    d =
+                        b ^ 2 - a * c
+                in
+                if d < 0 then
+                    Nothing
+
+                else
+                    Just ((-b - sqrt d) / a)
+
+
 type Msg
     = OnTick Float
 
@@ -288,60 +342,6 @@ updateBall staticBalls ball =
         | position = vecAdd ball.position (vecFromRTheta ball.speed angle)
         , angle = angle
     }
-
-
-testMovingSphereSphere : ( ( Vec, Float ), Vec ) -> ( ( Vec, Float ), Vec ) -> Maybe Float
-testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
-    let
-        s =
-            vecFromTo ac bc
-
-        r =
-            ar + br
-
-        c =
-            vecDotProduct s s - r ^ 2
-    in
-    if c < 0 then
-        -- Exit early if already colliding
-        --Just 0
-        Nothing
-        -- Mod: Ensuring that circles are approaching one another if already colliding
-        --if vecDotProduct av bv < 0 then
-        --    Just 0
-        --
-        --else
-        --    Nothing
-
-    else
-        let
-            v =
-                vecFromTo av bv
-
-            a =
-                vecDotProduct v v
-        in
-        if a < 0.001 then
-            Nothing
-
-        else
-            let
-                b =
-                    vecDotProduct v s
-            in
-            if b >= 0 then
-                Nothing
-
-            else
-                let
-                    d =
-                        b ^ 2 - a * c
-                in
-                if d < 0 then
-                    Nothing
-
-                else
-                    Just ((-b - sqrt d) / a)
 
 
 ballVelocityOnEdgesCollision : Vec -> Ball -> Maybe Vec
