@@ -238,14 +238,11 @@ updateBall staticBalls ball =
 
                             Just ( t, other ) ->
                                 let
-                                    otherPositionAtT =
-                                        other.position
-
                                     ballPositionAtT =
                                         vecAdd ball.position (velocity |> vecScale t)
 
                                     normal =
-                                        vecFromTo ballPositionAtT otherPositionAtT
+                                        vecFromTo ballPositionAtT other.position
                                 in
                                 vecSub velocity (vecScale 2 (vecAlong normal velocity))
                                     |> Just
