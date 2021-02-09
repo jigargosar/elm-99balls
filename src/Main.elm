@@ -256,7 +256,7 @@ updateBall ( ball, otherBalls ) =
                             velocity
 
                         Just ( t, ( other, otherVelocity ) ) ->
-                            if t > 1 then
+                            if t == 0 || t > 1 then
                                 velocity
 
                             else
