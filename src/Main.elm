@@ -215,22 +215,15 @@ updateBall staticBalls ball =
         velocity =
             ballVelocity ball
 
-        newAngle =
+        newVelocity =
             ballVelocityOnEdgesCollision velocity ball
                 |> Maybe.orElseLazy
                     (\_ ->
                         ballVelocityOnFirstStaticBallCollision staticBalls velocity ball
                     )
                 |> Maybe.withDefault velocity
-                |> vecAngle
-
-        newVelocity =
-            vecFromRTheta ball.speed newAngle
     in
-    { ball
-        | position = vecAdd ball.position newVelocity
-        , angle = newAngle
-    }
+    setBallVelocityAndUpdatePosition newVelocity ball
 
 
 setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
