@@ -99,6 +99,11 @@ randomBallPosition =
         |> always (randomVecInRadii sri)
 
 
+ballVelocity : Ball -> Vec
+ballVelocity ball =
+    vecFromRTheta ball.speed ball.angle
+
+
 type alias Edge =
     { from : Vec
     , to : Vec
@@ -229,11 +234,6 @@ updateBall ball =
         | position = vecAdd ball.position velocity
         , angle = angle
     }
-
-
-ballVelocity : Ball -> Vec
-ballVelocity ball =
-    vecFromRTheta ball.speed ball.angle
 
 
 testMovingBalls : Ball -> Ball -> Maybe Float
