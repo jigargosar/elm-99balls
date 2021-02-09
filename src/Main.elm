@@ -239,6 +239,12 @@ ballVelocity ball =
 testMovingSphereSphere : Ball -> Ball -> Maybe Float
 testMovingSphereSphere ba bb =
     let
+        ( ac, ar, av ) =
+            ( ba.position, ba.radius, ballVelocity ba )
+
+        ( bc, br, bv ) =
+            ( bb.position, bb.radius, ballVelocity bb )
+
         s =
             vecFromTo ba.position bb.position
 
@@ -253,9 +259,6 @@ testMovingSphereSphere ba bb =
 
     else
         let
-            ( av, bv ) =
-                ( ballVelocity ba, ballVelocity bb )
-
             v =
                 vecFromTo av bv
 
