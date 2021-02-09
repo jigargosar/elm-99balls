@@ -244,8 +244,8 @@ updateBall ( ball, otherBalls ) =
                                             ballVelocity other
                                     in
                                     testMovingSphereSphere
-                                        ( ball.position, ball.radius, velocity )
-                                        ( other.position, other.radius, otherVelocity )
+                                        ( ( ball.position, ball.radius ), velocity )
+                                        ( ( other.position, other.radius ), otherVelocity )
                                         |> Maybe.map (\t -> ( t, ( other, otherVelocity ) ))
                                 )
                                 otherBalls
@@ -288,8 +288,8 @@ updateBall ( ball, otherBalls ) =
     }
 
 
-testMovingSphereSphere : ( Vec, Float, Vec ) -> ( Vec, Float, Vec ) -> Maybe Float
-testMovingSphereSphere ( ac, ar, av ) ( bc, br, bv ) =
+testMovingSphereSphere : ( ( Vec, Float ), Vec ) -> ( ( Vec, Float ), Vec ) -> Maybe Float
+testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
     let
         s =
             vecFromTo ac bc
