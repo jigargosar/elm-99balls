@@ -53,8 +53,7 @@ type alias Flags =
 
 type alias Model =
     { balls : List Ball
-    , frames : Int
-    , elapsed : Float
+    , staticBalls : List Ball
     }
 
 
@@ -201,10 +200,15 @@ init _ =
         initialSeed =
             Random.initialSeed 0
 
-        ( balls, _ ) =
-            Random.step randomBalls initialSeed
+        ( ( balls, staticBalls ), _ ) =
+            Random.step
+                (Random.pair
+                    (Random.list 10 randomBall)
+                    (Random.list 20 randomBall)
+                )
+                initialSeed
     in
-    ( { balls = balls, frames = 0, elapsed = 0 }, Cmd.none )
+    ( { balls = balls, staticBalls = staticBalls }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
