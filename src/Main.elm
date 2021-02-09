@@ -104,6 +104,21 @@ ballVelocity ball =
     vecFromRTheta ball.speed ball.angle
 
 
+setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
+setBallVelocityAndUpdatePosition rawVelocity ball =
+    let
+        angle =
+            vecAngle rawVelocity
+
+        velocity =
+            vecFromRTheta ball.speed angle
+    in
+    { ball
+        | position = vecAdd ball.position velocity
+        , angle = angle
+    }
+
+
 type alias Edge =
     { from : Vec
     , to : Vec
@@ -224,21 +239,6 @@ updateBall staticBalls ball =
                 |> Maybe.withDefault velocity
     in
     setBallVelocityAndUpdatePosition newVelocity ball
-
-
-setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
-setBallVelocityAndUpdatePosition rawVelocity ball =
-    let
-        angle =
-            vecAngle rawVelocity
-
-        velocity =
-            vecFromRTheta ball.speed angle
-    in
-    { ball
-        | position = vecAdd ball.position velocity
-        , angle = angle
-    }
 
 
 ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
