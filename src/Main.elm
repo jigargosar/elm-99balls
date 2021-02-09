@@ -231,6 +231,60 @@ updateBall ball =
     }
 
 
+ballVelocity : Ball -> Vec
+ballVelocity ball =
+    vecFromRTheta ball.speed ball.angle
+
+
+testMovingSphereSphere : Ball -> Ball -> Maybe Float
+testMovingSphereSphere ba bb =
+    let
+        s =
+            vecFromTo ba.position bb.position
+
+        r =
+            ba.radius + bb.radius
+
+        c =
+            vecDotProduct s s - r ^ 2
+    in
+    if c < 0 then
+        Just 0
+
+    else
+        let
+            ( av, bv ) =
+                ( ballVelocity ba, ballVelocity bb )
+
+            v =
+                vecFromTo av bv
+
+            a =
+                vecDotProduct v v
+        in
+        if a < 0.001 then
+            Nothing
+
+        else
+            let
+                b =
+                    vecDotProduct v s
+            in
+            if b >= 0 then
+                Nothing
+
+            else
+                let
+                    d =
+                        b ^ 2 - a * c
+                in
+                if d < 0 then
+                    Nothing
+
+                else
+                    Just ((-b - sqrt d) / a)
+
+
 computeNewBallVelocity : Ball -> Vec
 computeNewBallVelocity ball =
     let
