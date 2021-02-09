@@ -225,13 +225,12 @@ updateSim model =
     { model
         | balls =
             model.balls
-                |> List.select
-                |> List.map updateBall
+                |> List.map (updateBall model.staticBalls)
     }
 
 
-updateBall : ( Ball, List Ball ) -> Ball
-updateBall ( ball, otherBalls ) =
+updateBall : List Ball -> Ball -> Ball
+updateBall otherBalls ball =
     let
         velocity =
             ballVelocity ball
