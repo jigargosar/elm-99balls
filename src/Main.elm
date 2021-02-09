@@ -5,6 +5,7 @@ import Browser.Events
 import Color
 import Html exposing (Html)
 import List.Extra as List
+import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -215,36 +216,31 @@ updateBall staticBalls ball =
             ballVelocity ball
 
         newVelocity =
-            case List.find (ballEdgeCollision velocity ball) edges of
-                Nothing ->
-                    let
-                        mbc =
-                            List.filterMap
-                                (\other ->
-                                    let
-                                        otherVelocity =
-                                            vecZero
-                                    in
-                                    testMovingSphereSphere
-                                        ( ( ball.position, ball.radius ), velocity )
-                                        ( ( other.position, other.radius ), otherVelocity )
-                                        |> Maybe.map (\t -> ( t, ( other, otherVelocity ) ))
-                                )
-                                staticBalls
-                                |> List.minimumBy Tuple.first
-                    in
-                    case mbc of
-                        Nothing ->
-                            velocity
+            ballVelocityOnEdgesCollision velocity ball
+                |> Maybe.orElseLazy
+                    (\_ ->
+                        let
+                            mbc =
+                                List.filterMap
+                                    (\other ->
+                                        let
+                                            otherVelocity =
+                                                vecZero
+                                        in
+                                        testMovingSphereSphere
+                                            ( ( ball.position, ball.radius ), velocity )
+                                            ( ( other.position, other.radius ), otherVelocity )
+                                            |> Maybe.filter (\t -> t > 0 && t <= 1)
+                                            |> Maybe.map (\t -> ( t, ( other, otherVelocity ) ))
+                                    )
+                                    staticBalls
+                                    |> List.minimumBy Tuple.first
+                        in
+                        case mbc of
+                            Nothing ->
+                                Nothing
 
-                        Just ( t, ( other, otherVelocity ) ) ->
-                            if t > 1 then
-                                velocity
-
-                            else if t == 0 then
-                                velocity
-
-                            else
+                            Just ( t, ( other, otherVelocity ) ) ->
                                 let
                                     otherPositionAtT =
                                         vecAdd other.position (otherVelocity |> vecScale t)
@@ -256,9 +252,9 @@ updateBall staticBalls ball =
                                         vecFromTo ballPositionAtT otherPositionAtT
                                 in
                                 vecSub velocity (vecScale 2 (vecAlong normal velocity))
-
-                Just edge ->
-                    vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
+                                    |> Just
+                    )
+                |> Maybe.withDefault velocity
 
         angle =
             vecAngle newVelocity
