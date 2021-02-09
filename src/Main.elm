@@ -285,7 +285,7 @@ detectBallCollision staticBalls velocity ball =
     Debug.todo ""
 
 
-detectBallStaticBallsCollision : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
+detectBallStaticBallsCollision : List Ball -> Vec -> Ball -> List ( Float, BallCollision )
 detectBallStaticBallsCollision staticBalls velocity ball =
     List.filterMap
         (\other ->
@@ -296,7 +296,6 @@ detectBallStaticBallsCollision staticBalls velocity ball =
                 |> Maybe.map (\t -> ( t, BallStaticBallCollision other ))
         )
         staticBalls
-        |> List.minimumBy Tuple.first
 
 
 ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
