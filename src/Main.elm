@@ -218,11 +218,16 @@ update message model =
 
 updateSim : Model -> Model
 updateSim model =
-    { model | balls = List.map updateBall model.balls }
+    { model
+        | balls =
+            model.balls
+                |> List.select
+                |> List.map updateBall
+    }
 
 
-updateBall : Ball -> Ball
-updateBall ball =
+updateBall : ( Ball, List Ball ) -> Ball
+updateBall ( ball, otherBalls ) =
     let
         angle =
             computeNewBallVelocity ball |> vecAngle
