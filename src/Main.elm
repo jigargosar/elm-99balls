@@ -305,13 +305,13 @@ testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
     in
     if c < 0 then
         -- Exit early if already colliding
-        --Just 0
+        Just 0
         -- Mod: Ensuring that circles are approaching one another if already colliding
-        if vecDotProduct av bv < 0 then
-            Just 0
-
-        else
-            Nothing
+        --if vecDotProduct av bv < 0 then
+        --    Just 0
+        --
+        --else
+        --    Nothing
 
     else
         let
