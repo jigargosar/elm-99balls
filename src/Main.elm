@@ -281,10 +281,6 @@ updateBall ( ball, otherBalls ) =
         angle =
             vecAngle newVelocity
     in
-    let
-        angle1 =
-            computeNewBallVelocity ball |> vecAngle
-    in
     { ball
         | position = vecAdd ball.position (vecFromRTheta ball.speed angle)
         , angle = angle
