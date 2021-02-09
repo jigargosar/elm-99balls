@@ -341,6 +341,17 @@ testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
                     Just ((-b - sqrt d) / a)
 
 
+ballVelocityOnEdgesCollision : Vec -> Ball -> Maybe Vec
+ballVelocityOnEdgesCollision velocity ball =
+    let
+        newVelocityHelp edge =
+            vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
+    in
+    edges
+        |> List.find (ballEdgeCollision velocity ball)
+        |> Maybe.map newVelocityHelp
+
+
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
 ballEdgeCollision velocity ball edge =
     let
