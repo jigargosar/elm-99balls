@@ -233,6 +233,21 @@ updateBall staticBalls ball =
     }
 
 
+updateBallPositionWithRawVelocity : Vec -> Ball -> Ball
+updateBallPositionWithRawVelocity rawVelocity ball =
+    let
+        angle =
+            vecAngle rawVelocity
+
+        velocity =
+            vecFromRTheta ball.speed angle
+    in
+    { ball
+        | position = vecAdd ball.position velocity
+        , angle = angle
+    }
+
+
 ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
 ballVelocityOnFirstStaticBallCollision staticBalls velocity ball =
     ballStaticBallsCollision staticBalls velocity ball
