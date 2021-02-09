@@ -286,49 +286,22 @@ detectBallStaticBallsCollision staticBalls velocity ball =
 
 detectBallEdgesCollision : Vec -> Ball -> List ( Float, BallCollision )
 detectBallEdgesCollision velocity ball =
-    edges
-        |> List.find (ballEdgeCollision velocity ball)
-        |> Maybe.map (\e -> [ ( 0, BallEdgeCollision e ) ])
-        |> Maybe.withDefault []
-
-
-intersectRaySphere : ( Vec, Vec ) -> ( Vec, Float ) -> Maybe Float
-intersectRaySphere ( p, d ) ( sc, sr ) =
-    let
-        m =
-            vecSub p sc
-
-        b =
-            vecDotProduct m d
-
-        c =
-            vecDotProduct m m - sr ^ 2
-    in
-    if c > 0 && b > 0 then
-        Nothing
-
-    else
-        let
-            discriminant =
-                b ^ 2 - c
-        in
-        if discriminant < 0 then
-            Nothing
-
-        else
-            (-b - sqrt discriminant)
-                |> atLeast 0
-                |> Just
-
-
-ballEdgeCollision : Vec -> Ball -> Edge -> Bool
-ballEdgeCollision velocity ball edge =
-    let
-        nextPosition =
-            vecAdd ball.position velocity
-    in
-    (sqDistSegmentPoint ( edge.from, edge.to ) nextPosition <= ball.radius ^ 2)
-        && (vecDotProduct velocity edge.normal < 0)
+    --ballEdgeCollision : Vec -> Ball -> Edge -> Bool
+    --ballEdgeCollision velocity ball edge =
+    --    let
+    --        nextPosition =
+    --            vecAdd ball.position velocity
+    --    in
+    --    (sqDistSegmentPoint ( edge.from, edge.to ) nextPosition <= ball.radius ^ 2)
+    --        && (vecDotProduct velocity edge.normal < 0)
+    List.filterMap
+        (\e ->
+            --intersectRaySphere ( e.from, vecNormalize (vecFromTo e.from e.to) ) ( ball.position, ball.radius )
+            testMovingSphereSphere ( ( ball.position, ball.radius ), velocity ) ( ( e.from, 1 ), vecFromTo e.from e.to )
+                |> Maybe.filter (\t -> t >= 0 && t <= 1 && vecDotProduct velocity e.normal < 0)
+                |> Maybe.map (\t -> ( t, BallEdgeCollision e ))
+        )
+        edges
 
 
 subscriptions : Model -> Sub Msg

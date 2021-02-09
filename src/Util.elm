@@ -1,6 +1,6 @@
 module Util exposing (..)
 
-import Basics.Extra exposing (uncurry)
+import Basics.Extra exposing (atLeast, uncurry)
 import Random exposing (Generator)
 import Random.Extra as Random
 
@@ -258,6 +258,35 @@ testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
 
                 else
                     Just ((-b - sqrt d) / a)
+
+
+intersectRaySphere : ( Vec, Vec ) -> ( Vec, Float ) -> Maybe Float
+intersectRaySphere ( p, d ) ( sc, sr ) =
+    let
+        m =
+            vecSub p sc
+
+        b =
+            vecDotProduct m d
+
+        c =
+            vecDotProduct m m - sr ^ 2
+    in
+    if c > 0 && b > 0 then
+        Nothing
+
+    else
+        let
+            discriminant =
+                b ^ 2 - c
+        in
+        if discriminant < 0 then
+            Nothing
+
+        else
+            (-b - sqrt discriminant)
+                |> atLeast 0
+                |> Just
 
 
 add =
