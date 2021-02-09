@@ -229,14 +229,55 @@ updateSim model =
 updateBall : ( Ball, List Ball ) -> Ball
 updateBall ( ball, otherBalls ) =
     let
+        velocity =
+            ballVelocity ball
+
+        _ =
+            case List.find (ballEdgeCollision velocity ball) edges of
+                Nothing ->
+                    let
+                        mbc =
+                            List.filterMap
+                                (\other ->
+                                    testMovingBalls ball other
+                                        |> Maybe.map (\t -> ( t, other ))
+                                )
+                                otherBalls
+                                |> List.minimumBy Tuple.first
+
+                        _ =
+                            case mbc of
+                                Nothing ->
+                                    velocity
+
+                                Just ( t, other ) ->
+                                    if t > 1 then
+                                        velocity
+
+                                    else
+                                        let
+                                            otherPositionAtT =
+                                                vecAdd other.position (ballVelocity other |> vecScale t)
+
+                                            ballPositionAtT =
+                                                vecAdd ball.position (ballVelocity ball |> vecScale t)
+
+                                            normal =
+                                                vecFromTo otherPositionAtT ballPositionAtT
+                                        in
+                                        vecSub velocity (vecScale 2 (vecAlong normal velocity))
+                    in
+                    velocity
+
+                Just edge ->
+                    vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
+    in
+    let
         angle =
             computeNewBallVelocity ball |> vecAngle
-
-        velocity =
-            vecFromRTheta ball.speed angle
     in
     { ball
-        | position = vecAdd ball.position velocity
+        | position = vecAdd ball.position (vecFromRTheta ball.speed angle)
         , angle = angle
     }
 
