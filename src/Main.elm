@@ -275,16 +275,16 @@ updateBall ( ball, otherBalls ) =
                 Just edge ->
                     vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
 
-        angle2 =
+        angle =
             vecAngle newVelocity
     in
     let
-        angle =
+        angle1 =
             computeNewBallVelocity ball |> vecAngle
     in
     { ball
-        | position = vecAdd ball.position (vecFromRTheta ball.speed angle2)
-        , angle = angle2
+        | position = vecAdd ball.position (vecFromRTheta ball.speed angle)
+        , angle = angle
     }
 
 
