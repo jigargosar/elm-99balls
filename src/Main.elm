@@ -22,7 +22,7 @@ import Util exposing (..)
   - [x] implement TestMovingSphereSphere (RTC) and compute new ball velocity against single static ball.
       - [x] same with static balls list.
 
-  - maybe bug: collision with multiple static balls, doesn't account for shortest collision.
+  - bug: collision with multiple static balls, doesn't account for shortest collision.
     only the first found.
 
   - bug: multiple collision i.e with edge and static ball at the same time;
