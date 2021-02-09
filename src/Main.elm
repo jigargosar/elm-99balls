@@ -192,6 +192,8 @@ sqDistSegmentPoint ( a, b ) c =
 
 testMovingSphereSphere : ( ( Vec, Float ), Vec ) -> ( ( Vec, Float ), Vec ) -> Maybe Float
 testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
+    -- Book: realtime collision detection
+    -- Page 223
     let
         s =
             vecFromTo ac bc
