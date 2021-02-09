@@ -282,7 +282,9 @@ setBallPositionAndVelocity p v ball =
 
 detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
 detectBallCollision staticBalls velocity ball =
-    Debug.todo ""
+    detectBallEdgesCollision velocity ball
+        ++ detectBallStaticBallsCollision staticBalls velocity ball
+        |> List.minimumBy Tuple.first
 
 
 detectBallStaticBallsCollision : List Ball -> Vec -> Ball -> List ( Float, BallCollision )
@@ -296,6 +298,14 @@ detectBallStaticBallsCollision staticBalls velocity ball =
                 |> Maybe.map (\t -> ( t, BallStaticBallCollision other ))
         )
         staticBalls
+
+
+detectBallEdgesCollision : Vec -> Ball -> List ( Float, BallCollision )
+detectBallEdgesCollision velocity ball =
+    edges
+        |> List.find (ballEdgeCollision velocity ball)
+        |> Maybe.map (\e -> [ ( 0, BallEdgeCollision e ) ])
+        |> Maybe.withDefault []
 
 
 ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
