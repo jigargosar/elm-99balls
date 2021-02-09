@@ -291,6 +291,42 @@ detectBallEdgesCollision velocity ball =
         |> Maybe.withDefault []
 
 
+intersectRaySphere : ( Vec, Vec ) -> ( Vec, Float ) -> Maybe Float
+intersectRaySphere ( p, d ) ( sc, sr ) =
+    let
+        m =
+            vecSub p sc
+
+        b =
+            vecDotProduct m d
+
+        c =
+            vecDotProduct m m - sr ^ 2
+    in
+    if c > 0 && b > 0 then
+        Nothing
+
+    else
+        let
+            discriminant =
+                b ^ 2 - c
+        in
+        if discriminant < 0 then
+            Nothing
+
+        else
+            let
+                t =
+                    -b - sqrt discriminant
+            in
+            if t < 0 then
+                Nothing
+                -- Just 0
+
+            else
+                Just t
+
+
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
 ballEdgeCollision velocity ball edge =
     let
