@@ -224,7 +224,7 @@ updateSim model =
 
 
 updateBall : List Ball -> Ball -> Ball
-updateBall otherBalls ball =
+updateBall staticBalls ball =
     let
         velocity =
             ballVelocity ball
@@ -238,14 +238,14 @@ updateBall otherBalls ball =
                                 (\other ->
                                     let
                                         otherVelocity =
-                                            ballVelocity other
+                                            vecZero
                                     in
                                     testMovingSphereSphere
                                         ( ( ball.position, ball.radius ), velocity )
                                         ( ( other.position, other.radius ), otherVelocity )
                                         |> Maybe.map (\t -> ( t, ( other, otherVelocity ) ))
                                 )
-                                otherBalls
+                                staticBalls
                                 |> List.minimumBy Tuple.first
                     in
                     case mbc of
