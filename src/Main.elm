@@ -289,6 +289,20 @@ ballVelocityOnFirstStaticBallCollision staticBalls velocity ball =
                 |> Just
 
 
+ballStaticBallsCollision : List Ball -> Vec -> Ball -> Maybe ( Float, Ball )
+ballStaticBallsCollision staticBalls velocity ball =
+    List.filterMap
+        (\other ->
+            testMovingSphereSphere
+                ( ( ball.position, ball.radius ), velocity )
+                ( ( other.position, other.radius ), vecZero )
+                |> Maybe.filter (\t -> t >= 0 && t <= 1)
+                |> Maybe.map (\t -> ( t, other ))
+        )
+        staticBalls
+        |> List.minimumBy Tuple.first
+
+
 ballVelocityOnEdgesCollision : Vec -> Ball -> Maybe Vec
 ballVelocityOnEdgesCollision velocity ball =
     let
