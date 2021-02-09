@@ -256,7 +256,7 @@ updateBall ( ball, otherBalls ) =
                             velocity
 
                         Just ( t, ( other, otherVelocity ) ) ->
-                            if t == 0 || t > 1 then
+                            if t > 1 then
                                 velocity
 
                             else
@@ -301,7 +301,14 @@ testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
             vecDotProduct s s - r ^ 2
     in
     if c < 0 then
-        Just 0
+        -- Exit early if already colliding
+        --Just 0
+        -- Mod: Ensuring that circles are approaching one another if already colliding
+        if vecDotProduct av bv < 0 then
+            Just 0
+
+        else
+            Nothing
 
     else
         let
