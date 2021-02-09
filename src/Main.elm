@@ -260,33 +260,18 @@ updateBall staticBalls ball =
 
 ballVelocityOnFirstStaticBallCollision : List Ball -> Vec -> Ball -> Maybe Vec
 ballVelocityOnFirstStaticBallCollision staticBalls velocity ball =
-    let
-        mbc =
-            List.filterMap
-                (\other ->
-                    testMovingSphereSphere
-                        ( ( ball.position, ball.radius ), velocity )
-                        ( ( other.position, other.radius ), vecZero )
-                        |> Maybe.filter (\t -> t >= 0 && t <= 1)
-                        |> Maybe.map (\t -> ( t, other ))
-                )
-                staticBalls
-                |> List.minimumBy Tuple.first
-    in
-    case mbc of
-        Nothing ->
-            Nothing
+    ballStaticBallsCollision staticBalls velocity ball
+        |> Maybe.map
+            (\( t, other ) ->
+                let
+                    ballPositionAtT =
+                        vecAdd ball.position (velocity |> vecScale t)
 
-        Just ( t, other ) ->
-            let
-                ballPositionAtT =
-                    vecAdd ball.position (velocity |> vecScale t)
-
-                normal =
-                    vecFromTo ballPositionAtT other.position
-            in
-            vecSub velocity (vecScale 2 (vecAlong normal velocity))
-                |> Just
+                    normal =
+                        vecFromTo ballPositionAtT other.position
+                in
+                vecSub velocity (vecScale 2 (vecAlong normal velocity))
+            )
 
 
 ballStaticBallsCollision : List Ball -> Vec -> Ball -> Maybe ( Float, Ball )
