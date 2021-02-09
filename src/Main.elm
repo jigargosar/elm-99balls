@@ -272,7 +272,12 @@ updateBall2 staticBalls ball =
                 newVelocity =
                     vecSub velocity (vecScale 2 (vecAlong collisionNormal velocity))
             in
-            setBallVelocityAndUpdatePosition newVelocity ball
+            setBallPositionAndVelocity ballPositionAtT newVelocity ball
+
+
+setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
+setBallPositionAndVelocity p v ball =
+    { ball | position = p, angle = vecAngle v }
 
 
 detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
