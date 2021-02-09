@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Basics.Extra exposing (atLeast)
 import Browser
 import Browser.Events
 import Color
@@ -315,16 +316,9 @@ intersectRaySphere ( p, d ) ( sc, sr ) =
             Nothing
 
         else
-            let
-                t =
-                    -b - sqrt discriminant
-            in
-            if t < 0 then
-                Nothing
-                -- Just 0
-
-            else
-                Just t
+            (-b - sqrt discriminant)
+                |> atLeast 0
+                |> Just
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
