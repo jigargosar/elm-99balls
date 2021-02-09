@@ -238,7 +238,8 @@ ballVelocity ball =
 
 testMovingBalls : Ball -> Ball -> Maybe Float
 testMovingBalls a b =
-    testMovingSphereSphere ( a.position, a.radius, ballVelocity a )
+    testMovingSphereSphere
+        ( a.position, a.radius, ballVelocity a )
         ( b.position, b.radius, ballVelocity b )
 
 
