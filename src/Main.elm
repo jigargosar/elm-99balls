@@ -293,7 +293,7 @@ computeNewBallVelocity : Ball -> Vec
 computeNewBallVelocity ball =
     let
         velocity =
-            vecFromRTheta ball.speed ball.angle
+            ballVelocity ball
     in
     case List.find (ballEdgeCollision velocity ball) edges of
         Nothing ->
