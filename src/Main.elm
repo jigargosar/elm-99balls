@@ -232,7 +232,7 @@ updateBall ( ball, otherBalls ) =
         velocity =
             ballVelocity ball
 
-        _ =
+        newVelocity =
             case List.find (ballEdgeCollision velocity ball) edges of
                 Nothing ->
                     let
@@ -274,13 +274,16 @@ updateBall ( ball, otherBalls ) =
 
                 Just edge ->
                     vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
+
+        angle2 =
+            vecAngle newVelocity
     in
     let
         angle =
             computeNewBallVelocity ball |> vecAngle
     in
     { ball
-        | position = vecAdd ball.position (vecFromRTheta ball.speed angle)
+        | position = vecAdd ball.position (vecFromRTheta ball.speed angle2)
         , angle = angle
     }
 
