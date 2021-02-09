@@ -233,8 +233,8 @@ updateBall staticBalls ball =
     }
 
 
-updateBallPositionWithRawVelocity : Vec -> Ball -> Ball
-updateBallPositionWithRawVelocity rawVelocity ball =
+setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
+setBallVelocityAndUpdatePosition rawVelocity ball =
     let
         angle =
             vecAngle rawVelocity
