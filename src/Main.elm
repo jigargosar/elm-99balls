@@ -239,35 +239,38 @@ updateBall ( ball, otherBalls ) =
                         mbc =
                             List.filterMap
                                 (\other ->
-                                    testMovingBalls ball other
-                                        |> Maybe.map (\t -> ( t, other ))
+                                    let
+                                        otherVelocity =
+                                            ballVelocity other
+                                    in
+                                    testMovingSphereSphere
+                                        ( ball.position, ball.radius, velocity )
+                                        ( other.position, other.radius, otherVelocity )
+                                        |> Maybe.map (\t -> ( t, ( other, otherVelocity ) ))
                                 )
                                 otherBalls
                                 |> List.minimumBy Tuple.first
-
-                        _ =
-                            case mbc of
-                                Nothing ->
-                                    velocity
-
-                                Just ( t, other ) ->
-                                    if t > 1 then
-                                        velocity
-
-                                    else
-                                        let
-                                            otherPositionAtT =
-                                                vecAdd other.position (ballVelocity other |> vecScale t)
-
-                                            ballPositionAtT =
-                                                vecAdd ball.position (ballVelocity ball |> vecScale t)
-
-                                            normal =
-                                                vecFromTo otherPositionAtT ballPositionAtT
-                                        in
-                                        vecSub velocity (vecScale 2 (vecAlong normal velocity))
                     in
-                    velocity
+                    case mbc of
+                        Nothing ->
+                            velocity
+
+                        Just ( t, ( other, otherVelocity ) ) ->
+                            if t > 1 then
+                                velocity
+
+                            else
+                                let
+                                    otherPositionAtT =
+                                        vecAdd other.position (otherVelocity |> vecScale t)
+
+                                    ballPositionAtT =
+                                        vecAdd ball.position (velocity |> vecScale t)
+
+                                    normal =
+                                        vecFromTo otherPositionAtT ballPositionAtT
+                                in
+                                vecSub velocity (vecScale 2 (vecAlong normal velocity))
 
                 Just edge ->
                     vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
@@ -280,13 +283,6 @@ updateBall ( ball, otherBalls ) =
         | position = vecAdd ball.position (vecFromRTheta ball.speed angle)
         , angle = angle
     }
-
-
-testMovingBalls : Ball -> Ball -> Maybe Float
-testMovingBalls a b =
-    testMovingSphereSphere
-        ( a.position, a.radius, ballVelocity a )
-        ( b.position, b.radius, ballVelocity b )
 
 
 testMovingSphereSphere : ( Vec, Float, Vec ) -> ( Vec, Float, Vec ) -> Maybe Float
