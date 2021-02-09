@@ -366,6 +366,7 @@ view model =
         [ Svg.g [ T.transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
             , viewBalls model.balls
+            , viewBalls model.staticBalls
             , viewEdges
             ]
         ]
