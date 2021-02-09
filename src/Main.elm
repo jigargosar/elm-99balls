@@ -236,20 +236,20 @@ ballVelocity ball =
     vecFromRTheta ball.speed ball.angle
 
 
-testMovingSphereSphere : Ball -> Ball -> Maybe Float
-testMovingSphereSphere ba bb =
+testMovingBalls : Ball -> Ball -> Maybe Float
+testMovingBalls a b =
+    testMovingSphereSphere ( a.position, a.radius, ballVelocity a )
+        ( b.position, b.radius, ballVelocity b )
+
+
+testMovingSphereSphere : ( Vec, Float, Vec ) -> ( Vec, Float, Vec ) -> Maybe Float
+testMovingSphereSphere ( ac, ar, av ) ( bc, br, bv ) =
     let
-        ( ac, ar, av ) =
-            ( ba.position, ba.radius, ballVelocity ba )
-
-        ( bc, br, bv ) =
-            ( bb.position, bb.radius, ballVelocity bb )
-
         s =
-            vecFromTo ba.position bb.position
+            vecFromTo ac bc
 
         r =
-            ba.radius + bb.radius
+            ar + br
 
         c =
             vecDotProduct s s - r ^ 2
