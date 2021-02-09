@@ -66,11 +66,6 @@ type alias Ball =
     }
 
 
-randomBalls : Generator (List Ball)
-randomBalls =
-    Random.list 50 randomBall
-
-
 randomBall : Generator Ball
 randomBall =
     Random.map5 Ball
@@ -341,20 +336,6 @@ testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
 
                 else
                     Just ((-b - sqrt d) / a)
-
-
-computeNewBallVelocity : Ball -> Vec
-computeNewBallVelocity ball =
-    let
-        velocity =
-            ballVelocity ball
-    in
-    case List.find (ballEdgeCollision velocity ball) edges of
-        Nothing ->
-            velocity
-
-        Just edge ->
-            vecSub velocity (vecScale 2 (vecAlong edge.normal velocity))
 
 
 ballEdgeCollision : Vec -> Ball -> Edge -> Bool
