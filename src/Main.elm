@@ -268,7 +268,7 @@ updateBall ( ball, otherBalls ) =
                                         vecAdd ball.position (velocity |> vecScale t)
 
                                     normal =
-                                        vecFromTo otherPositionAtT ballPositionAtT
+                                        vecFromTo ballPositionAtT otherPositionAtT
                                 in
                                 vecSub velocity (vecScale 2 (vecAlong normal velocity))
 
@@ -284,7 +284,7 @@ updateBall ( ball, otherBalls ) =
     in
     { ball
         | position = vecAdd ball.position (vecFromRTheta ball.speed angle2)
-        , angle = angle
+        , angle = angle2
     }
 
 
