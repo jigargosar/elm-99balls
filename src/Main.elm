@@ -224,8 +224,8 @@ updateSim model =
     }
 
 
-updateBall : List Ball -> Ball -> Ball
-updateBall staticBalls ball =
+updateBall1 : List Ball -> Ball -> Ball
+updateBall1 staticBalls ball =
     let
         velocity =
             ballVelocity ball
@@ -246,8 +246,8 @@ type BallCollision
     | BallStaticBallCollision Ball
 
 
-updateBall2 : List Ball -> Ball -> Ball
-updateBall2 staticBalls ball =
+updateBall : List Ball -> Ball -> Ball
+updateBall staticBalls ball =
     let
         velocity =
             ballVelocity ball
