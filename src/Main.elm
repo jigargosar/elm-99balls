@@ -132,6 +132,10 @@ ballVelocity ball =
     vecFromRTheta ball.speed ball.angle
 
 
+
+--noinspection ElmUnusedSymbol
+
+
 setBallPosition : Vec -> Ball -> Ball
 setBallPosition v ball =
     { ball | angle = vecAngle v }
@@ -299,6 +303,9 @@ updateBall ball ( targets, acc, floored ) =
 
                 newVelocity =
                     vecSub velocity (vecScale 2 (vecAlong normal velocity))
+
+                newBall =
+                    setBallPositionAndVelocity ballPositionAtT newVelocity ball
             in
             case bc of
                 BallEdgeCollision e ->
@@ -307,9 +314,9 @@ updateBall ball ( targets, acc, floored ) =
                         acc
 
                       else
-                        setBallPositionAndVelocity ballPositionAtT newVelocity ball :: acc
+                        newBall :: acc
                     , if isBottomEdge e then
-                        setBallPosition ballPositionAtT ball :: floored
+                        newBall :: floored
 
                       else
                         floored
@@ -319,7 +326,7 @@ updateBall ball ( targets, acc, floored ) =
                     ( targets
                         |> List.updateIf (eq target) decHP
                         |> List.filter hasHP
-                    , setBallPositionAndVelocity ballPositionAtT newVelocity ball :: acc
+                    , newBall :: acc
                     , floored
                     )
 
