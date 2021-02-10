@@ -99,25 +99,25 @@ randomTargets =
         gri =
             sri
 
-        ( gw, gh ) =
-            ( 8, 12 )
+        gw =
+            8
+
+        gh =
+            12
 
         cri =
             vec (gri.x / gw) (gri.y / gh)
 
-        cw =
-            (gri.x * 2) / toFloat gw
-
         targetRadius =
-            cw * 0.5 * 0.8
+            cri.x * 0.8
 
         dx =
-            (cw / 2) - (gri.x / 2)
+            cri.x - gri.x
 
         xs =
             List.range 0 (gw - 1)
                 |> List.map toFloat
-                |> List.map (mul cw >> add dx)
+                |> List.map (mul (cri.x * 2) >> add dx)
 
         randomTargetPositions =
             xs
