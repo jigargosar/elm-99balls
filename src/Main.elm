@@ -226,7 +226,7 @@ randomLevel =
             (Random.list 10 randomBall)
             (Random.list 20 randomBall)
         )
-        (Random.constant [])
+        (Random.list 20 randomTarget)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
