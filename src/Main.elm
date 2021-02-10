@@ -320,12 +320,13 @@ updateBall ball ( targets, acc, floored ) =
                     ( targets, nAcc, nFloored )
 
                 BallTargetCollision target ->
-                    ( targets
-                        |> List.updateIf (eq target) decHP
-                        |> List.filter hasHP
-                    , newBall :: acc
-                    , floored
-                    )
+                    let
+                        nTargets =
+                            targets
+                                |> List.updateIf (eq target) decHP
+                                |> List.filter hasHP
+                    in
+                    ( nTargets, newBall :: acc, floored )
 
 
 detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
