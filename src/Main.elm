@@ -396,7 +396,7 @@ viewTargets targets =
             Svg.circle
                 [ Px.r target.radius
                 , T.transform [ vecApply Translate target.position ]
-                , T.stroke (Paint (targetColor target))
+                , T.fill (Paint (targetColor target))
                 ]
                 []
     in
