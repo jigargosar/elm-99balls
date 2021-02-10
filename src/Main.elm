@@ -116,20 +116,18 @@ randomTargets =
 
         gps =
             List.range 0 (gw - 1)
-                |> List.map toFloat
-                |> List.map
-                    (\x ->
-                        let
-                            y =
-                                0
-                        in
-                        vec (x * cri.x * 2 + dx) (y * cri.y * 2 + dy)
+                |> List.concatMap
+                    (toFloat
+                        >> (\x ->
+                                List.range 0 0
+                                    |> List.map
+                                        (toFloat
+                                            >> (\y ->
+                                                    vec (x * cri.x * 2 + dx) (y * cri.y * 2 + dy)
+                                               )
+                                        )
+                           )
                     )
-
-        xs =
-            List.range 0 (gw - 1)
-                |> List.map toFloat
-                |> List.map (mul (cri.x * 2) >> add dx)
 
         randomTargetPositions =
             gps
