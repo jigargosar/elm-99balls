@@ -246,14 +246,6 @@ updateBall staticBalls ball =
                 ballPositionAtT =
                     vecAdd ball.position (velocity |> vecScale t)
 
-                collisionNormal =
-                    case collision of
-                        BallEdgeCollision edge ->
-                            edge.normal
-
-                        BallStaticBallCollision other ->
-                            vecFromTo ballPositionAtT other.position
-
                 newVelocity =
                     vecSub velocity (vecScale 2 (vecAlong normal velocity))
             in
