@@ -6,6 +6,7 @@ import Color
 import Html exposing (Html)
 import List.Extra as List
 import Random exposing (Generator, Seed)
+import Random.Extra as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -89,6 +90,19 @@ hasHP target =
 
 maxHP =
     20
+
+
+randomTargets : Generator (List Target)
+randomTargets =
+    [ vecZero ]
+        |> List.map randomTargetAt
+        |> Random.combine
+
+
+randomTargetAt : Vec -> Generator Target
+randomTargetAt p =
+    Random.map (Target p 30)
+        (Random.int (maxHP // 2) maxHP)
 
 
 randomTarget : Generator Target
