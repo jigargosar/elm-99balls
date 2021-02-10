@@ -236,10 +236,14 @@ update message model =
 
 updateSim : Model -> Model
 updateSim model =
-    { model
-        | balls =
+    let
+        ( targets, balls ) =
             model.balls
-                |> List.map (updateBall model.targets)
+                |> List.mapAccuml updateBall model.targets
+    in
+    { model
+        | balls = balls
+        , targets = targets
     }
 
 
@@ -248,7 +252,7 @@ type BallCollision
     | BallTargetCollision Target
 
 
-updateBall : List Target -> Ball -> Ball
+updateBall : List Target -> Ball -> ( List Target, Ball )
 updateBall targets ball =
     let
         velocity =
@@ -256,7 +260,7 @@ updateBall targets ball =
     in
     case detectBallCollision targets velocity ball of
         Nothing ->
-            setBallVelocityAndUpdatePosition velocity ball
+            ( targets, setBallVelocityAndUpdatePosition velocity ball )
 
         Just ( { t, normal }, _ ) ->
             let
@@ -266,7 +270,7 @@ updateBall targets ball =
                 newVelocity =
                     vecSub velocity (vecScale 2 (vecAlong normal velocity))
             in
-            setBallPositionAndVelocity ballPositionAtT newVelocity ball
+            ( targets, setBallPositionAndVelocity ballPositionAtT newVelocity ball )
 
 
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
