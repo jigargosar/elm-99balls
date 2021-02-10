@@ -72,6 +72,16 @@ type alias Target =
     }
 
 
+decHP : Target -> Target
+decHP target =
+    { target | hp = target.hp - 1 }
+
+
+hasHP : Target -> Bool
+hasHP target =
+    target.hp > 0
+
+
 randomTarget : Generator Target
 randomTarget =
     Random.map3 Target
@@ -262,7 +272,7 @@ updateBall targets ball =
         Nothing ->
             ( targets, setBallVelocityAndUpdatePosition velocity ball )
 
-        Just ( { t, normal }, _ ) ->
+        Just ( { t, normal }, bc ) ->
             let
                 ballPositionAtT =
                     vecAdd ball.position (velocity |> vecScale t)
@@ -270,7 +280,16 @@ updateBall targets ball =
                 newVelocity =
                     vecSub velocity (vecScale 2 (vecAlong normal velocity))
             in
-            ( targets, setBallPositionAndVelocity ballPositionAtT newVelocity ball )
+            ( case bc of
+                BallEdgeCollision _ ->
+                    targets
+
+                BallTargetCollision target ->
+                    targets
+                        |> List.updateIf (eq target) decHP
+                        |> List.filter hasHP
+            , setBallPositionAndVelocity ballPositionAtT newVelocity ball
+            )
 
 
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball

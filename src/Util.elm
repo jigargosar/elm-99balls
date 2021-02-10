@@ -305,6 +305,10 @@ mul =
     (*)
 
 
+eq =
+    (==)
+
+
 map2 : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
 map2 fn ( a, b ) ( c, d ) =
     ( fn a c, fn b d )
