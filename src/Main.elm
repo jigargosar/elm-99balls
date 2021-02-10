@@ -564,13 +564,17 @@ viewBall ball =
 
 
 viewBallHelper x y nx ny radius hue =
+    let
+        strokeW =
+            4
+    in
     Svg.g
         [ strokeH hue
         , T.transform [ Translate x y ]
-        , Px.strokeWidth 2
+        , Px.strokeWidth strokeW
         ]
-        [ Svg.circle [ Px.r radius ] []
-        , Svg.line [ Px.x2 nx, Px.y2 ny ] []
+        [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
+        , Svg.line [ Px.x2 nx, Px.y2 ny, Px.strokeWidth 2 ] []
         ]
 
 
