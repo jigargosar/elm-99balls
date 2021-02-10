@@ -400,7 +400,11 @@ viewTargets targets =
                     , T.fill (Paint (targetColor target))
                     ]
                     []
-                , Svg.text_ [ S.fill "#fff" ] [ Svg.text (String.fromInt target.hp) ]
+                , Svg.text_
+                    [ S.fill "#fff"
+                    , T.transform [ scale (target.radius / 14) ]
+                    ]
+                    [ Svg.text (String.fromInt target.hp) ]
                 ]
     in
     Svg.g [] (List.map viewTarget targets)
