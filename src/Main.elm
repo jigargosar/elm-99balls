@@ -94,15 +94,23 @@ maxHP =
 
 randomTargets : Generator (List Target)
 randomTargets =
+    let
+        gw =
+            sri.x * 2
+
+        cw =
+            gw / 8
+
+        cr =
+            cw * 0.5 * 0.8
+    in
     [ vecZero ]
-        |> List.map randomTargetAt
+        |> List.map
+            (\p ->
+                Random.map (Target p cr)
+                    (Random.int (maxHP // 2) maxHP)
+            )
         |> Random.combine
-
-
-randomTargetAt : Vec -> Generator Target
-randomTargetAt p =
-    Random.map (Target p 30)
-        (Random.int (maxHP // 2) maxHP)
 
 
 
