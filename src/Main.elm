@@ -324,8 +324,8 @@ updateBallHelp targets ball =
                     ( BallHitTarget target, newBall )
 
 
-updateBall2 : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall2 ball ( targets, acc, floored ) =
+updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
+updateBall ball ( targets, acc, floored ) =
     let
         ( bu, newBall ) =
             updateBallHelp targets ball
@@ -347,8 +347,8 @@ updateBall2 ball ( targets, acc, floored ) =
             ( nTargets, newBall :: acc, floored )
 
 
-updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall ball ( targets, acc, floored ) =
+updateBall1 : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
+updateBall1 ball ( targets, acc, floored ) =
     let
         velocity =
             ballVelocity ball
