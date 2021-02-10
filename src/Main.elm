@@ -225,7 +225,7 @@ edges =
 
 isBottomEdge : Edge -> Bool
 isBottomEdge edge =
-    edge.normal == vec 0 -1
+    eqByAtLeast 0.01 (vecAngle edge.normal) (turns -0.25)
 
 
 type Msg

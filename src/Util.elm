@@ -321,3 +321,7 @@ mapEach fn =
 
 pairTo b a =
     ( a, b )
+
+
+eqByAtLeast tol a b =
+    abs (a - b) < tol
