@@ -109,10 +109,22 @@ randomTargets =
             vec (gri.x / gw) (gri.y / gh)
 
         targetRadius =
-            cri.x * 0.8
+            cri.x * 0.7
 
-        dx =
-            cri.x - gri.x
+        ( dx, dy ) =
+            ( cri.x - gri.x, cri.y - gri.y )
+
+        gps =
+            List.range 0 (gw - 1)
+                |> List.map toFloat
+                |> List.map
+                    (\x ->
+                        let
+                            y =
+                                0
+                        in
+                        vec (x * cri.x * 2 + dx) (y * cri.y * 2 + dy)
+                    )
 
         xs =
             List.range 0 (gw - 1)
@@ -120,8 +132,7 @@ randomTargets =
                 |> List.map (mul (cri.x * 2) >> add dx)
 
         randomTargetPositions =
-            xs
-                |> List.map (\x -> vec x 0)
+            gps
                 |> Random.shuffle
                 |> Random.map2 (\i -> List.take (gw - i)) (Random.int 3 5)
     in
