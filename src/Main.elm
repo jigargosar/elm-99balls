@@ -257,13 +257,6 @@ setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
 
 
-detectBallCollision1 : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
-detectBallCollision1 staticBalls velocity ball =
-    detectBallEdgesCollision velocity ball
-        ++ detectBallStaticBallsCollision staticBalls velocity ball
-        |> List.minimumBy Tuple.first
-
-
 detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Collision, BallCollision )
 detectBallCollision staticBalls velocity ball =
     let
@@ -293,19 +286,6 @@ detectBallCollision staticBalls velocity ball =
 
 pairTo b a =
     ( a, b )
-
-
-detectBallStaticBallsCollision : List Ball -> Vec -> Ball -> List ( Float, BallCollision )
-detectBallStaticBallsCollision staticBalls velocity ball =
-    List.filterMap
-        (\other ->
-            testMovingSphereSphere
-                ( ( ball.position, ball.radius ), velocity )
-                ( ( other.position, other.radius ), vecZero )
-                |> Maybe.filter (\t -> t >= 0 && t <= 1)
-                |> Maybe.map (\t -> ( t, BallStaticBallCollision other ))
-        )
-        staticBalls
 
 
 type alias Circle =
@@ -363,26 +343,6 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
                 else
                     Nothing
             )
-
-
-detectBallEdgesCollision : Vec -> Ball -> List ( Float, BallCollision )
-detectBallEdgesCollision velocity ball =
-    --ballEdgeCollision : Vec -> Ball -> Edge -> Bool
-    --ballEdgeCollision velocity ball edge =
-    --    let
-    --        nextPosition =
-    --            vecAdd ball.position velocity
-    --    in
-    --    (sqDistSegmentPoint ( edge.from, edge.to ) nextPosition <= ball.radius ^ 2)
-    --        && (vecDotProduct velocity edge.normal < 0)
-    List.filterMap
-        (\e ->
-            --intersectRaySphere ( e.from, vecNormalize (vecFromTo e.from e.to) ) ( ball.position, ball.radius )
-            testMovingSphereSphere ( ( ball.position, ball.radius ), velocity ) ( ( e.from, 1 ), vecFromTo e.from e.to )
-                |> Maybe.filter (\t -> t >= 0 && t <= 1 && vecDotProduct velocity e.normal < 0)
-                |> Maybe.map (\t -> ( t, BallEdgeCollision e ))
-        )
-        edges
 
 
 subscriptions : Model -> Sub Msg
