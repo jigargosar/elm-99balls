@@ -309,18 +309,15 @@ updateBall ball ( targets, acc, floored ) =
             in
             case bc of
                 BallEdgeCollision e ->
-                    ( targets
-                    , if isBottomEdge e then
-                        acc
+                    let
+                        ( nAcc, nFloored ) =
+                            if isBottomEdge e then
+                                ( acc, newBall :: floored )
 
-                      else
-                        newBall :: acc
-                    , if isBottomEdge e then
-                        newBall :: floored
-
-                      else
-                        floored
-                    )
+                            else
+                                ( newBall :: acc, floored )
+                    in
+                    ( targets, nAcc, nFloored )
 
                 BallTargetCollision target ->
                     ( targets
