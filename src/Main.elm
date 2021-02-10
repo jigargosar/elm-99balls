@@ -505,7 +505,7 @@ viewTargets : List Target -> Svg msg
 viewTargets targets =
     let
         targetHue target =
-            toFloat target.hp / 20
+            toFloat target.hp / maxHP
 
         viewTarget target =
             Svg.g [ T.transform [ vecApply Translate target.position ] ]
