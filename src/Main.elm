@@ -338,7 +338,7 @@ detectMovingCircleAndCircleCollision mc c =
                         c
 
                     normal =
-                        vecFromTo p2 (vecScale t p1)
+                        vecFromTo p2 (vecAdd p1 (vecScale t velocity))
                             |> vecNormalize
                 in
                 if vecDotProduct velocity normal < 0 then
