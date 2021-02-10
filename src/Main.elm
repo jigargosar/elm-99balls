@@ -388,7 +388,7 @@ viewTargets : List Target -> Svg msg
 viewTargets targets =
     let
         targetHue target =
-            toFloat target.hp / 30
+            toFloat target.hp / 20
 
         targetColor target =
             Color.hsl (targetHue target) 0.7 0.6
