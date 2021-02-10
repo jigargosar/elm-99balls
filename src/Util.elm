@@ -183,6 +183,19 @@ randomOneOf xs =
                 |> Random.map Just
 
 
+cornersFromRadii : Vec -> { leftTop : Vec, rightTop : Vec, rightBottom : Vec, leftBottom : Vec }
+cornersFromRadii ri =
+    let
+        ( hw, hh ) =
+            vecToTuple ri
+    in
+    { leftTop = vec -hw -hh
+    , rightTop = vec hw -hh
+    , rightBottom = vec hw hh
+    , leftBottom = vec -hw hh
+    }
+
+
 type alias Circle =
     ( Vec, Float )
 

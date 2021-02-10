@@ -213,20 +213,8 @@ edgePoints2 =
 edges : List Edge
 edges =
     let
-        ( hw, hh ) =
-            vecToTuple sri
-
-        leftTop =
-            vec -hw -hh
-
-        rightTop =
-            vec hw -hh
-
-        rightBottom =
-            vec hw hh
-
-        leftBottom =
-            vec -hw hh
+        { leftTop, rightTop, leftBottom, rightBottom } =
+            cornersFromRadii sri
     in
     [ edgeFromTo leftTop rightTop
     , edgeFromTo rightTop rightBottom
@@ -237,14 +225,8 @@ edges =
 
 bottomEdge =
     let
-        ( hw, hh ) =
-            vecToTuple sri
-
-        rightBottom =
-            vec hw hh
-
-        leftBottom =
-            vec -hw hh
+        { leftTop, rightTop, leftBottom, rightBottom } =
+            cornersFromRadii sri
     in
     edgeFromTo rightBottom leftBottom
 
