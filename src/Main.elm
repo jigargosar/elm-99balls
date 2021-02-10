@@ -263,9 +263,9 @@ update message model =
 updateSim : Model -> Model
 updateSim model =
     let
-        ( targets, balls ) =
+        ( targets, balls, _ ) =
             model.balls
-                |> List.mapAccuml updateBall model.targets
+                |> List.foldl updateBall ( model.targets, [], [] )
     in
     { model
         | balls = balls
@@ -278,15 +278,15 @@ type BallCollision
     | BallTargetCollision Target
 
 
-updateBall : List Target -> Ball -> ( List Target, Ball )
-updateBall targets ball =
+updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
+updateBall ball ( targets, acc, acc2 ) =
     let
         velocity =
             ballVelocity ball
     in
     case detectBallCollision targets velocity ball of
         Nothing ->
-            ( targets, setBallVelocityAndUpdatePosition velocity ball )
+            ( targets, setBallVelocityAndUpdatePosition velocity ball :: acc, acc2 )
 
         Just ( { t, normal }, bc ) ->
             let
@@ -300,17 +300,23 @@ updateBall targets ball =
                 BallEdgeCollision e ->
                     ( targets
                     , if isBottomEdge e then
-                        setBallPosition ballPositionAtT ball
+                        acc
 
                       else
-                        setBallPositionAndVelocity ballPositionAtT newVelocity ball
+                        setBallPositionAndVelocity ballPositionAtT newVelocity ball :: acc
+                    , if isBottomEdge e then
+                        setBallPosition ballPositionAtT ball :: acc2
+
+                      else
+                        acc2
                     )
 
                 BallTargetCollision target ->
                     ( targets
                         |> List.updateIf (eq target) decHP
                         |> List.filter hasHP
-                    , setBallPositionAndVelocity ballPositionAtT newVelocity ball
+                    , setBallPositionAndVelocity ballPositionAtT newVelocity ball :: acc
+                    , acc2
                     )
 
 
