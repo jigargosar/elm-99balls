@@ -508,7 +508,7 @@ viewTargets targets =
             Svg.g [ T.transform [ vecApply Translate target.position ] ]
                 [ Svg.circle
                     [ Px.r target.radius
-                    , T.fill (Paint (targetColor target))
+                    , fillH (targetHue target)
                     ]
                     []
                 , Svg.text_
@@ -521,10 +521,6 @@ viewTargets targets =
                 ]
     in
     Svg.g [] (List.map viewTarget targets)
-
-
-scale s =
-    Scale s s
 
 
 viewEdges : Svg Msg
@@ -572,7 +568,7 @@ viewBall ball =
 
 viewBallHelper x y nx ny radius hue =
     Svg.g
-        [ T.stroke (Paint (Color.hsl hue 0.9 0.45))
+        [ strokeH hue
         , T.transform [ Translate x y ]
         , Px.strokeWidth 2
         ]
@@ -599,3 +595,23 @@ rect w h xf aa =
             :: aa
         )
         []
+
+
+fromHue hue =
+    Color.hsl hue 0.9 0.45
+
+
+paintHue =
+    fromHue >> Paint
+
+
+strokeH =
+    paintHue >> T.stroke
+
+
+fillH =
+    paintHue >> T.fill
+
+
+scale s =
+    Scale s s
