@@ -6,7 +6,7 @@ import Color
 import Html exposing (Html)
 import List.Extra as List
 import Maybe.Extra as Maybe
-import Random exposing (Generator)
+import Random exposing (Generator, Seed)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -65,6 +65,7 @@ type alias Model =
     { balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
+    , seed : Seed
     }
 
 
@@ -244,10 +245,16 @@ init _ =
         initialSeed =
             Random.initialSeed 0
 
-        ( ( balls, targets ), _ ) =
+        ( ( balls, targets ), seed ) =
             Random.step randomLevel initialSeed
     in
-    ( { balls = balls, floorBalls = [], targets = targets }, Cmd.none )
+    ( { balls = balls
+      , floorBalls = []
+      , targets = targets
+      , seed = seed
+      }
+    , Cmd.none
+    )
 
 
 randomLevel : Generator ( List Ball, List Target )
@@ -273,19 +280,29 @@ updateSim model =
             model.balls
                 |> List.foldl updateBall ( model.targets, [], [] )
     in
-    if balls == [] then
+    { model
+        | balls = balls
+        , targets = targets
+        , floorBalls = model.floorBalls ++ floorBalls
+    }
+        |> handleEmptyMovingBalls
+
+
+handleEmptyMovingBalls : Model -> Model
+handleEmptyMovingBalls model =
+    if model.balls == [] then
         { model
-            | balls = model.floorBalls ++ floorBalls
-            , targets = targets
+            | balls = model.floorBalls
             , floorBalls = []
         }
 
     else
-        { model
-            | balls = balls
-            , targets = targets
-            , floorBalls = model.floorBalls ++ floorBalls
-        }
+        model
+
+
+handleEmptyTargets : Model -> Model
+handleEmptyTargets model =
+    model
 
 
 type BallUpdate
