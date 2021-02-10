@@ -287,6 +287,13 @@ update message model =
 
 updateSim : Model -> Model
 updateSim model =
+    model
+        |> moveSim
+        |> handleEmptyMovingBalls
+
+
+moveSim : Model -> Model
+moveSim model =
     let
         ( targets, balls, floorBalls ) =
             model.balls
@@ -297,7 +304,6 @@ updateSim model =
         , targets = targets
         , floorBalls = model.floorBalls ++ floorBalls
     }
-        |> handleEmptyMovingBalls
 
 
 handleEmptyMovingBalls : Model -> Model
