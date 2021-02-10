@@ -5,7 +5,6 @@ import Browser.Events
 import Color
 import Html exposing (Html)
 import List.Extra as List
-import Maybe.Extra as Maybe
 import Random exposing (Generator, Seed)
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -396,10 +395,6 @@ updateBallHelp targets ball =
 
                 BallTargetCollision target ->
                     ( BallHitTarget target, newBall )
-
-
-type alias MovingCircle =
-    ( Circle, Vec )
 
 
 type alias CollisionResponse =

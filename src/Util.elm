@@ -222,7 +222,11 @@ type alias Collision =
     { t : Float, normal : Vec }
 
 
-detectMovingCircleAndCircleCollision : ( Circle, Vec ) -> Circle -> Maybe Collision
+type alias MovingCircle =
+    ( Circle, Vec )
+
+
+detectMovingCircleAndCircleCollision : MovingCircle -> Circle -> Maybe Collision
 detectMovingCircleAndCircleCollision mc c =
     testMovingSphereSphere mc ( c, vecZero )
         |> Maybe.filter (\t -> t >= 0 && t <= 1)
@@ -250,7 +254,7 @@ detectMovingCircleAndCircleCollision mc c =
             )
 
 
-detectMovingCircleAndSegCollision : ( Circle, Vec ) -> ( Vec, Vec ) -> Maybe Collision
+detectMovingCircleAndSegCollision : MovingCircle -> ( Vec, Vec ) -> Maybe Collision
 detectMovingCircleAndSegCollision mc ( from, to ) =
     testMovingSphereSphere mc ( ( from, 1 ), vecFromTo from to )
         |> Maybe.filter (\t -> t >= 0 && t <= 1)
