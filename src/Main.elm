@@ -90,7 +90,7 @@ hasHP target =
 
 
 maxHP =
-    5
+    20
 
 
 randomTargets : Generator (List Target)
@@ -120,7 +120,7 @@ randomTargets =
             xs
                 |> List.map (\x -> vec x 0)
                 |> Random.shuffle
-                |> Random.map2 (\i -> List.take (gwi - i)) (Random.int 2 5)
+                |> Random.map2 (\i -> List.take (gwi - i)) (Random.int 3 5)
     in
     randomTargetPositions
         |> Random.andThen
@@ -129,7 +129,7 @@ randomTargets =
                     |> List.map
                         (\p ->
                             Random.map (Target p targetRadius)
-                                (Random.int (maxHP // 2) maxHP)
+                                (Random.int 1 (maxHP // 3))
                         )
                     |> Random.combine
             )
