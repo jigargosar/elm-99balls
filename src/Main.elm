@@ -555,13 +555,6 @@ viewBalls balls =
     Svg.g [] (List.map viewBall balls)
 
 
-viewBallHelper x y nx ny radius hue =
-    Svg.g [ T.stroke (Paint (Color.hsl hue 0.7 0.6)), T.transform [ Translate x y ] ]
-        [ Svg.circle [ Px.r radius ] []
-        , Svg.line [ Px.x2 nx, Px.y2 ny ] []
-        ]
-
-
 viewBall : Ball -> Svg Msg
 viewBall ball =
     let
@@ -575,6 +568,13 @@ viewBall ball =
                 |> roundFloat2
     in
     viewBallHelper x y nx ny ball.radius ball.hue
+
+
+viewBallHelper x y nx ny radius hue =
+    Svg.g [ T.stroke (Paint (Color.hsl hue 1 0.45)), T.transform [ Translate x y ] ]
+        [ Svg.circle [ Px.r radius ] []
+        , Svg.line [ Px.x2 nx, Px.y2 ny ] []
+        ]
 
 
 roundFloat =
