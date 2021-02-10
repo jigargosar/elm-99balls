@@ -119,7 +119,10 @@ randomBall =
 
 randomBallPositionAtBottom : Generator Vec
 randomBallPositionAtBottom =
-    randomPtOnSeg screenSeg.bottom
+    --Random.map (vecScale 1)
+    Random.map2 (\offset -> vecMapR (add -offset))
+        (Random.float 0 10)
+        (randomPtOnSeg screenSeg.bottom)
 
 
 randomBallPosition : Generator Vec
