@@ -241,7 +241,7 @@ updateBall staticBalls ball =
         Nothing ->
             setBallVelocityAndUpdatePosition velocity ball
 
-        Just ( { t, normal }, collision ) ->
+        Just ( { t, normal }, _ ) ->
             let
                 ballPositionAtT =
                     vecAdd ball.position (velocity |> vecScale t)
