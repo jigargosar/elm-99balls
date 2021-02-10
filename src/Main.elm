@@ -124,7 +124,7 @@ randomBallPosition =
     in
     randomOneOf (List.map gen edges)
         |> Random.map (Maybe.withDefault vecZero)
-        |> always (randomVecInRadii sri)
+        |> always (randomVecInRadii (sri |> vecAdd (vec -50 -50)))
 
 
 ballVelocity : Ball -> Vec
