@@ -100,10 +100,10 @@ randomTargets =
             sri
 
         gw =
-            8
+            6
 
         gh =
-            12
+            8
 
         cri =
             vec (gri.x / gw) (gri.y / gh)
