@@ -280,14 +280,14 @@ type BallCollision
 
 
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall ball ( targets, acc, acc2 ) =
+updateBall ball ( targets, acc, floored ) =
     let
         velocity =
             ballVelocity ball
     in
     case detectBallCollision targets velocity ball of
         Nothing ->
-            ( targets, setBallVelocityAndUpdatePosition velocity ball :: acc, acc2 )
+            ( targets, setBallVelocityAndUpdatePosition velocity ball :: acc, floored )
 
         Just ( { t, normal }, bc ) ->
             let
@@ -306,10 +306,10 @@ updateBall ball ( targets, acc, acc2 ) =
                       else
                         setBallPositionAndVelocity ballPositionAtT newVelocity ball :: acc
                     , if isBottomEdge e then
-                        setBallPosition ballPositionAtT ball :: acc2
+                        setBallPosition ballPositionAtT ball :: floored
 
                       else
-                        acc2
+                        floored
                     )
 
                 BallTargetCollision target ->
@@ -317,7 +317,7 @@ updateBall ball ( targets, acc, acc2 ) =
                         |> List.updateIf (eq target) decHP
                         |> List.filter hasHP
                     , setBallPositionAndVelocity ballPositionAtT newVelocity ball :: acc
-                    , acc2
+                    , floored
                     )
 
 
