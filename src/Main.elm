@@ -378,10 +378,10 @@ updateBallHelp targets ball =
         Nothing ->
             ( BallMoved, setBallVelocityAndUpdatePosition velocity ball )
 
-        Just ( res, bc ) ->
+        Just ( response, bc ) ->
             let
                 newBall =
-                    setBallPositionAndVelocity res.position res.velocity ball
+                    setBallPositionAndVelocity response.position response.velocity ball
             in
             case bc of
                 BallEdgeCollision e ->
