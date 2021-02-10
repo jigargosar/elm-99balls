@@ -26,6 +26,8 @@ import Util exposing (..)
   - [x] bug: collision with multiple static balls, doesn't account for shortest collision.
     only the first found.
 
+  - generate targets in top row.
+
   - Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
 
   - Understand exactly how collision computes time `t` and document or return clarifying types.
