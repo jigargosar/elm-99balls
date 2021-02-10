@@ -114,7 +114,7 @@ randomBall =
         --hue
         (Random.float 0 1)
         --radius
-        (Random.int 10 30 |> Random.map toFloat)
+        (Random.int 15 25 |> Random.map toFloat)
 
 
 randomBallPositionAtBottom : Generator Vec
