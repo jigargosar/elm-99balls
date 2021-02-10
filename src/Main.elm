@@ -96,7 +96,7 @@ randomBall =
         --angle
         (Random.float 0 (turns 1))
         --speed
-        (Random.float 1 2)
+        (Random.float 2 5)
         --hue
         (Random.float 0 1)
         --radius
@@ -372,8 +372,8 @@ view model =
         ]
         [ Svg.g [ T.transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
-            , viewBalls model.balls
             , viewTargets model.targets
+            , viewBalls model.balls
             , viewEdges
             ]
         ]
