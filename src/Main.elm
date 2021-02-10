@@ -285,6 +285,33 @@ detectBallStaticBallsCollision staticBalls velocity ball =
         staticBalls
 
 
+type alias Circle =
+    ( Vec, Float )
+
+
+type alias Collision =
+    { t : Float, normal : Vec }
+
+
+detectMovingCircleAndCircleCollision : ( Circle, Vec ) -> Circle -> Maybe Float
+detectMovingCircleAndCircleCollision mc c =
+    testMovingSphereSphere mc ( c, vecZero )
+        |> Maybe.filter (\t -> t >= 0 && t <= 1)
+
+
+detectMovingCircleAndSegCollision : ( Circle, Vec ) -> ( Vec, Vec ) -> Maybe Float
+detectMovingCircleAndSegCollision mc ( from, to ) =
+    let
+        ( _, velocity ) =
+            mc
+
+        normal =
+            vecUnitNormalFromTo from to
+    in
+    testMovingSphereSphere mc ( ( from, 1 ), vecFromTo from to )
+        |> Maybe.filter (\t -> t >= 0 && t <= 1 && vecDotProduct velocity normal < 0)
+
+
 detectBallEdgesCollision : Vec -> Ball -> List ( Float, BallCollision )
 detectBallEdgesCollision velocity ball =
     --ballEdgeCollision : Vec -> Ball -> Edge -> Bool
