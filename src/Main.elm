@@ -178,6 +178,11 @@ type alias Edge =
     }
 
 
+edgeFromSeg : Seg -> Edge
+edgeFromSeg ( a, b ) =
+    edgeFromTo a b
+
+
 edgeFromTo : Vec -> Vec -> Edge
 edgeFromTo from to =
     let
@@ -210,25 +215,22 @@ edgePoints2 =
     edgePoints >> List.map vecToTuple
 
 
+screenSeg =
+    boundingSegFromRadii sri
+
+
 edges : List Edge
 edges =
     let
-        { leftTop, rightTop, leftBottom, rightBottom } =
-            cornersFromRadii sri
+        { top, right, bottom, left } =
+            screenSeg
     in
-    [ edgeFromTo leftTop rightTop
-    , edgeFromTo rightTop rightBottom
-    , edgeFromTo rightBottom leftBottom
-    , edgeFromTo leftBottom leftTop
-    ]
+    [ top, right, bottom, left ]
+        |> List.map edgeFromSeg
 
 
 bottomEdge =
-    let
-        { leftTop, rightTop, leftBottom, rightBottom } =
-            cornersFromRadii sri
-    in
-    edgeFromTo rightBottom leftBottom
+    edgeFromSeg screenSeg.bottom
 
 
 isBottomEdge : Edge -> Bool
