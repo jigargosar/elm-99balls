@@ -196,11 +196,28 @@ cornersFromRadii ri =
     }
 
 
+type alias Seg =
+    ( Vec, Vec )
+
+
+boundingSegFromRadii : Vec -> { top : Seg, right : Seg, bottom : Seg, left : Seg }
+boundingSegFromRadii ri =
+    let
+        { leftTop, rightTop, leftBottom, rightBottom } =
+            cornersFromRadii ri
+    in
+    { top = ( leftTop, rightTop )
+    , right = ( rightTop, rightBottom )
+    , bottom = ( rightBottom, leftBottom )
+    , left = ( leftBottom, leftTop )
+    }
+
+
 type alias Circle =
     ( Vec, Float )
 
 
-sqDistSegmentPoint : ( Vec, Vec ) -> Vec -> Float
+sqDistSegmentPoint : Seg -> Vec -> Float
 sqDistSegmentPoint ( a, b ) c =
     -- Book: realtime collision detection
     -- Page 130
@@ -221,7 +238,7 @@ sqDistSegmentPoint ( a, b ) c =
         vecDotProduct ac ac - e * e / f
 
 
-testMovingSphereSphere : ( ( Vec, Float ), Vec ) -> ( ( Vec, Float ), Vec ) -> Maybe Float
+testMovingSphereSphere : ( Circle, Vec ) -> ( Circle, Vec ) -> Maybe Float
 testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
     -- Book: realtime collision detection
     -- Page 223
@@ -277,7 +294,7 @@ testMovingSphereSphere ( ( ac, ar ), av ) ( ( bc, br ), bv ) =
                     Just ((-b - sqrt d) / a)
 
 
-intersectRaySphere : ( Vec, Vec ) -> ( Vec, Float ) -> Maybe Float
+intersectRaySphere : ( Vec, Vec ) -> Circle -> Maybe Float
 intersectRaySphere ( p, d ) ( sc, sr ) =
     let
         m =
