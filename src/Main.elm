@@ -278,11 +278,6 @@ updateSim model =
     }
 
 
-type BallCollision
-    = BallEdgeCollision Edge
-    | BallTargetCollision Target
-
-
 type BallUpdate
     = BallMoved
     | BallHitTarget Target
@@ -310,6 +305,11 @@ updateBall ball ( targets, acc, floored ) =
                         |> List.filter hasHP
             in
             ( nTargets, newBall :: acc, floored )
+
+
+type BallCollision
+    = BallEdgeCollision Edge
+    | BallTargetCollision Target
 
 
 updateBallHelp : List Target -> Ball -> ( BallUpdate, Ball )
