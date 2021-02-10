@@ -371,7 +371,7 @@ updateBallHelp targets ball =
     let
         velocity =
             ballVelocity ball
-                |> vecMapY (add 0.1)
+                |> vecMapY (add 0.01)
     in
     case detectBallCollision targets velocity ball of
         Nothing ->
