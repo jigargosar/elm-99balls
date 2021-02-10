@@ -379,22 +379,18 @@ updateBallHelp targets ball =
             ( BallMoved, setBallVelocityAndUpdatePosition velocity ball )
 
         Just ( response, ballCollision ) ->
-            let
-                newBall =
-                    setBallPositionAndVelocity response.position response.velocity ball
-            in
-            case ballCollision of
+            ( case ballCollision of
                 BallEdgeCollision e ->
-                    ( if isBottomEdge e then
+                    if isBottomEdge e then
                         BallHitBottomEdge
 
-                      else
+                    else
                         BallMoved
-                    , newBall
-                    )
 
                 BallTargetCollision target ->
-                    ( BallHitTarget target, newBall )
+                    BallHitTarget target
+            , setBallPositionAndVelocity response.position response.velocity ball
+            )
 
 
 type alias CollisionResponse =
