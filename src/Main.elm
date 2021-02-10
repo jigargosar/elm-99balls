@@ -119,7 +119,7 @@ randomTargets =
                 |> List.concatMap
                     (toFloat
                         >> (\x ->
-                                List.range 0 0
+                                List.range 0 1
                                     |> List.map
                                         (toFloat
                                             >> (\y ->
@@ -132,7 +132,7 @@ randomTargets =
         randomTargetPositions =
             gps
                 |> Random.shuffle
-                |> Random.map2 (\i -> List.take (gw - i)) (Random.int 3 5)
+                |> Random.map2 List.drop (Random.int 3 5)
     in
     randomTargetPositions
         |> Random.andThen
