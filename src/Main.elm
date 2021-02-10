@@ -574,7 +574,7 @@ viewBallHelper x y nx ny radius hue =
         , Px.strokeWidth strokeW
         ]
         [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
-        , Svg.line [ Px.x2 nx, Px.y2 ny, Px.strokeWidth 2 ] []
+        , Svg.line [ Px.x2 nx, Px.y2 ny ] []
         ]
 
 
