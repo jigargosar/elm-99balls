@@ -61,7 +61,6 @@ type alias Flags =
 
 type alias Model =
     { balls : List Ball
-    , staticBalls : List Ball
     , targets : List Target
     }
 
@@ -213,19 +212,16 @@ init _ =
         initialSeed =
             Random.initialSeed 0
 
-        ( ( ( balls, staticBalls ), targets ), _ ) =
+        ( ( balls, targets ), _ ) =
             Random.step randomLevel initialSeed
     in
-    ( { balls = balls, staticBalls = staticBalls, targets = targets }, Cmd.none )
+    ( { balls = balls, targets = targets }, Cmd.none )
 
 
-randomLevel : Generator ( ( List Ball, List Ball ), List Target )
+randomLevel : Generator ( List Ball, List Target )
 randomLevel =
     Random.pair
-        (Random.pair
-            (Random.list 10 randomBall)
-            (Random.list 20 randomBall)
-        )
+        (Random.list 20 randomBall)
         (Random.list 20 randomTarget)
 
 
@@ -243,22 +239,22 @@ updateSim model =
     { model
         | balls =
             model.balls
-                |> List.map (updateBall model.staticBalls)
+                |> List.map (updateBall model.targets)
     }
 
 
 type BallCollision
     = BallEdgeCollision Edge
-    | BallStaticBallCollision Ball
+    | BallTargetCollision Target
 
 
-updateBall : List Ball -> Ball -> Ball
-updateBall staticBalls ball =
+updateBall : List Target -> Ball -> Ball
+updateBall targets ball =
     let
         velocity =
             ballVelocity ball
     in
-    case detectBallCollision staticBalls velocity ball of
+    case detectBallCollision targets velocity ball of
         Nothing ->
             setBallVelocityAndUpdatePosition velocity ball
 
@@ -278,8 +274,8 @@ setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
 
 
-detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Collision, BallCollision )
-detectBallCollision staticBalls velocity ball =
+detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
+detectBallCollision targets velocity ball =
     let
         mc =
             ( ( ball.position, ball.radius ), velocity )
@@ -293,11 +289,11 @@ detectBallCollision staticBalls velocity ball =
                     )
 
         c2 =
-            staticBalls
+            targets
                 |> List.filterMap
                     (\o ->
                         detectMovingCircleAndCircleCollision mc ( o.position, o.radius )
-                            |> Maybe.map (pairTo (BallStaticBallCollision o))
+                            |> Maybe.map (pairTo (BallTargetCollision o))
                     )
     in
     c1
@@ -377,7 +373,6 @@ view model =
         [ Svg.g [ T.transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
             , viewBalls model.balls
-            , viewBalls model.staticBalls
             , viewTargets model.targets
             , viewEdges
             ]
