@@ -108,16 +108,11 @@ randomTargetAt p =
 randomTarget : Generator Target
 randomTarget =
     Random.map3 Target
-        randomTargetPosition
+        randomBallPosition
         --radius
         (Random.int 25 30 |> Random.map toFloat)
         --hp
         (Random.int (maxHP // 2) maxHP)
-
-
-randomTargetPosition : Generator Vec
-randomTargetPosition =
-    Random.uniform vecZero []
 
 
 type alias Ball =
