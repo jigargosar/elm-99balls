@@ -272,29 +272,31 @@ detectBallCollision staticBalls velocity ball =
         |> List.minimumBy Tuple.first
 
 
-detectBallCollision2 : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
+detectBallCollision2 : List Ball -> Vec -> Ball -> Maybe ( Collision, BallCollision )
 detectBallCollision2 staticBalls velocity ball =
     let
         mc =
             ( ( ball.position, ball.radius ), velocity )
 
-        _ =
-            List.filterMap
-                (\e ->
-                    detectMovingCircleAndSegCollision mc ( e.from, e.to )
-                        |> Maybe.map (pairTo (BallEdgeCollision e))
-                )
+        c1 =
+            edges
+                |> List.filterMap
+                    (\e ->
+                        detectMovingCircleAndSegCollision mc ( e.from, e.to )
+                            |> Maybe.map (pairTo (BallEdgeCollision e))
+                    )
 
-        _ =
-            List.filterMap
-                (\o ->
-                    detectMovingCircleAndCircleCollision mc ( o.position, o.radius )
-                        |> Maybe.map (pairTo (BallStaticBallCollision o))
-                )
+        c2 =
+            staticBalls
+                |> List.filterMap
+                    (\o ->
+                        detectMovingCircleAndCircleCollision mc ( o.position, o.radius )
+                            |> Maybe.map (pairTo (BallStaticBallCollision o))
+                    )
     in
-    detectBallEdgesCollision velocity ball
-        ++ detectBallStaticBallsCollision staticBalls velocity ball
-        |> List.minimumBy Tuple.first
+    c1
+        ++ c2
+        |> List.minimumBy (Tuple.first >> .t)
 
 
 pairTo b a =
