@@ -283,6 +283,12 @@ type BallCollision
     | BallTargetCollision Target
 
 
+type BallUpdate
+    = BallMoved
+    | BallHitTarget Target
+    | BallHitBottomEdge
+
+
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
 updateBall ball ( targets, acc, floored ) =
     let
