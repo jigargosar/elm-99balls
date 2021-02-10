@@ -402,18 +402,11 @@ type alias MovingCircle =
     ( Circle, Vec )
 
 
-type alias CollisionResolution =
+type alias CollisionResponse =
     { position : Vec, velocity : Vec }
 
 
-resolveMovingCircleCollision : MovingCircle -> Collision -> CollisionResolution
-resolveMovingCircleCollision ( ( position, _ ), velocity ) { t, normal } =
-    { position = vecAdd position (velocity |> vecScale t)
-    , velocity = vecSub velocity (vecScale 2 (vecAlong normal velocity))
-    }
-
-
-detectBallCollision : List Target -> Vec -> Ball -> Maybe ( CollisionResolution, BallCollision )
+detectBallCollision : List Target -> Vec -> Ball -> Maybe ( CollisionResponse, BallCollision )
 detectBallCollision targets velocity ball =
     let
         mc =
@@ -438,7 +431,14 @@ detectBallCollision targets velocity ball =
     c1
         ++ c2
         |> List.minimumBy (Tuple.first >> .t)
-        |> Maybe.map (Tuple.mapFirst (resolveMovingCircleCollision mc))
+        |> Maybe.map (Tuple.mapFirst (movingCircleCollisionResponse mc))
+
+
+movingCircleCollisionResponse : MovingCircle -> Collision -> CollisionResponse
+movingCircleCollisionResponse ( ( position, _ ), velocity ) { t, normal } =
+    { position = vecAdd position (velocity |> vecScale t)
+    , velocity = vecSub velocity (vecScale 2 (vecAlong normal velocity))
+    }
 
 
 subscriptions : Model -> Sub Msg
