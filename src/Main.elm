@@ -61,6 +61,7 @@ type alias Flags =
 
 type alias Model =
     { balls : List Ball
+    , floorBalls : List Ball
     , targets : List Target
     }
 
@@ -225,7 +226,7 @@ init _ =
         ( ( balls, targets ), _ ) =
             Random.step randomLevel initialSeed
     in
-    ( { balls = balls, targets = targets }, Cmd.none )
+    ( { balls = balls, floorBalls = [], targets = targets }, Cmd.none )
 
 
 randomLevel : Generator ( List Ball, List Target )
