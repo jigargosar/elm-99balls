@@ -284,14 +284,6 @@ detectBallCollision staticBalls velocity ball =
         |> List.minimumBy (Tuple.first >> .t)
 
 
-pairTo b a =
-    ( a, b )
-
-
-type alias Circle =
-    ( Vec, Float )
-
-
 type alias Collision =
     { t : Float, normal : Vec }
 

@@ -183,6 +183,10 @@ randomOneOf xs =
                 |> Random.map Just
 
 
+type alias Circle =
+    ( Vec, Float )
+
+
 sqDistSegmentPoint : ( Vec, Vec ) -> Vec -> Float
 sqDistSegmentPoint ( a, b ) c =
     -- Book: realtime collision detection
@@ -309,3 +313,7 @@ map2 fn ( a, b ) ( c, d ) =
 mapEach : (a -> x) -> ( a, a ) -> ( x, x )
 mapEach fn =
     Tuple.mapBoth fn fn
+
+
+pairTo b a =
+    ( a, b )
