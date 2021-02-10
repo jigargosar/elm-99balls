@@ -107,7 +107,7 @@ randomBall =
         --angle
         (Random.float 0 (turns 1))
         --speed
-        (Random.float 2 5)
+        (Random.float 5 15)
         --hue
         (Random.float 0 1)
         --radius
@@ -272,7 +272,11 @@ updateSim model =
                 |> List.foldl updateBall ( model.targets, [], [] )
     in
     if balls == [] then
-        { model | balls = floorBalls, targets = targets, floorBalls = [] }
+        { model
+            | balls = model.floorBalls ++ floorBalls
+            , targets = targets
+            , floorBalls = []
+        }
 
     else
         { model
