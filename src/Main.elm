@@ -132,6 +132,16 @@ ballVelocity ball =
     vecFromRTheta ball.speed ball.angle
 
 
+setBallPosition : Vec -> Ball -> Ball
+setBallPosition v ball =
+    { ball | angle = vecAngle v }
+
+
+setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
+setBallPositionAndVelocity p v ball =
+    { ball | position = p, angle = vecAngle v }
+
+
 setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
 setBallVelocityAndUpdatePosition rawVelocity ball =
     let
@@ -291,11 +301,6 @@ updateBall targets ball =
                         |> List.filter hasHP
             , setBallPositionAndVelocity ballPositionAtT newVelocity ball
             )
-
-
-setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
-setBallPositionAndVelocity p v ball =
-    { ball | position = p, angle = vecAngle v }
 
 
 detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
