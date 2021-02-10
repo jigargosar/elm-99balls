@@ -278,11 +278,6 @@ type BallCollision
     | BallTargetCollision Target
 
 
-type BallUpdate
-    = BallHitGround
-    | BallHitTarget Target
-
-
 updateBall : List Target -> Ball -> ( List Target, Ball )
 updateBall targets ball =
     let
