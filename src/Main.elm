@@ -290,6 +290,7 @@ updateSim model =
     model
         |> moveSim
         |> handleEmptyMovingBalls
+        |> handleEmptyTargets
 
 
 moveSim : Model -> Model
@@ -308,12 +309,11 @@ moveSim model =
 
 handleEmptyMovingBalls : Model -> Model
 handleEmptyMovingBalls model =
-    if model.balls == [] then
+    if model.balls == [] && model.targets /= [] then
         { model
             | balls = model.floorBalls
             , floorBalls = []
         }
-            |> handleEmptyTargets
 
     else
         model
@@ -321,7 +321,7 @@ handleEmptyMovingBalls model =
 
 handleEmptyTargets : Model -> Model
 handleEmptyTargets model =
-    if model.targets == [] then
+    if model.targets == [] && model.balls == [] then
         let
             ( targets, seed ) =
                 Random.step (Random.list 10 randomTarget) model.seed
