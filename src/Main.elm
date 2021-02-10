@@ -107,11 +107,11 @@ randomBall =
         --angle
         (Random.float 0 (turns 1))
         --speed
-        (Random.float 5 15)
+        (Random.float 10 15)
         --hue
         (Random.float 0 1)
         --radius
-        (Random.int 5 50 |> Random.map toFloat)
+        (Random.int 10 30 |> Random.map toFloat)
 
 
 randomBallPosition : Generator Vec
