@@ -117,6 +117,11 @@ randomBall =
         (Random.int 10 30 |> Random.map toFloat)
 
 
+randomBallPositionOnBottomEdge =
+    edges
+        |> List.find isBottomEdge
+
+
 randomBallPosition : Generator Vec
 randomBallPosition =
     let
@@ -228,6 +233,20 @@ edges =
     , edgeFromTo rightBottom leftBottom
     , edgeFromTo leftBottom leftTop
     ]
+
+
+bottomEdge =
+    let
+        ( hw, hh ) =
+            vecToTuple sri
+
+        rightBottom =
+            vec hw hh
+
+        leftBottom =
+            vec -hw hh
+    in
+    edgeFromTo rightBottom leftBottom
 
 
 isBottomEdge : Edge -> Bool
