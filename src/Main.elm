@@ -379,16 +379,10 @@ updateBallHelp targets ball =
         Nothing ->
             ( BallMoved, setBallVelocityAndUpdatePosition velocity ball )
 
-        Just ( { t, normal }, bc ) ->
+        Just ( res, bc ) ->
             let
-                ballPositionAtT =
-                    vecAdd ball.position (velocity |> vecScale t)
-
-                newVelocity =
-                    vecSub velocity (vecScale 2 (vecAlong normal velocity))
-
                 newBall =
-                    setBallPositionAndVelocity ballPositionAtT newVelocity ball
+                    setBallPositionAndVelocity res.position res.velocity ball
             in
             case bc of
                 BallEdgeCollision e ->
@@ -404,7 +398,22 @@ updateBallHelp targets ball =
                     ( BallHitTarget target, newBall )
 
 
-detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
+type alias MovingCircle =
+    ( Circle, Vec )
+
+
+type alias CollisionResolution =
+    { position : Vec, velocity : Vec }
+
+
+resolveMovingCircleCollision : MovingCircle -> Collision -> CollisionResolution
+resolveMovingCircleCollision ( ( position, _ ), velocity ) { t, normal } =
+    { position = vecAdd position (velocity |> vecScale t)
+    , velocity = vecSub velocity (vecScale 2 (vecAlong normal velocity))
+    }
+
+
+detectBallCollision : List Target -> Vec -> Ball -> Maybe ( CollisionResolution, BallCollision )
 detectBallCollision targets velocity ball =
     let
         mc =
@@ -429,6 +438,7 @@ detectBallCollision targets velocity ball =
     c1
         ++ c2
         |> List.minimumBy (Tuple.first >> .t)
+        |> Maybe.map (Tuple.mapFirst (resolveMovingCircleCollision mc))
 
 
 subscriptions : Model -> Sub Msg
