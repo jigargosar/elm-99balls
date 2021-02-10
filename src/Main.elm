@@ -97,7 +97,7 @@ randomTarget =
         --radius
         (Random.int 25 30 |> Random.map toFloat)
         --hp
-        (Random.int 10 maxHP)
+        (Random.int (maxHP // 2) maxHP)
 
 
 type alias Ball =
