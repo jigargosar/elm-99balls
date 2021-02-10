@@ -241,7 +241,7 @@ updateBall staticBalls ball =
         Nothing ->
             setBallVelocityAndUpdatePosition velocity ball
 
-        Just ( t, collision ) ->
+        Just ( { t, normal }, collision ) ->
             let
                 ballPositionAtT =
                     vecAdd ball.position (velocity |> vecScale t)
@@ -265,15 +265,15 @@ setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
 
 
-detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
-detectBallCollision staticBalls velocity ball =
+detectBallCollision1 : List Ball -> Vec -> Ball -> Maybe ( Float, BallCollision )
+detectBallCollision1 staticBalls velocity ball =
     detectBallEdgesCollision velocity ball
         ++ detectBallStaticBallsCollision staticBalls velocity ball
         |> List.minimumBy Tuple.first
 
 
-detectBallCollision2 : List Ball -> Vec -> Ball -> Maybe ( Collision, BallCollision )
-detectBallCollision2 staticBalls velocity ball =
+detectBallCollision : List Ball -> Vec -> Ball -> Maybe ( Collision, BallCollision )
+detectBallCollision staticBalls velocity ball =
     let
         mc =
             ( ( ball.position, ball.radius ), velocity )
@@ -338,7 +338,7 @@ detectMovingCircleAndCircleCollision mc c =
                         c
 
                     normal =
-                        vecFromTo (vecScale t p1) p2
+                        vecFromTo p2 (vecScale t p1)
                             |> vecNormalize
                 in
                 if vecDotProduct velocity normal < 0 then
