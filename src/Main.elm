@@ -62,6 +62,7 @@ type alias Flags =
 type alias Model =
     { balls : List Ball
     , staticBalls : List Ball
+    , targets : List Target
     }
 
 
@@ -212,7 +213,7 @@ init _ =
                 )
                 initialSeed
     in
-    ( { balls = balls, staticBalls = staticBalls }, Cmd.none )
+    ( { balls = balls, staticBalls = staticBalls, targets = [] }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
