@@ -96,23 +96,26 @@ maxHP =
 randomTargets : Generator (List Target)
 randomTargets =
     let
-        gw =
-            sri.x * 2
+        gri =
+            sri
 
-        gwi =
-            8
+        ( gw, gh ) =
+            ( 8, 12 )
+
+        cri =
+            vec (gri.x / gw) (gri.y / gh)
 
         cw =
-            gw / gwi
+            (gri.x * 2) / toFloat gw
 
         targetRadius =
             cw * 0.5 * 0.8
 
         dx =
-            (cw / 2) - (gw / 2)
+            (cw / 2) - (gri.x / 2)
 
         xs =
-            List.range 0 (gwi - 1)
+            List.range 0 (gw - 1)
                 |> List.map toFloat
                 |> List.map (mul cw >> add dx)
 
@@ -120,7 +123,7 @@ randomTargets =
             xs
                 |> List.map (\x -> vec x 0)
                 |> Random.shuffle
-                |> Random.map2 (\i -> List.take (gwi - i)) (Random.int 3 5)
+                |> Random.map2 (\i -> List.take (gw - i)) (Random.int 3 5)
     in
     randomTargetPositions
         |> Random.andThen
