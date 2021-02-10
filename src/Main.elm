@@ -105,14 +105,15 @@ randomTargetAt p =
         (Random.int (maxHP // 2) maxHP)
 
 
-randomTarget : Generator Target
-randomTarget =
-    Random.map3 Target
-        randomBallPosition
-        --radius
-        (Random.int 25 30 |> Random.map toFloat)
-        --hp
-        (Random.int (maxHP // 2) maxHP)
+
+--randomTarget : Generator Target
+--randomTarget =
+--    Random.map3 Target
+--        (randomVecInRadii (sri |> vecScale 0.7))
+--        --radius
+--        (Random.int 25 30 |> Random.map toFloat)
+--        --hp
+--        (Random.int (maxHP // 2) maxHP)
 
 
 type alias Ball =
@@ -144,19 +145,6 @@ randomBallPositionAtBottom =
     Random.map2 (\offset -> vecMapR (add -offset))
         (Random.float 0 10)
         (randomPtOnSeg screenSeg.bottom)
-
-
-randomBallPosition : Generator Vec
-randomBallPosition =
-    let
-        gen e =
-            Random.map2 (\offset -> vecMapR (add -offset))
-                (Random.float 0 10)
-                (randomPtOnSeg ( e.from, e.to ))
-    in
-    randomOneOf (List.map gen edges)
-        |> Random.map (Maybe.withDefault vecZero)
-        |> always (randomVecInRadii (sri |> vecScale 0.7))
 
 
 ballVelocity : Ball -> Vec
@@ -288,7 +276,7 @@ randomLevel : Generator ( List Ball, List Target )
 randomLevel =
     Random.pair
         (Random.list 10 randomBall)
-        (Random.list 10 randomTarget)
+        randomTargets
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -339,7 +327,7 @@ handleEmptyTargets model =
     if model.targets == [] && model.balls == [] then
         let
             ( targets, seed ) =
-                Random.step (Random.list 10 randomTarget) model.seed
+                Random.step randomTargets model.seed
         in
         { model | targets = targets, seed = seed }
 
