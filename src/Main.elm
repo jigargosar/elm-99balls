@@ -293,23 +293,49 @@ type alias Collision =
     { t : Float, normal : Vec }
 
 
-detectMovingCircleAndCircleCollision : ( Circle, Vec ) -> Circle -> Maybe Float
+detectMovingCircleAndCircleCollision : ( Circle, Vec ) -> Circle -> Maybe Collision
 detectMovingCircleAndCircleCollision mc c =
     testMovingSphereSphere mc ( c, vecZero )
         |> Maybe.filter (\t -> t >= 0 && t <= 1)
+        |> Maybe.andThen
+            (\t ->
+                let
+                    ( ( p1, _ ), velocity ) =
+                        mc
+
+                    ( p2, _ ) =
+                        c
+
+                    normal =
+                        vecFromTo (vecScale t p1) p2
+                in
+                if vecDotProduct velocity normal < 0 then
+                    Just (Collision t normal)
+
+                else
+                    Nothing
+            )
 
 
-detectMovingCircleAndSegCollision : ( Circle, Vec ) -> ( Vec, Vec ) -> Maybe Float
+detectMovingCircleAndSegCollision : ( Circle, Vec ) -> ( Vec, Vec ) -> Maybe Collision
 detectMovingCircleAndSegCollision mc ( from, to ) =
-    let
-        ( _, velocity ) =
-            mc
-
-        normal =
-            vecUnitNormalFromTo from to
-    in
     testMovingSphereSphere mc ( ( from, 1 ), vecFromTo from to )
-        |> Maybe.filter (\t -> t >= 0 && t <= 1 && vecDotProduct velocity normal < 0)
+        |> Maybe.filter (\t -> t >= 0 && t <= 1)
+        |> Maybe.andThen
+            (\t ->
+                let
+                    ( _, velocity ) =
+                        mc
+
+                    normal =
+                        vecUnitNormalFromTo from to
+                in
+                if vecDotProduct velocity normal < 0 then
+                    Just (Collision t normal)
+
+                else
+                    Nothing
+            )
 
 
 detectBallEdgesCollision : Vec -> Ball -> List ( Float, BallCollision )
