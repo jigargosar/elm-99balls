@@ -378,9 +378,29 @@ view model =
             [ rect sw sh [] [ S.stroke "black" ]
             , viewBalls model.balls
             , viewBalls model.staticBalls
+            , viewTargets model.targets
             , viewEdges
             ]
         ]
+
+
+viewTargets targets =
+    let
+        targetHue target =
+            0
+
+        targetColor target =
+            Color.hsl (targetHue target) 0.7 0.6
+
+        viewTarget target =
+            Svg.circle
+                [ Px.r target.radius
+                , T.transform [ vecApply Translate target.position ]
+                , T.stroke (Paint (targetColor target))
+                ]
+                []
+    in
+    Svg.g [] (List.map viewTarget targets)
 
 
 scale s =
