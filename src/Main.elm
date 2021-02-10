@@ -73,6 +73,14 @@ type alias Target =
     }
 
 
+randomTarget : Generator Target
+randomTarget =
+    Random.map3 Target
+        randomBallPosition
+        (Random.int 5 50 |> Random.map toFloat)
+        (Random.int 10 20)
+
+
 type alias Ball =
     { position : Vec
     , angle : Float
