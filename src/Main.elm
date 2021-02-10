@@ -502,7 +502,7 @@ viewTargets targets =
             toFloat target.hp / 20
 
         targetColor target =
-            Color.hsl (targetHue target) 0.7 0.6
+            Color.hsl (targetHue target) 0.9 0.45
 
         viewTarget target =
             Svg.g [ T.transform [ vecApply Translate target.position ] ]
