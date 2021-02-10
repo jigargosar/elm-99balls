@@ -123,7 +123,7 @@ randomBallPosition =
         gen e =
             Random.map2 (\offset -> vecMapR (add -offset))
                 (Random.float 0 10)
-                (randomVecOnLine e.from e.to)
+                (randomVecOnSeg ( e.from, e.to ))
     in
     randomOneOf (List.map gen edges)
         |> Random.map (Maybe.withDefault vecZero)
