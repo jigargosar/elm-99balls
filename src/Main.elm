@@ -289,6 +289,41 @@ type BallUpdate
     | BallHitBottomEdge
 
 
+updateBallHelp : List Target -> Ball -> ( BallUpdate, Ball )
+updateBallHelp targets ball =
+    let
+        velocity =
+            ballVelocity ball
+    in
+    case detectBallCollision targets velocity ball of
+        Nothing ->
+            ( BallMoved, setBallVelocityAndUpdatePosition velocity ball )
+
+        Just ( { t, normal }, bc ) ->
+            let
+                ballPositionAtT =
+                    vecAdd ball.position (velocity |> vecScale t)
+
+                newVelocity =
+                    vecSub velocity (vecScale 2 (vecAlong normal velocity))
+
+                newBall =
+                    setBallPositionAndVelocity ballPositionAtT newVelocity ball
+            in
+            case bc of
+                BallEdgeCollision e ->
+                    ( if isBottomEdge e then
+                        BallHitBottomEdge
+
+                      else
+                        BallMoved
+                    , newBall
+                    )
+
+                BallTargetCollision target ->
+                    ( BallHitTarget target, newBall )
+
+
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
 updateBall ball ( targets, acc, floored ) =
     let
