@@ -400,7 +400,7 @@ viewTargets targets =
                     , T.fill (Paint (targetColor target))
                     ]
                     []
-                , Svg.text_ [] [ Svg.text (String.fromInt target.hp) ]
+                , Svg.text_ [ S.fill "#fff" ] [ Svg.text (String.fromInt target.hp) ]
                 ]
     in
     Svg.g [] (List.map viewTarget targets)
