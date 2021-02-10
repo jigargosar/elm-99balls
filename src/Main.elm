@@ -384,6 +384,7 @@ view model =
         ]
 
 
+viewTargets : List Target -> Svg msg
 viewTargets targets =
     let
         targetHue target =
@@ -393,12 +394,14 @@ viewTargets targets =
             Color.hsl (targetHue target) 0.7 0.6
 
         viewTarget target =
-            Svg.circle
-                [ Px.r target.radius
-                , T.transform [ vecApply Translate target.position ]
-                , T.fill (Paint (targetColor target))
+            Svg.g [ T.transform [ vecApply Translate target.position ] ]
+                [ Svg.circle
+                    [ Px.r target.radius
+                    , T.fill (Paint (targetColor target))
+                    ]
+                    []
+                , Svg.text_ [] [ Svg.text (String.fromInt target.hp) ]
                 ]
-                []
     in
     Svg.g [] (List.map viewTarget targets)
 
