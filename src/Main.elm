@@ -292,7 +292,6 @@ updateSim model =
         , floorBalls = model.floorBalls ++ floorBalls
     }
         |> handleEmptyMovingBalls
-        |> handleEmptyTargets
 
 
 handleEmptyMovingBalls : Model -> Model
@@ -302,6 +301,7 @@ handleEmptyMovingBalls model =
             | balls = model.floorBalls
             , floorBalls = []
         }
+            |> handleEmptyTargets
 
     else
         model
