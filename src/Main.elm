@@ -289,6 +289,29 @@ type BallUpdate
     | BallHitBottomEdge
 
 
+updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
+updateBall ball ( targets, acc, floored ) =
+    let
+        ( bu, newBall ) =
+            updateBallHelp targets ball
+    in
+    case bu of
+        BallMoved ->
+            ( targets, newBall :: acc, floored )
+
+        BallHitBottomEdge ->
+            ( targets, acc, newBall :: floored )
+
+        BallHitTarget target ->
+            let
+                nTargets =
+                    targets
+                        |> List.updateIf (eq target) decHP
+                        |> List.filter hasHP
+            in
+            ( nTargets, newBall :: acc, floored )
+
+
 updateBallHelp : List Target -> Ball -> ( BallUpdate, Ball )
 updateBallHelp targets ball =
     let
@@ -322,75 +345,6 @@ updateBallHelp targets ball =
 
                 BallTargetCollision target ->
                     ( BallHitTarget target, newBall )
-
-
-updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall ball ( targets, acc, floored ) =
-    let
-        ( bu, newBall ) =
-            updateBallHelp targets ball
-    in
-    case bu of
-        BallMoved ->
-            ( targets, newBall :: acc, floored )
-
-        BallHitBottomEdge ->
-            ( targets, acc, newBall :: floored )
-
-        BallHitTarget target ->
-            let
-                nTargets =
-                    targets
-                        |> List.updateIf (eq target) decHP
-                        |> List.filter hasHP
-            in
-            ( nTargets, newBall :: acc, floored )
-
-
-updateBall1 : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall1 ball ( targets, acc, floored ) =
-    let
-        velocity =
-            ballVelocity ball
-    in
-    case detectBallCollision targets velocity ball of
-        Nothing ->
-            ( targets
-            , setBallVelocityAndUpdatePosition velocity ball :: acc
-            , floored
-            )
-
-        Just ( { t, normal }, bc ) ->
-            let
-                ballPositionAtT =
-                    vecAdd ball.position (velocity |> vecScale t)
-
-                newVelocity =
-                    vecSub velocity (vecScale 2 (vecAlong normal velocity))
-
-                newBall =
-                    setBallPositionAndVelocity ballPositionAtT newVelocity ball
-            in
-            case bc of
-                BallEdgeCollision e ->
-                    let
-                        ( nAcc, nFloored ) =
-                            if isBottomEdge e then
-                                ( acc, newBall :: floored )
-
-                            else
-                                ( newBall :: acc, floored )
-                    in
-                    ( targets, nAcc, nFloored )
-
-                BallTargetCollision target ->
-                    let
-                        nTargets =
-                            targets
-                                |> List.updateIf (eq target) decHP
-                                |> List.filter hasHP
-                    in
-                    ( nTargets, newBall :: acc, floored )
 
 
 detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
