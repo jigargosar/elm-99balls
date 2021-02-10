@@ -271,11 +271,15 @@ updateSim model =
             model.balls
                 |> List.foldl updateBall ( model.targets, [], [] )
     in
-    { model
-        | balls = balls
-        , targets = targets
-        , floorBalls = model.floorBalls ++ floorBalls
-    }
+    if balls == [] then
+        { model | balls = floorBalls, targets = targets, floorBalls = [] }
+
+    else
+        { model
+            | balls = balls
+            , targets = targets
+            , floorBalls = model.floorBalls ++ floorBalls
+        }
 
 
 type BallUpdate
