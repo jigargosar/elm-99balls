@@ -324,6 +324,29 @@ updateBallHelp targets ball =
                     ( BallHitTarget target, newBall )
 
 
+updateBall2 : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
+updateBall2 ball ( targets, acc, floored ) =
+    let
+        ( bu, newBall ) =
+            updateBallHelp targets ball
+    in
+    case bu of
+        BallMoved ->
+            ( targets, newBall :: acc, floored )
+
+        BallHitBottomEdge ->
+            ( targets, acc, newBall :: floored )
+
+        BallHitTarget target ->
+            let
+                nTargets =
+                    targets
+                        |> List.updateIf (eq target) decHP
+                        |> List.filter hasHP
+            in
+            ( nTargets, newBall :: acc, floored )
+
+
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
 updateBall ball ( targets, acc, floored ) =
     let
