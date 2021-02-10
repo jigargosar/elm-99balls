@@ -223,6 +223,11 @@ edges =
     ]
 
 
+isBottomEdge : Edge -> Bool
+isBottomEdge edge =
+    edge.normal == vec 0 -1
+
+
 type Msg
     = OnTick Float
 
@@ -291,16 +296,22 @@ updateBall targets ball =
                 newVelocity =
                     vecSub velocity (vecScale 2 (vecAlong normal velocity))
             in
-            ( case bc of
-                BallEdgeCollision _ ->
-                    targets
+            case bc of
+                BallEdgeCollision e ->
+                    ( targets
+                    , if isBottomEdge e then
+                        setBallPosition ballPositionAtT ball
+
+                      else
+                        setBallPosition ballPositionAtT ball
+                    )
 
                 BallTargetCollision target ->
-                    targets
+                    ( targets
                         |> List.updateIf (eq target) decHP
                         |> List.filter hasHP
-            , setBallPositionAndVelocity ballPositionAtT newVelocity ball
-            )
+                    , setBallPositionAndVelocity ballPositionAtT newVelocity ball
+                    )
 
 
 detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
