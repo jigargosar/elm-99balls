@@ -26,6 +26,8 @@ import Util exposing (..)
   - [x] bug: collision with multiple static balls, doesn't account for shortest collision.
     only the first found.
 
+  - Understand exactly how collision computes time `t` and document or return clarifying types.
+
   - bug: multiple collision i.e with edge and static ball at the same time;
     only respecting edge, and tunneling through static ball.
 
