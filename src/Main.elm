@@ -65,6 +65,13 @@ type alias Model =
     }
 
 
+type alias Target =
+    { position : Vec
+    , radius : Float
+    , hp : Int
+    }
+
+
 type alias Ball =
     { position : Vec
     , angle : Float
