@@ -325,3 +325,19 @@ pairTo b a =
 
 eqByAtLeast tol a b =
     abs (a - b) < tol
+
+
+when pred fn x =
+    if pred x then
+        fn x
+
+    else
+        x
+
+
+propEmpty fn =
+    propEq fn []
+
+
+propEq fn v x =
+    fn x == v

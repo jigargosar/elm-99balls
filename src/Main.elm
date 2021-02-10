@@ -286,6 +286,7 @@ updateSim model =
         , floorBalls = model.floorBalls ++ floorBalls
     }
         |> handleEmptyMovingBalls
+        |> handleEmptyTargets
 
 
 handleEmptyMovingBalls : Model -> Model
