@@ -260,8 +260,8 @@ init _ =
 randomLevel : Generator ( List Ball, List Target )
 randomLevel =
     Random.pair
-        (Random.list 20 randomBall)
-        (Random.list 20 randomTarget)
+        (Random.list 10 randomBall)
+        (Random.list 10 randomTarget)
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -306,7 +306,7 @@ handleEmptyTargets model =
     if model.targets == [] then
         let
             ( targets, seed ) =
-                Random.step (Random.list 20 randomTarget) model.seed
+                Random.step (Random.list 10 randomTarget) model.seed
         in
         { model | targets = targets, seed = seed }
 
