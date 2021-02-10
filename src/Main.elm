@@ -98,16 +98,28 @@ randomTargets =
         gw =
             sri.x * 2
 
-        cw =
-            gw / 8
+        gwi =
+            8
 
-        cr =
+        cw =
+            gw / gwi
+
+        targetRadius =
             cw * 0.5 * 0.8
+
+        dx =
+            (cw / 2) - (gw / 2)
+
+        xs =
+            List.range 0 (gwi - 1)
+                |> List.map toFloat
+                |> List.map (mul cw >> add dx)
     in
-    [ vecZero ]
+    xs
+        |> List.map (\x -> vec x 0)
         |> List.map
             (\p ->
-                Random.map (Target p cr)
+                Random.map (Target p targetRadius)
                     (Random.int (maxHP // 2) maxHP)
             )
         |> Random.combine
