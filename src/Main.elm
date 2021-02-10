@@ -354,12 +354,12 @@ updateBall ball ( targets, acc, floored ) =
 
         BallHitTarget target ->
             let
-                nTargets =
+                newTargets =
                     targets
                         |> List.updateIf (eq target) decHP
                         |> List.filter hasHP
             in
-            ( nTargets, newBall :: acc, floored )
+            ( newTargets, newBall :: acc, floored )
 
 
 type BallCollision
