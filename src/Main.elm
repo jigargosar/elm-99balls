@@ -287,7 +287,10 @@ updateBall ball ( targets, acc, floored ) =
     in
     case detectBallCollision targets velocity ball of
         Nothing ->
-            ( targets, setBallVelocityAndUpdatePosition velocity ball :: acc, floored )
+            ( targets
+            , setBallVelocityAndUpdatePosition velocity ball :: acc
+            , floored
+            )
 
         Just ( { t, normal }, bc ) ->
             let
