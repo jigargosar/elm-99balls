@@ -106,7 +106,7 @@ type alias Ball =
 randomBall : Generator Ball
 randomBall =
     Random.map5 Ball
-        randomBallPosition
+        randomBallPositionAtBottom
         --angle
         (Random.float 0 (turns 1))
         --speed
@@ -117,9 +117,9 @@ randomBall =
         (Random.int 10 30 |> Random.map toFloat)
 
 
-randomBallPositionOnBottomEdge =
-    edges
-        |> List.find isBottomEdge
+randomBallPositionAtBottom : Generator Vec
+randomBallPositionAtBottom =
+    randomVecOnSeg screenSeg.bottom
 
 
 randomBallPosition : Generator Vec
@@ -235,7 +235,7 @@ bottomEdge =
 
 isBottomEdge : Edge -> Bool
 isBottomEdge edge =
-    eqByAtLeast 0.01 (vecAngle edge.normal) (turns -0.25)
+    edge == bottomEdge
 
 
 type Msg
