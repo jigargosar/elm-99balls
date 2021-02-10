@@ -255,7 +255,7 @@ updateBall staticBalls ball =
                             vecFromTo ballPositionAtT other.position
 
                 newVelocity =
-                    vecSub velocity (vecScale 2 (vecAlong collisionNormal velocity))
+                    vecSub velocity (vecScale 2 (vecAlong normal velocity))
             in
             setBallPositionAndVelocity ballPositionAtT newVelocity ball
 
