@@ -7,6 +7,7 @@ import Html exposing (Html)
 import List.Extra as List
 import Random exposing (Generator, Seed)
 import Random.Extra as Random
+import Random.List as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -89,7 +90,7 @@ hasHP target =
 
 
 maxHP =
-    20
+    5
 
 
 randomTargets : Generator (List Target)
@@ -114,15 +115,24 @@ randomTargets =
             List.range 0 (gwi - 1)
                 |> List.map toFloat
                 |> List.map (mul cw >> add dx)
+
+        randomTargetPositions =
+            xs
+                |> List.map (\x -> vec x 0)
+                |> Random.shuffle
+                |> Random.map2 (\i -> List.take (gwi - i)) (Random.int 2 5)
     in
-    xs
-        |> List.map (\x -> vec x 0)
-        |> List.map
-            (\p ->
-                Random.map (Target p targetRadius)
-                    (Random.int (maxHP // 2) maxHP)
+    randomTargetPositions
+        |> Random.andThen
+            (\ps ->
+                ps
+                    |> List.map
+                        (\p ->
+                            Random.map (Target p targetRadius)
+                                (Random.int (maxHP // 2) maxHP)
+                        )
+                    |> Random.combine
             )
-        |> Random.combine
 
 
 
