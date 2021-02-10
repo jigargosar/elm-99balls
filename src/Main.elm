@@ -86,12 +86,18 @@ hasHP target =
     target.hp > 0
 
 
+maxHP =
+    20
+
+
 randomTarget : Generator Target
 randomTarget =
     Random.map3 Target
         randomBallPosition
-        (Random.int 30 30 |> Random.map toFloat)
-        (Random.int 10 20)
+        --radius
+        (Random.int 25 30 |> Random.map toFloat)
+        --hp
+        (Random.int 10 maxHP)
 
 
 type alias Ball =
