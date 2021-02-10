@@ -571,7 +571,11 @@ viewBall ball =
 
 
 viewBallHelper x y nx ny radius hue =
-    Svg.g [ T.stroke (Paint (Color.hsl hue 1 0.45)), T.transform [ Translate x y ] ]
+    Svg.g
+        [ T.stroke (Paint (Color.hsl hue 0.9 0.45))
+        , T.transform [ Translate x y ]
+        , Px.strokeWidth 2
+        ]
         [ Svg.circle [ Px.r radius ] []
         , Svg.line [ Px.x2 nx, Px.y2 ny ] []
         ]
