@@ -302,7 +302,15 @@ handleEmptyMovingBalls model =
 
 handleEmptyTargets : Model -> Model
 handleEmptyTargets model =
-    model
+    if model.targets == [] then
+        let
+            ( targets, seed ) =
+                Random.step (Random.list 20 randomTarget) model.seed
+        in
+        { model | targets = targets, seed = seed }
+
+    else
+        model
 
 
 type BallUpdate
