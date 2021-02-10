@@ -205,15 +205,20 @@ init _ =
         initialSeed =
             Random.initialSeed 0
 
-        ( ( balls, staticBalls ), _ ) =
-            Random.step
-                (Random.pair
-                    (Random.list 10 randomBall)
-                    (Random.list 20 randomBall)
-                )
-                initialSeed
+        ( ( ( balls, staticBalls ), targets ), _ ) =
+            Random.step randomLevel initialSeed
     in
-    ( { balls = balls, staticBalls = staticBalls, targets = [] }, Cmd.none )
+    ( { balls = balls, staticBalls = staticBalls, targets = targets }, Cmd.none )
+
+
+randomLevel : Generator ( ( List Ball, List Ball ), List Target )
+randomLevel =
+    Random.pair
+        (Random.pair
+            (Random.list 10 randomBall)
+            (Random.list 20 randomBall)
+        )
+        (Random.constant [])
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
