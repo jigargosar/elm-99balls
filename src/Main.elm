@@ -431,59 +431,6 @@ detectBallCollision targets velocity ball =
         |> List.minimumBy (Tuple.first >> .t)
 
 
-type alias Collision =
-    { t : Float, normal : Vec }
-
-
-detectMovingCircleAndCircleCollision : ( Circle, Vec ) -> Circle -> Maybe Collision
-detectMovingCircleAndCircleCollision mc c =
-    testMovingSphereSphere mc ( c, vecZero )
-        |> Maybe.filter (\t -> t >= 0 && t <= 1)
-        |> Maybe.andThen
-            (\t ->
-                let
-                    ( ( p1, _ ), velocity ) =
-                        mc
-
-                    ( p2, _ ) =
-                        c
-
-                    p1AtT =
-                        vecAdd p1 (vecScale t velocity)
-
-                    normal =
-                        vecFromTo p2 p1AtT
-                            |> vecNormalize
-                in
-                if vecDotProduct velocity normal < 0 then
-                    Just (Collision t normal)
-
-                else
-                    Nothing
-            )
-
-
-detectMovingCircleAndSegCollision : ( Circle, Vec ) -> ( Vec, Vec ) -> Maybe Collision
-detectMovingCircleAndSegCollision mc ( from, to ) =
-    testMovingSphereSphere mc ( ( from, 1 ), vecFromTo from to )
-        |> Maybe.filter (\t -> t >= 0 && t <= 1)
-        |> Maybe.andThen
-            (\t ->
-                let
-                    ( _, velocity ) =
-                        mc
-
-                    normal =
-                        vecUnitNormalFromTo from to
-                in
-                if vecDotProduct velocity normal < 0 then
-                    Just (Collision t normal)
-
-                else
-                    Nothing
-            )
-
-
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
