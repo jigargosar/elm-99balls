@@ -263,13 +263,14 @@ update message model =
 updateSim : Model -> Model
 updateSim model =
     let
-        ( targets, balls, _ ) =
+        ( targets, balls, floorBalls ) =
             model.balls
                 |> List.foldl updateBall ( model.targets, [], [] )
     in
     { model
         | balls = balls
         , targets = targets
+        , floorBalls = model.floorBalls ++ floorBalls
     }
 
 
