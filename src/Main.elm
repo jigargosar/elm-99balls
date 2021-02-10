@@ -303,7 +303,7 @@ updateBall targets ball =
                         setBallPosition ballPositionAtT ball
 
                       else
-                        setBallPosition ballPositionAtT ball
+                        setBallPositionAndVelocity ballPositionAtT newVelocity ball
                     )
 
                 BallTargetCollision target ->
