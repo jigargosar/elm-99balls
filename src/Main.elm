@@ -672,7 +672,12 @@ view model =
         , group [ transform [ scale 0.7 ] ]
             [ rect sri [ fillP black ]
             , viewBalls model.floorBalls
-            , viewTargets model.targets
+            , case model.state of
+                TargetsEntering start ->
+                    viewTargets -1 model.targets
+
+                Sim ->
+                    viewTargets 0 model.targets
             , viewBalls model.balls
             , viewEdges
             , case model.maybeEmitter of
@@ -685,14 +690,14 @@ view model =
         ]
 
 
-viewTargets : List Target -> Svg msg
-viewTargets targets =
+viewTargets : Float -> List Target -> Svg msg
+viewTargets progress targets =
     let
         targetHue target =
             toFloat target.hp / maxHP
 
         viewTarget target =
-            group [ transform [ translate target.position ] ]
+            group [ transform [ translate (target.position |> vecMapY (add (progress * gc.cri.y * 2))) ] ]
                 [ Svg.circle
                     [ Px.r target.radius
                     , fillH (targetHue target)
