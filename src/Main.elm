@@ -1,5 +1,6 @@
 module Main exposing (main)
 
+import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events
 import Color exposing (..)
@@ -320,9 +321,20 @@ convergeFloorBalls model =
             { model
                 | floorBalls =
                     f
-                        :: List.map (setBallPosition f.position) rest
+                        :: List.map (slideBallTowards f.position) rest
                         |> List.reverse
             }
+
+
+slideBallTowards : Vec -> Ball -> Ball
+slideBallTowards to ball =
+    let
+        p =
+            vecFromTo ball.position to
+                |> vecScale 0.1
+                |> vecAdd ball.position
+    in
+    setBallPosition p ball
 
 
 updateSimHelp : Model -> Model
