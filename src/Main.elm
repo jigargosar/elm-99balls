@@ -104,56 +104,56 @@ maxHP =
 moveTargetDown : Target -> Target
 moveTargetDown target =
     { target
-        | position = vecMapY (add (targetConfig.cri.y * 2)) target.position
+        | position = vecMapY (add (gc.cri.y * 2)) target.position
         , gy = inc target.gy
     }
 
 
-type alias TargetConfig =
-    { gri : Vec
-    , gw : Int
-    , gh : Int
+type alias GridConf =
+    { ri : Vec
+    , w : Int
+    , h : Int
     , cri : Vec
     , tr : Float
     , dx : Float
     , dy : Float
-    , gps : List ( Int, Int )
+    , topRowPS : List ( Int, Int )
     }
 
 
-targetConfig : TargetConfig
-targetConfig =
+gc : GridConf
+gc =
     let
-        gri =
+        ri =
             sri
 
-        gw =
+        w =
             6
 
-        gh =
+        h =
             8
 
         cri =
-            vec (gri.x / gw) (gri.y / gh)
+            vec (ri.x / w) (ri.y / h)
 
-        targetRadius =
+        tr =
             cri.x * 0.7
 
         ( dx, dy ) =
-            ( cri.x - gri.x, cri.y - gri.y )
+            ( cri.x - ri.x, cri.y - ri.y )
 
-        gps =
-            List.range 0 (gw - 1)
+        topRowPS =
+            List.range 0 (w - 1)
                 |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
     in
-    { gri = gri
-    , gw = gw
-    , gh = gh
+    { ri = ri
+    , w = w
+    , h = h
     , cri = cri
-    , tr = targetRadius
+    , tr = tr
     , dx = dx
     , dy = dy
-    , gps = gps
+    , topRowPS = topRowPS
     }
 
 
@@ -170,14 +170,14 @@ gridToWorld { cri, dy, dx } ( x, y ) =
 
 randomTarget : ( Int, Int ) -> Generator Target
 randomTarget (( _, y ) as gp) =
-    rnd1 (Target (gridToWorld targetConfig gp) y targetConfig.tr) (rndI 1 maxHP)
+    rnd1 (Target (gridToWorld gc gp) y gc.tr) (rndI 1 maxHP)
 
 
 randomTargets : Generator (List Target)
 randomTargets =
     let
         randomTargetPositions =
-            rnd2 List.drop (rndI 0 3) (rndShuffle targetConfig.gps)
+            rnd2 List.drop (rndI 0 3) (rndShuffle gc.topRowPS)
     in
     randomTargetPositions
         |> rndAndThen
@@ -442,7 +442,7 @@ updateTargetsAndInitEmitter model =
 
 stepTargetRows : Model -> Model
 stepTargetRows model =
-    if maximumTargetGYOr -1 model.targets < (targetConfig.gh - 2) then
+    if maximumTargetGYOr -1 model.targets < (gc.h - 2) then
         let
             ( targets, seed ) =
                 rndStep ( randomTargets, model.seed )
