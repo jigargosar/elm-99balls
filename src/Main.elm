@@ -195,8 +195,8 @@ ballVelocity ball =
 
 
 setBallPosition : Vec -> Ball -> Ball
-setBallPosition v ball =
-    { ball | angle = vecAngle v }
+setBallPosition p ball =
+    { ball | position = p }
 
 
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
@@ -312,7 +312,17 @@ updateSim model =
 
 convergeFloorBalls : Model -> Model
 convergeFloorBalls model =
-    model
+    case model.floorBalls |> List.reverse of
+        [] ->
+            model
+
+        f :: rest ->
+            { model
+                | floorBalls =
+                    f
+                        :: List.map (setBallPosition f.position) rest
+                        |> List.reverse
+            }
 
 
 updateSimHelp : Model -> Model
