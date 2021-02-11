@@ -105,6 +105,23 @@ moveTargetDown target =
     { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
 
 
+randomTarget : ( Int, Int ) -> Generator Target
+randomTarget gp =
+    rnd1 (initTarget gp) (rndInt 1 maxHP)
+
+
+initTarget : ( Int, Int ) -> Int -> Target
+initTarget gp hp =
+    Target (toWorld gp) gc.tr hp
+
+
+maximumTargetGYOr : Int -> List Target -> Int
+maximumTargetGYOr or targets =
+    maximumBy (.position >> .y) targets
+        |> Maybe.map (.position >> fromWorld >> snd)
+        |> Maybe.withDefault or
+
+
 type alias GridConf =
     { ri : Vec
     , w : Int
@@ -153,13 +170,6 @@ gc =
     }
 
 
-maximumTargetGYOr : Int -> List Target -> Int
-maximumTargetGYOr or targets =
-    maximumBy (.position >> .y) targets
-        |> Maybe.map (.position >> fromWorld >> snd)
-        |> Maybe.withDefault or
-
-
 toWorld : ( Int, Int ) -> Vec
 toWorld ( x, y ) =
     let
@@ -179,16 +189,11 @@ fromWorld { x, y } =
         |> round2
 
 
-randomTarget : ( Int, Int ) -> Generator Target
-randomTarget gp =
-    rnd1 (Target (toWorld gp) gc.tr) (rndI 1 maxHP)
-
-
 randomTargets : Generator (List Target)
 randomTargets =
     let
         randomTargetPositions =
-            rnd2 List.drop (rndI 0 3) (rndShuffle gc.topRowPS)
+            rnd2 List.drop (rndInt 0 3) (rndShuffle gc.topRowPS)
     in
     randomTargetPositions
         |> rndAndThen
@@ -217,7 +222,7 @@ randomBall =
         --hue
         (rndF 0 1 |> always (rndConstant 0.15))
         --radius
-        (rndI 15 25 |> rnd1 toFloat |> always (rndConstant 20))
+        (rndInt 15 25 |> rnd1 toFloat |> always (rndConstant 20))
 
 
 randomBallPositionAtBottom : Generator Vec

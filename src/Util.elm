@@ -570,7 +570,7 @@ rndShuffle =
     Random.List.shuffle
 
 
-rndI =
+rndInt =
     Random.int
 
 
