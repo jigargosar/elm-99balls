@@ -4,6 +4,7 @@ import Basics.Extra exposing (atLeast, uncurry)
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Random.Extra as Random
+import Random.List
 
 
 type alias Vec =
@@ -429,3 +430,67 @@ propEmpty fn =
 
 propEq fn v x =
     fn x == v
+
+
+
+-- Random
+
+
+type alias Generator a =
+    Random.Generator a
+
+
+type alias Seed =
+    Random.Seed
+
+
+seedFrom =
+    Random.initialSeed
+
+
+rndStep ( g, s ) =
+    Random.step g s
+
+
+rndPair =
+    Random.pair
+
+
+rnd5 =
+    Random.map5
+
+
+rnd2 =
+    Random.map2
+
+
+rnd1 =
+    Random.map
+
+
+rndList =
+    Random.list
+
+
+rndConstant =
+    Random.constant
+
+
+rndAndThen =
+    Random.andThen
+
+
+rndShuffle =
+    Random.List.shuffle
+
+
+rndI =
+    Random.int
+
+
+rndF =
+    Random.float
+
+
+rndCombine =
+    Random.combine

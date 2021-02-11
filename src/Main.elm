@@ -5,9 +5,6 @@ import Browser.Events
 import Color
 import Html exposing (Html)
 import List.Extra as List
-import Random exposing (Generator, Seed)
-import Random.Extra as Random
-import Random.List as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -131,19 +128,19 @@ randomTargets =
 
         randomTargetPositions =
             gps
-                |> Random.shuffle
-                |> Random.map2 List.drop (Random.constant 10)
+                |> rndShuffle
+                |> rnd2 List.drop (rndConstant 10)
     in
     randomTargetPositions
-        |> Random.andThen
+        |> rndAndThen
             (\ps ->
                 ps
                     |> List.map
                         (\p ->
-                            Random.map (Target p targetRadius)
-                                (Random.int 1 (maxHP // 3))
+                            rnd1 (Target p targetRadius)
+                                (rndI 1 (maxHP // 3))
                         )
-                    |> Random.combine
+                    |> rndCombine
             )
 
 
@@ -169,23 +166,23 @@ type alias Ball =
 
 randomBall : Generator Ball
 randomBall =
-    Random.map5 Ball
+    rnd5 Ball
         randomBallPositionAtBottom
         --angle
-        (Random.float 0 (turns 1))
+        (rndF 0 (turns 1))
         --speed
-        (Random.float 10 15)
+        (rndF 10 15)
         --hue
-        (Random.float 0 1)
+        (rndF 0 1)
         --radius
-        (Random.int 15 25 |> Random.map toFloat)
+        (rndI 15 25 |> rnd1 toFloat)
 
 
 randomBallPositionAtBottom : Generator Vec
 randomBallPositionAtBottom =
     --Random.map (vecScale 1)
-    Random.map2 (\offset -> vecMapR (add -offset))
-        (Random.float 0 10)
+    rnd2 (\offset -> vecMapR (add -offset))
+        (rndF 0 10)
         (randomPtOnSeg screenSeg.bottom)
 
 
@@ -300,10 +297,10 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
         initialSeed =
-            Random.initialSeed 0
+            seedFrom 0
 
         ( ( balls, targets ), seed ) =
-            Random.step randomLevel initialSeed
+            rndStep ( randomLevel, initialSeed )
     in
     ( { balls = balls
       , floorBalls = []
@@ -316,8 +313,8 @@ init _ =
 
 randomLevel : Generator ( List Ball, List Target )
 randomLevel =
-    Random.pair
-        (Random.list 10 randomBall)
+    rndPair
+        (rndList 10 randomBall)
         randomTargets
 
 
@@ -369,7 +366,7 @@ handleEmptyTargets model =
     if model.targets == [] && model.balls == [] then
         let
             ( targets, seed ) =
-                Random.step randomTargets model.seed
+                rndStep ( randomTargets, model.seed )
         in
         { model | targets = targets, seed = seed }
 
