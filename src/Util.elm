@@ -93,6 +93,16 @@ vecAngle { x, y } =
     atan2 y x
 
 
+vecLenSqFromTo : Vec -> Vec -> Float
+vecLenSqFromTo a b =
+    vecFromTo a b |> vecLenSq
+
+
+vecLenSq : Vec -> Float
+vecLenSq v =
+    vecDotProduct v v
+
+
 vecNormalize : Vec -> Vec
 vecNormalize v =
     vecFromAngle (vecAngle v)

@@ -353,7 +353,7 @@ updateSimHelp model =
 
 handleEmptyMovingBalls : Model -> Model
 handleEmptyMovingBalls model =
-    if model.balls == [] && model.targets /= [] then
+    if model.balls == [] && model.targets /= [] && areFloorBallsSettled model then
         { model
             | balls = model.floorBalls
             , floorBalls = []
@@ -361,6 +361,21 @@ handleEmptyMovingBalls model =
 
     else
         model
+
+
+areFloorBallsSettled model =
+    case model.floorBalls |> List.reverse of
+        [] ->
+            False
+
+        f :: rest ->
+            List.all (areBallsCloseEnough f) rest
+
+
+areBallsCloseEnough : Ball -> Ball -> Bool
+areBallsCloseEnough a b =
+    vecLenSqFromTo a.position b.position
+        |> eqByAtLeast 1 0
 
 
 handleEmptyTargets : Model -> Model
