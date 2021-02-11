@@ -237,9 +237,9 @@ edgeFromTo from to =
     }
 
 
-edgePoints : Edge -> List Vec
-edgePoints { from, to } =
-    [ from, to ]
+edgeToSeg : Edge -> Seg
+edgeToSeg { from, to } =
+    ( from, to )
 
 
 screenSeg =
@@ -500,38 +500,40 @@ viewTargets targets =
 
 viewEdges : Svg Msg
 viewEdges =
-    group []
-        [ group [] (List.map viewEdge edges)
-        , group [] (List.map viewEdgeNormal edges)
-            |> always viewNone
-        ]
-
-
-viewEdge : Edge -> Svg Msg
-viewEdge edge =
-    polyline (edgePoints edge) [ strokeP red, Px.strokeWidth 1 ]
-
-
-edgeDebugNormal : Edge -> Seg
-edgeDebugNormal { from, to } =
     let
-        start =
-            vecMidpoint from to
+        do =
+            group []
+                [ group [] (List.map viewEdge edges)
+                , group [] (List.map viewEdgeNormal edges)
+                    |> always viewNone
+                ]
 
-        velocity =
-            vecUnitNormalFromTo from to
-                |> vecScale (sw * 0.1)
+        viewEdge : Edge -> Svg Msg
+        viewEdge edge =
+            polySeg (edgeToSeg edge)
+                [ strokeP red, Px.strokeWidth 1 ]
 
-        end =
-            vecAdd start velocity
+        viewEdgeNormal : Edge -> Svg Msg
+        viewEdgeNormal edge =
+            polySeg (edgeDebugNormal edge)
+                [ strokeP blue, Px.strokeWidth 5 ]
+
+        edgeDebugNormal : Edge -> Seg
+        edgeDebugNormal { from, to } =
+            let
+                start =
+                    vecMidpoint from to
+
+                velocity =
+                    vecUnitNormalFromTo from to
+                        |> vecScale (sw * 0.1)
+
+                end =
+                    vecAdd start velocity
+            in
+            ( start, end )
     in
-    ( start, end )
-
-
-viewEdgeNormal : Edge -> Svg Msg
-viewEdgeNormal edge =
-    polySeg (edgeDebugNormal edge)
-        [ strokeP blue, Px.strokeWidth 5 ]
+    do
 
 
 viewBalls : List Ball -> Svg Msg
