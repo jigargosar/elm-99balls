@@ -305,8 +305,14 @@ updateSim : Model -> Model
 updateSim model =
     model
         |> updateSimHelp
+        |> convergeFloorBalls
         |> handleEmptyMovingBalls
         |> handleEmptyTargets
+
+
+convergeFloorBalls : Model -> Model
+convergeFloorBalls model =
+    model
 
 
 updateSimHelp : Model -> Model
