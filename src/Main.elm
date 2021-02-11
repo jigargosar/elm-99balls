@@ -430,9 +430,12 @@ updateTargetsAndInitEmitter model =
 
 maximumTargetGYOr : Int -> List Target -> Int
 maximumTargetGYOr or targets =
-    List.map .gy targets
-        |> maximum
-        |> Maybe.withDefault or
+    Debug.log
+        "List.map .gy targets ..."
+        (List.map .gy targets
+            |> maximum
+            |> Maybe.withDefault or
+        )
 
 
 stepTargetRows : Model -> Model
