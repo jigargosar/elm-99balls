@@ -321,13 +321,13 @@ convergeFloorBalls model =
             { model
                 | floorBalls =
                     f
-                        :: List.map (slideBallTowards f.position) rest
+                        :: List.map (convergeBallTowards f.position) rest
                         |> List.reverse
             }
 
 
-slideBallTowards : Vec -> Ball -> Ball
-slideBallTowards to ball =
+convergeBallTowards : Vec -> Ball -> Ball
+convergeBallTowards to ball =
     let
         p =
             vecFromTo ball.position to
