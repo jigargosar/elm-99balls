@@ -359,10 +359,10 @@ updateSim : Model -> Model
 updateSim model =
     model
         |> moveBallsAndHandleCollision
-        |> updateTargets model
-        |> reInitEmitterFromFlooredBalls model
         |> emitBalls
         |> convergeFloorBalls
+        |> reInitEmitterFromFlooredBalls model
+        |> updateTargets model
         |> incFrame
 
 
