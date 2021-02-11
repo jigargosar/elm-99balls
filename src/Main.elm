@@ -160,11 +160,7 @@ randomTargets =
     in
     randomTargetPositions
         |> rndAndThen
-            (List.map
-                (\p ->
-                    rnd1 (Target p targetConfig.tr)
-                        (rndI 1 (maxHP // 3))
-                )
+            (List.map (\p -> rnd1 (Target p targetConfig.tr) (rndI 1 maxHP))
                 >> rndCombine
             )
 
