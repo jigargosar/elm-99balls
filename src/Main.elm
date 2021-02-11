@@ -466,7 +466,7 @@ view model =
         , S.stroke "none"
         ]
         [ group [ transform [ scale 0.7 ] ]
-            [ rect sw sh [] [ S.stroke "black" ]
+            [ rect sri [ S.stroke "black" ]
             , viewBalls model.floorBalls
             , viewTargets model.targets
             , viewBalls model.balls
@@ -564,13 +564,16 @@ viewBalls =
     do
 
 
-rect w h xf aa =
+rect ri =
+    vecApply rectWH ri
+
+
+rectWH w h aa =
     Svg.rect
         (Px.x (-w / 2)
             :: Px.y (-h / 2)
             :: Px.width w
             :: Px.height h
-            :: transform xf
             :: aa
         )
         []
