@@ -317,9 +317,9 @@ updateSim model =
     model
         |> updateSimHelp
         |> emitBalls
-        |> handleEmptyTargets
         |> convergeFloorBalls
         |> handleConvergedFloorBalls
+        |> updateTargets
         |> incFrame
 
 
@@ -433,8 +433,8 @@ areBallsCloseEnough a b =
         |> eqByAtLeast 1 0
 
 
-handleEmptyTargets : Model -> Model
-handleEmptyTargets model =
+updateTargets : Model -> Model
+updateTargets model =
     if model.targets == [] && model.balls == [] then
         let
             ( targets, seed ) =
