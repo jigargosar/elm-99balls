@@ -460,6 +460,24 @@ updateTargetsAndInitEmitter model =
         model
 
 
+initEmitterFromFloorBalls : Model -> Model
+initEmitterFromFloorBalls model =
+    case model.floorBalls |> List.reverse of
+        [] ->
+            model
+
+        f :: rest ->
+            { model
+                | floorBalls = []
+                , maybeEmitter =
+                    Just
+                        (Emitter model.frame
+                            f
+                            (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
+                        )
+            }
+
+
 stepTargetRows : Model -> Model
 stepTargetRows model =
     if canTargetsSafelyMoveDown model.targets then
