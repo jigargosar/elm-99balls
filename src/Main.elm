@@ -8,7 +8,7 @@ import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
-import TypedSvg.Types as TT exposing (..)
+import TypedSvg.Types exposing (..)
 import Util exposing (..)
 
 
@@ -513,8 +513,8 @@ viewTargets targets =
                     []
                 , Svg.text_
                     [ S.fill "#fff"
-                    , T.alignmentBaseline TT.AlignmentCentral
-                    , T.textAnchor TT.AnchorMiddle
+                    , T.alignmentBaseline AlignmentCentral
+                    , T.textAnchor AnchorMiddle
                     , transform [ scale (target.radius / 14) ]
                     ]
                     [ Svg.text (String.fromInt target.hp) ]
