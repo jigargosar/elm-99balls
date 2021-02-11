@@ -461,8 +461,8 @@ detectBallCollision targets velocity ball =
     in
     c1
         ++ c2
-        |> List.minimumBy (Tuple.first >> .t)
-        |> Maybe.map (Tuple.mapFirst (movingCircleCollisionResponse mc))
+        |> minimumBy (fst >> .t)
+        |> Maybe.map (mapFst (movingCircleCollisionResponse mc))
 
 
 movingCircleCollisionResponse : MovingCircle -> Collision -> CollisionResponse
@@ -563,10 +563,10 @@ viewBall ball =
                 |> fromPolar
                 |> roundFloat2
     in
-    viewBallHelper x y nx ny ball.radius ball.hue
-
-
-viewBallHelper x y nx ny radius hue =
+    let
+        { radius, hue } =
+            ball
+    in
     let
         strokeW =
             4
@@ -579,14 +579,6 @@ viewBallHelper x y nx ny radius hue =
         [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
         , Svg.line [ Px.x2 nx, Px.y2 ny ] []
         ]
-
-
-roundFloat =
-    round >> toFloat
-
-
-roundFloat2 =
-    mapEach roundFloat
 
 
 rect w h xf aa =

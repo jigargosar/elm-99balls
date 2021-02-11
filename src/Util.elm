@@ -383,6 +383,10 @@ intersectRaySphere ( p, d ) ( sc, sr ) =
                 |> Just
 
 
+
+-- Basics
+
+
 add =
     (+)
 
@@ -399,6 +403,14 @@ eq =
     (==)
 
 
+roundFloat =
+    round >> toFloat
+
+
+roundFloat2 =
+    mapEach roundFloat
+
+
 map2 : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
 map2 fn ( a, b ) ( c, d ) =
     ( fn a c, fn b d )
@@ -411,6 +423,22 @@ mapEach fn =
 
 pairTo b a =
     ( a, b )
+
+
+fst =
+    Tuple.first
+
+
+snd =
+    Tuple.second
+
+
+mapFst =
+    Tuple.mapFirst
+
+
+mapSnd =
+    Tuple.mapSecond
 
 
 eqByAtLeast tol a b =
@@ -451,6 +479,10 @@ keepWhen =
 
 reject =
     List.filterNot
+
+
+minimumBy =
+    List.minimumBy
 
 
 
