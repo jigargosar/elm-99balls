@@ -5,7 +5,6 @@ import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
 import List exposing (maximum)
-import List.Extra exposing (maximumBy)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Tuple exposing (pair)
@@ -429,6 +428,7 @@ updateTargetsAndInitEmitter model =
         model
 
 
+maximumTargetGYOr : Int -> List Target -> Int
 maximumTargetGYOr or targets =
     List.map .gy targets
         |> maximum
