@@ -1,6 +1,5 @@
 module Main exposing (main)
 
-import Basics.Extra exposing (flip)
 import Browser
 import Browser.Events
 import Color exposing (..)
