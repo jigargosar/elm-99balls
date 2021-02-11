@@ -67,9 +67,15 @@ type alias Model =
     , balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
+    , state : State
     , frame : Float
     , seed : Seed
     }
+
+
+type State
+    = Input
+    | Sim
 
 
 type alias Emitter =
@@ -334,6 +340,7 @@ init _ =
       , balls = balls
       , floorBalls = []
       , targets = targets
+      , state = Sim
       , frame = 0
       , seed = seed
       }
