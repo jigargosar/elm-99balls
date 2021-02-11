@@ -674,10 +674,10 @@ view model =
             , viewBalls model.floorBalls
             , case model.state of
                 TargetsEntering start ->
-                    viewTargets -1 model.targets
+                    viewTargets 0 model.targets
 
                 Sim ->
-                    viewTargets 0 model.targets
+                    viewTargets 1 model.targets
             , viewBalls model.balls
             , viewEdges
             , case model.maybeEmitter of
@@ -696,8 +696,11 @@ viewTargets progress targets =
         targetHue target =
             toFloat target.hp / maxHP
 
+        dy =
+            (1 - progress) * gc.cri.y * 2
+
         viewTarget target =
-            group [ transform [ translate (target.position |> vecMapY (add (progress * gc.cri.y * 2))) ] ]
+            group [ transform [ translate (target.position |> vecMapY (add dy)) ] ]
                 [ Svg.circle
                     [ Px.r target.radius
                     , fillH (targetHue target)
