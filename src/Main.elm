@@ -465,7 +465,7 @@ view model =
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ Svg.g [ transform [ scale 0.7 ] ]
+        [ group [ transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
             , viewBalls model.floorBalls
             , viewTargets model.targets
@@ -482,7 +482,7 @@ viewTargets targets =
             toFloat target.hp / maxHP
 
         viewTarget target =
-            Svg.g [ transform [ translate target.position ] ]
+            group [ transform [ translate target.position ] ]
                 [ Svg.circle
                     [ Px.r target.radius
                     , fillH (targetHue target)
@@ -495,14 +495,14 @@ viewTargets targets =
                     ]
                 ]
     in
-    Svg.g [] (List.map viewTarget targets)
+    group [] (List.map viewTarget targets)
 
 
 viewEdges : Svg Msg
 viewEdges =
-    Svg.g []
-        [ Svg.g [] (List.map viewEdge edges)
-        , Svg.g [] (List.map viewEdgeNormal edges)
+    group []
+        [ group [] (List.map viewEdge edges)
+        , group [] (List.map viewEdgeNormal edges)
         ]
 
 
@@ -531,7 +531,7 @@ viewBalls : List Ball -> Svg Msg
 viewBalls =
     let
         do balls =
-            Svg.g [] (List.map viewBall balls)
+            group [] (List.map viewBall balls)
 
         viewBall : Ball -> Svg Msg
         viewBall ball =
@@ -552,7 +552,7 @@ viewBalls =
                 strokeW =
                     4
             in
-            Svg.g
+            group
                 [ strokeH hue
                 , transform [ translate p ]
                 , Px.strokeWidth strokeW
@@ -603,3 +603,7 @@ strokeH =
 
 fillH =
     paintHue >> T.fill
+
+
+group =
+    Svg.g
