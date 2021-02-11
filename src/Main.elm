@@ -465,7 +465,8 @@ view model =
         ]
         [ rect sri [ strokeP black ]
         , group [ transform [ scale 0.7 ] ]
-            [ viewBalls model.floorBalls
+            [ rect sri [ fillP black ]
+            , viewBalls model.floorBalls
             , viewTargets model.targets
             , viewBalls model.balls
             , viewEdges
