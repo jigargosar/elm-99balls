@@ -1,11 +1,13 @@
 module Util exposing (..)
 
-import Basics.Extra exposing (atLeast, uncurry)
+import Basics.Extra exposing (atLeast)
 import List.Extra as List
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Random.Extra as Random
 import Random.List
+import TypedSvg.Attributes as T
+import TypedSvg.Types exposing (..)
 
 
 type alias Vec =
@@ -552,3 +554,28 @@ rndF =
 
 rndCombine =
     Random.combine
+
+
+
+-- SVG
+
+
+strokeP =
+    Paint >> T.stroke
+
+
+fillP =
+    Paint >> T.fill
+
+
+scale s =
+    Scale s s
+
+
+transform =
+    T.transform
+
+
+translate : Vec -> Transform
+translate =
+    vecApply Translate

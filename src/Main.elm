@@ -2,7 +2,7 @@ module Main exposing (main)
 
 import Browser
 import Browser.Events
-import Color
+import Color exposing (..)
 import Html exposing (Html)
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -512,7 +512,7 @@ viewTargets targets =
                     ]
                     []
                 , Svg.text_
-                    [ S.fill "#fff"
+                    [ fillP white
                     , T.alignmentBaseline AlignmentCentral
                     , T.textAnchor AnchorMiddle
                     , transform [ scale (target.radius / 14) ]
@@ -533,7 +533,7 @@ viewEdges =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (edgePoints2 edge), S.stroke "red", Px.strokeWidth 1 ] []
+    Svg.polyline [ T.points (edgePoints2 edge), strokeP red, Px.strokeWidth 1 ] []
 
 
 viewEdgeNormal : Edge -> Svg Msg
@@ -544,7 +544,7 @@ viewEdgeNormal edge =
                 edge.midpoint
                 (edge.normal |> vecScale (sw * 0.1))
     in
-    Svg.polyline [ T.points (edgePoints2 normal), S.stroke "blue", Px.strokeWidth 5 ] []
+    Svg.polyline [ T.points (edgePoints2 normal), strokeP blue, Px.strokeWidth 5 ] []
 
 
 viewBalls balls =
@@ -593,7 +593,7 @@ rect w h xf aa =
 
 
 fromHue hue =
-    Color.hsl hue 0.9 0.45
+    hsl hue 0.9 0.45
 
 
 paintHue =
@@ -606,16 +606,3 @@ strokeH =
 
 fillH =
     paintHue >> T.fill
-
-
-scale s =
-    Scale s s
-
-
-transform =
-    T.transform
-
-
-translate : Vec -> Transform
-translate =
-    vecApply Translate
