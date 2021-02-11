@@ -374,8 +374,34 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
+stepEmitter frame emitter =
+    if frame - emitter.start > 10 then
+        Just
+            ( emitter.next
+            , case emitter.rest of
+                [] ->
+                    Nothing
+
+                n :: r ->
+                    Just (Emitter frame n r)
+            )
+
+    else
+        Nothing
+
+
 emitBalls : Model -> Model
 emitBalls model =
+    let
+        _ =
+            model.maybeEmitter
+                |> Maybe.andThen (stepEmitter model.frame)
+                |> Maybe.map
+                    (\( ball, maybeEmitter ) ->
+                        { model | balls = ball :: model.balls, maybeEmitter = maybeEmitter }
+                    )
+                |> Maybe.withDefault model
+    in
     case model.maybeEmitter of
         Nothing ->
             model
@@ -416,6 +442,37 @@ toState model =
 
                 moving ->
                     Moving { moving = moving, floored = model.floorBalls }
+
+
+
+--updateSimHelp2 : Model -> Model
+--updateSimHelp2 model =
+--    case toState model of
+--        Emitting {emitter,moving,floored} ->
+--            let
+--                (newEmitter, newMoving) =
+--                    if model.frame - emitter.start > 10 then
+--                                                    { model
+--                                                        | balls = emitter.next :: model.balls
+--                                                        , maybeEmitter =
+--                                                            case emitter.rest of
+--                                                                [] ->
+--                                                                    Nothing
+--
+--                                                                n :: r ->
+--                                                                    Just (Emitter model.frame n r)
+--                                                    }
+--
+--                                                else
+--                                                    model
+--            in
+--
+--
+--
+--        Moving record ->
+--
+--
+--        Sweeping record ->
 
 
 convergeFloorBalls : Model -> Model
