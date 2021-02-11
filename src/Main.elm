@@ -358,8 +358,9 @@ update message model =
 updateSim : Model -> Model
 updateSim model =
     model
-        |> updateSimHelp
-        |> updateTargetsAndInitEmitter
+        |> moveBallsAndHandleCollision
+        |> updateTargets model
+        |> reInitEmitterFromFlooredBalls model
         |> emitBalls
         |> convergeFloorBalls
         |> incFrame
@@ -501,8 +502,8 @@ convergeBallTowards to ball =
     setBallPosition p ball
 
 
-updateSimHelp : Model -> Model
-updateSimHelp model =
+moveBallsAndHandleCollision : Model -> Model
+moveBallsAndHandleCollision model =
     let
         ( targets, floorBalls, balls ) =
             model.balls
@@ -515,46 +516,55 @@ updateSimHelp model =
     }
 
 
-updateTargetsAndInitEmitter : Model -> Model
-updateTargetsAndInitEmitter model =
-    if model.balls == [] && areFloorBallsSettled model && model.maybeEmitter == Nothing then
-        model
-            |> initEmitterFromFloorBalls
-            |> stepTargetRows
+updateTargets : Model -> Model -> Model
+updateTargets old model =
+    if
+        (old.maybeEmitter == Nothing)
+            && (old.balls /= [])
+            && (model.balls == [])
+    then
+        if canTargetsSafelyMoveDown model.targets then
+            let
+                ( targets, seed ) =
+                    rndStep ( randomTargets, model.seed )
+            in
+            { model
+                | targets = targets ++ List.map moveTargetDown model.targets
+                , seed = seed
+            }
+
+        else
+            model
 
     else
         model
 
 
-initEmitterFromFloorBalls : Model -> Model
-initEmitterFromFloorBalls model =
-    case model.floorBalls |> List.reverse of
-        [] ->
-            model
+reInitEmitterFromFlooredBalls : Model -> Model -> Model
+reInitEmitterFromFlooredBalls old model =
+    if
+        (model.maybeEmitter == Nothing)
+            && (model.balls == [])
+            && areFloorBallsSettled old
+            && areFloorBallsSettled model
+    then
+        case model.floorBalls |> List.reverse of
+            [] ->
+                model
 
-        f :: rest ->
-            { model
-                | floorBalls = []
-                , maybeEmitter =
-                    Just
-                        (Emitter model.frame
-                            f
-                            (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
-                        )
-            }
-
-
-stepTargetRows : Model -> Model
-stepTargetRows model =
-    if canTargetsSafelyMoveDown model.targets then
-        let
-            ( targets, seed ) =
-                rndStep ( randomTargets, model.seed )
-        in
-        { model
-            | targets = targets ++ List.map moveTargetDown model.targets
-            , seed = seed
-        }
+            f :: rest ->
+                { model
+                    | floorBalls = []
+                    , maybeEmitter =
+                        Just
+                            (Emitter model.frame
+                                f
+                                (rest
+                                    |> List.map
+                                        (setBallPositionAndVelocity f.position (ballVelocity f))
+                                )
+                            )
+                }
 
     else
         model
