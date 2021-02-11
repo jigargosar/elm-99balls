@@ -531,15 +531,8 @@ edgeDebugNormal { from, to } =
 viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
-        from =
-            vecMidpoint edge.from edge.to
-
-        velocity =
-            vecUnitNormalFromTo edge.from edge.to
-                |> vecScale (sw * 0.1)
-
-        to =
-            vecAdd from velocity
+        ( from, to ) =
+            edgeDebugNormal edge
     in
     Svg.polyline [ points [ from, to ], strokeP blue, Px.strokeWidth 5 ] []
 
