@@ -209,13 +209,10 @@ randomTargets : Generator (List Target)
 randomTargets =
     let
         randomTargetPositions =
-            rnd2 List.drop (rndInt 0 3) (rndShuffle gc.topRowPS)
+            rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
     in
     randomTargetPositions
-        |> rndAndThen
-            (List.map randomTarget
-                >> rndCombine
-            )
+        |> rndAndThen (List.map randomTarget >> rndCombine)
 
 
 type alias Ball =
