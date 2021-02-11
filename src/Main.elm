@@ -547,37 +547,39 @@ viewEdgeNormal edge =
     Svg.polyline [ T.points (edgePoints2 normal), strokeP blue, Px.strokeWidth 5 ] []
 
 
-viewBalls balls =
-    Svg.g [] (List.map viewBall balls)
-
-
-viewBall : Ball -> Svg Msg
-viewBall ball =
+viewBalls : List Ball -> Svg Msg
+viewBalls =
     let
-        p =
-            vecRound ball.position
+        viewBall : Ball -> Svg Msg
+        viewBall ball =
+            let
+                p =
+                    vecRound ball.position
 
-        ( nx, ny ) =
-            ( ball.radius, ball.angle )
-                |> fromPolar
-                |> roundFloat2
+                ( nx, ny ) =
+                    ( ball.radius, ball.angle )
+                        |> fromPolar
+                        |> roundFloat2
+            in
+            let
+                { radius, hue } =
+                    ball
+            in
+            let
+                strokeW =
+                    4
+            in
+            Svg.g
+                [ strokeH hue
+                , transform [ translate p ]
+                , Px.strokeWidth strokeW
+                ]
+                [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
+                , Svg.line [ Px.x2 nx, Px.y2 ny ] []
+                ]
     in
-    let
-        { radius, hue } =
-            ball
-    in
-    let
-        strokeW =
-            4
-    in
-    Svg.g
-        [ strokeH hue
-        , transform [ translate p ]
-        , Px.strokeWidth strokeW
-        ]
-        [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
-        , Svg.line [ Px.x2 nx, Px.y2 ny ] []
-        ]
+    \balls ->
+        Svg.g [] (List.map viewBall balls)
 
 
 rect w h xf aa =
