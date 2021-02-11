@@ -488,13 +488,11 @@ viewTargets targets =
                     , fillH (targetHue target)
                     ]
                     []
-                , Svg.text_
+                , words
+                    (String.fromInt target.hp)
                     [ fillP white
-                    , T.alignmentBaseline AlignmentCentral
-                    , T.textAnchor AnchorMiddle
                     , transform [ scale (target.radius / 14) ]
                     ]
-                    [ Svg.text (String.fromInt target.hp) ]
                 ]
     in
     Svg.g [] (List.map viewTarget targets)
@@ -576,6 +574,15 @@ rect w h xf aa =
             :: aa
         )
         []
+
+
+words txt aa =
+    Svg.text_
+        (T.alignmentBaseline AlignmentCentral
+            :: T.textAnchor AnchorMiddle
+            :: aa
+        )
+        [ Svg.text txt ]
 
 
 points =
