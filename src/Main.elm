@@ -326,8 +326,7 @@ updateSim : Model -> Model
 updateSim model =
     model
         |> updateSimHelp
-        |> updateTargets
-        |> handleConvergedFloorBalls
+        |> updateTargetsAndInitEmitter
         |> emitBalls
         |> convergeFloorBalls
         |> incFrame
@@ -405,16 +404,22 @@ updateSimHelp model =
     }
 
 
-handleConvergedFloorBalls : Model -> Model
-handleConvergedFloorBalls model =
+updateTargetsAndInitEmitter : Model -> Model
+updateTargetsAndInitEmitter model =
     if model.balls == [] && areFloorBallsSettled model && model.maybeEmitter == Nothing then
         case model.floorBalls |> List.reverse of
             [] ->
                 model
 
             f :: rest ->
+                let
+                    ( targets, seed ) =
+                        rndStep ( randomTargets, model.seed )
+                in
                 { model
-                    | floorBalls = []
+                    | targets = targets ++ List.map moveTargetDown model.targets
+                    , seed = seed
+                    , floorBalls = []
                     , maybeEmitter =
                         Just
                             (Emitter model.frame
@@ -422,19 +427,6 @@ handleConvergedFloorBalls model =
                                 (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
                             )
                 }
-
-    else
-        model
-
-
-updateTargets : Model -> Model
-updateTargets model =
-    if (model.balls == []) && areFloorBallsSettled model then
-        let
-            ( targets, seed ) =
-                rndStep ( randomTargets, model.seed )
-        in
-        { model | targets = targets ++ List.map moveTargetDown model.targets, seed = seed }
 
     else
         model
