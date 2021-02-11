@@ -403,6 +403,21 @@ type State
     | Sweeping { floored : List Ball }
 
 
+toState : Model -> State
+toState model =
+    case model.maybeEmitter of
+        Just emitter ->
+            Emitting { emitter = emitter, moving = model.balls, floored = model.floorBalls }
+
+        Nothing ->
+            case model.balls of
+                [] ->
+                    Sweeping { floored = model.floorBalls }
+
+                moving ->
+                    Moving { moving = moving, floored = model.floorBalls }
+
+
 convergeFloorBalls : Model -> Model
 convergeFloorBalls model =
     case model.floorBalls |> List.reverse of
