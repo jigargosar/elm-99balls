@@ -61,7 +61,8 @@ type alias Flags =
 
 
 type alias Model =
-    { balls : List Ball
+    { gun : Maybe { start : Float, next : Ball, rest : List Ball }
+    , balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
     , seed : Seed
@@ -278,7 +279,8 @@ init _ =
         ( ( balls, targets ), seed ) =
             rndStep ( randomLevel, initialSeed )
     in
-    ( { balls = balls
+    ( { gun = Nothing
+      , balls = balls
       , floorBalls = []
       , targets = targets
       , seed = seed
