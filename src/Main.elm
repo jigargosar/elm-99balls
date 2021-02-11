@@ -306,13 +306,13 @@ update message model =
 updateSim : Model -> Model
 updateSim model =
     model
-        |> moveSim
+        |> updateSimHelp
         |> handleEmptyMovingBalls
         |> handleEmptyTargets
 
 
-moveSim : Model -> Model
-moveSim model =
+updateSimHelp : Model -> Model
+updateSimHelp model =
     let
         ( targets, balls, floorBalls ) =
             model.balls
