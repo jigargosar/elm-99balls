@@ -420,6 +420,10 @@ eq =
     (==)
 
 
+inc =
+    add 1
+
+
 round2 =
     mapEach round
 

@@ -389,10 +389,6 @@ updateOnTick model =
                 |> reInitEmitterFromFlooredBalls model
 
 
-inc =
-    add 1
-
-
 incFrame : Model -> Model
 incFrame model =
     { model | frame = inc model.frame }
