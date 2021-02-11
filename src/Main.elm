@@ -170,11 +170,11 @@ randomBall =
         --angle
         (rndF 0 (turns 1))
         --speed
-        (rndF 10 15)
+        (rndF 10 15 |> always (rndConstant 15))
         --hue
         (rndF 0 1 |> always (rndConstant 0.15))
         --radius
-        (rndI 15 25 |> rnd1 toFloat)
+        (rndI 15 25 |> rnd1 toFloat |> always (rndConstant 20))
 
 
 randomBallPositionAtBottom : Generator Vec
