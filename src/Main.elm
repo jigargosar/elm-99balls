@@ -172,7 +172,7 @@ randomBall =
         --speed
         (rndF 10 15)
         --hue
-        (rndF 0 1)
+        (rndF 0 1 |> always (rndConstant 0.15))
         --radius
         (rndI 15 25 |> rnd1 toFloat)
 
