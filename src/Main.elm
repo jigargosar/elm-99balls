@@ -151,7 +151,10 @@ targetConfig =
 
 moveTargetDown : Target -> Target
 moveTargetDown target =
-    { target | position = vecMapY (add (targetConfig.cri.y * 2)) target.position, gy = inc target.gy }
+    { target
+        | position = vecMapY (add (targetConfig.cri.y * 2)) target.position
+        , gy = inc target.gy
+    }
 
 
 gridToWorld { cri, dy, dx } ( x, y ) =
