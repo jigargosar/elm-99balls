@@ -427,9 +427,22 @@ updateTargetsAndInitEmitter model =
                                 (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
                             )
                 }
+                    |> stepTargetRow
 
     else
         model
+
+
+stepTargetRow : Model -> Model
+stepTargetRow model =
+    let
+        ( targets, seed ) =
+            rndStep ( randomTargets, model.seed )
+    in
+    { model
+        | targets = targets ++ List.map moveTargetDown model.targets
+        , seed = seed
+    }
 
 
 areFloorBallsSettled : Model -> Bool
