@@ -366,6 +366,7 @@ handleConvergedFloorBalls model =
         model
 
 
+areFloorBallsSettled : Model -> Bool
 areFloorBallsSettled model =
     case model.floorBalls |> List.reverse of
         [] ->
