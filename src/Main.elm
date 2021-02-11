@@ -164,13 +164,17 @@ maximumTargetGYOr or targets =
         |> Maybe.withDefault or
 
 
-gridToWorld { cri, dy, dx } ( x, y ) =
+toWorld ( x, y ) =
+    let
+        { cri, dy, dx } =
+            gc
+    in
     vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
 
 
 randomTarget : ( Int, Int ) -> Generator Target
 randomTarget (( _, y ) as gp) =
-    rnd1 (Target (gridToWorld gc gp) y gc.tr) (rndI 1 maxHP)
+    rnd1 (Target (toWorld gp) y gc.tr) (rndI 1 maxHP)
 
 
 randomTargets : Generator (List Target)
