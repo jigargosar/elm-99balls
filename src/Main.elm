@@ -532,11 +532,12 @@ viewEdgeNormal edge =
         from =
             edge.midpoint
 
-        direction =
+        velocity =
             vecUnitNormalFromTo edge.from edge.to
+                |> vecScale (sw * 0.1)
 
         to =
-            vecAdd from (direction |> vecScale (sw * 0.1))
+            vecAdd from velocity
     in
     Svg.polyline [ points [ from, to ], strokeP blue, Px.strokeWidth 5 ] []
 
