@@ -65,6 +65,7 @@ type alias Model =
     , balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
+    , frame : Float
     , seed : Seed
     }
 
@@ -283,6 +284,7 @@ init _ =
       , balls = balls
       , floorBalls = []
       , targets = targets
+      , frame = 0
       , seed = seed
       }
     , Cmd.none
