@@ -250,19 +250,9 @@ edgeFromTo from to =
     }
 
 
-edgeFromWithOffset : Vec -> Vec -> Edge
-edgeFromWithOffset a b =
-    edgeFromTo a (vecAdd a b)
-
-
 edgePoints : Edge -> List Vec
 edgePoints { from, to } =
     [ from, to ]
-
-
-edgePoints2 : Edge -> List ( Float, Float )
-edgePoints2 =
-    edgePoints >> List.map vecToTuple
 
 
 screenSeg =
@@ -533,18 +523,26 @@ viewEdges =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ T.points (edgePoints2 edge), strokeP red, Px.strokeWidth 1 ] []
+    Svg.polyline [ points (edgePoints edge), strokeP red, Px.strokeWidth 1 ] []
 
 
 viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
-        normal =
-            edgeFromWithOffset
-                edge.midpoint
-                (edge.normal |> vecScale (sw * 0.1))
+        from =
+            edge.midpoint
+
+        direction =
+            vecUnitNormalFromTo edge.from edge.to
+
+        to =
+            vecAdd from (direction |> vecScale (sw * 0.1))
     in
-    Svg.polyline [ T.points (edgePoints2 normal), strokeP blue, Px.strokeWidth 5 ] []
+    Svg.polyline [ points [ from, to ], strokeP blue, Px.strokeWidth 5 ] []
+
+
+points =
+    List.map vecToTuple >> T.points
 
 
 viewBalls : List Ball -> Svg Msg
