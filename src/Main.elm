@@ -307,7 +307,7 @@ updateSim model =
     model
         |> updateSimHelp
         |> convergeFloorBalls
-        |> handleEmptyMovingBalls
+        |> handleSettledFloorBallsBalls
         |> handleEmptyTargets
 
 
@@ -351,8 +351,8 @@ updateSimHelp model =
     }
 
 
-handleEmptyMovingBalls : Model -> Model
-handleEmptyMovingBalls model =
+handleSettledFloorBallsBalls : Model -> Model
+handleSettledFloorBallsBalls model =
     if model.balls == [] && model.targets /= [] && areFloorBallsSettled model then
         { model
             | balls = model.floorBalls
