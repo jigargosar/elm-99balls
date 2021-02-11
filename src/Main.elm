@@ -424,58 +424,6 @@ emitBalls model =
                 model
 
 
-type State
-    = Emitting { emitter : Emitter, moving : List Ball, floored : List Ball }
-    | Moving { moving : List Ball, floored : List Ball }
-    | Sweeping { floored : List Ball }
-
-
-toState : Model -> State
-toState model =
-    case model.maybeEmitter of
-        Just emitter ->
-            Emitting { emitter = emitter, moving = model.balls, floored = model.floorBalls }
-
-        Nothing ->
-            case model.balls of
-                [] ->
-                    Sweeping { floored = model.floorBalls }
-
-                moving ->
-                    Moving { moving = moving, floored = model.floorBalls }
-
-
-
---updateSimHelp2 : Model -> Model
---updateSimHelp2 model =
---    case toState model of
---        Emitting {emitter,moving,floored} ->
---            let
---                (newEmitter, newMoving) =
---                    if model.frame - emitter.start > 10 then
---                                                    { model
---                                                        | balls = emitter.next :: model.balls
---                                                        , maybeEmitter =
---                                                            case emitter.rest of
---                                                                [] ->
---                                                                    Nothing
---
---                                                                n :: r ->
---                                                                    Just (Emitter model.frame n r)
---                                                    }
---
---                                                else
---                                                    model
---            in
---
---
---
---        Moving record ->
---
---
---        Sweeping record ->
-
-
 convergeFloorBalls : Model -> Model
 convergeFloorBalls model =
     case model.floorBalls |> List.reverse of
