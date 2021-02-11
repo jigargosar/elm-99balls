@@ -719,7 +719,7 @@ points =
 
 
 fromHue hue =
-    hsl hue 0.9 0.45
+    hsl hue 0.8 0.6
 
 
 paintHue =
