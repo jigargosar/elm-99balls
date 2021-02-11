@@ -125,7 +125,7 @@ randomTargets =
 
         gps =
             List.range 0 (gw - 1)
-                |> List.concatMap (\x -> List.range 1 2 |> List.map (pair x))
+                |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
                 |> List.map gridToWorld
 
         randomTargetPositions =
