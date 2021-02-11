@@ -420,6 +420,10 @@ eq =
     (==)
 
 
+round2 =
+    mapEach round
+
+
 toFloat2 =
     mapEach toFloat
 
@@ -504,6 +508,14 @@ reject =
 
 minimumBy =
     List.minimumBy
+
+
+maximumBy =
+    List.maximumBy
+
+
+maximum =
+    List.maximum
 
 
 

@@ -4,7 +4,7 @@ import Browser
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
-import List exposing (maximum)
+import List
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Tuple exposing (pair)
@@ -81,7 +81,6 @@ type alias Emitter =
 
 type alias Target =
     { position : Vec
-    , gy : Int
     , radius : Float
     , hp : Int
     }
@@ -103,10 +102,7 @@ maxHP =
 
 moveTargetDown : Target -> Target
 moveTargetDown target =
-    { target
-        | position = vecMapY (add (gc.cri.y * 2)) target.position
-        , gy = inc target.gy
-    }
+    { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
 
 
 type alias GridConf =
@@ -159,11 +155,12 @@ gc =
 
 maximumTargetGYOr : Int -> List Target -> Int
 maximumTargetGYOr or targets =
-    List.map .gy targets
-        |> maximum
+    maximumBy (.position >> .y) targets
+        |> Maybe.map (.position >> fromWorld >> snd)
         |> Maybe.withDefault or
 
 
+toWorld : ( Int, Int ) -> Vec
 toWorld ( x, y ) =
     let
         { cri, dy, dx } =
@@ -172,9 +169,19 @@ toWorld ( x, y ) =
     vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
 
 
+fromWorld : Vec -> ( Int, Int )
+fromWorld { x, y } =
+    let
+        { cri, dy, dx } =
+            gc
+    in
+    ( (x - dx) / (cri.x * 2), (y - dy) / (cri.y * 2) )
+        |> round2
+
+
 randomTarget : ( Int, Int ) -> Generator Target
-randomTarget (( _, y ) as gp) =
-    rnd1 (Target (toWorld gp) y gc.tr) (rndI 1 maxHP)
+randomTarget gp =
+    rnd1 (Target (toWorld gp) gc.tr) (rndI 1 maxHP)
 
 
 randomTargets : Generator (List Target)
