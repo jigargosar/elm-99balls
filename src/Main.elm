@@ -229,7 +229,7 @@ randomBall =
     rnd5 Ball
         randomBallPositionAtBottom
         --angle
-        (rndF 0 (turns 1))
+        (rndF (turns 0.6) (turns 0.9))
         --speed
         (rndF 10 15 |> always (rndConstant 15))
         --hue
@@ -334,7 +334,7 @@ init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
         initialSeed =
-            seedFrom 0
+            seedFrom 4
 
         ( ( floorBalls, targets ), seed ) =
             rndStep ( randomLevel, initialSeed )
@@ -354,7 +354,7 @@ init _ =
 randomLevel : Generator ( List Ball, List Target )
 randomLevel =
     rndPair
-        (rndList 5 randomBall)
+        (rndList 15 randomBall)
         randomTargets
 
 
