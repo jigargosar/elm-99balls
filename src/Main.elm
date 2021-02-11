@@ -101,6 +101,14 @@ maxHP =
     20
 
 
+moveTargetDown : Target -> Target
+moveTargetDown target =
+    { target
+        | position = vecMapY (add (targetConfig.cri.y * 2)) target.position
+        , gy = inc target.gy
+    }
+
+
 type alias TargetConfig =
     { gri : Vec
     , gw : Int
@@ -149,16 +157,20 @@ targetConfig =
     }
 
 
-moveTargetDown : Target -> Target
-moveTargetDown target =
-    { target
-        | position = vecMapY (add (targetConfig.cri.y * 2)) target.position
-        , gy = inc target.gy
-    }
+maximumTargetGYOr : Int -> List Target -> Int
+maximumTargetGYOr or targets =
+    List.map .gy targets
+        |> maximum
+        |> Maybe.withDefault or
 
 
 gridToWorld { cri, dy, dx } ( x, y ) =
     vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
+
+
+randomTarget : ( Int, Int ) -> Generator Target
+randomTarget (( _, y ) as gp) =
+    rnd1 (Target (gridToWorld targetConfig gp) y targetConfig.tr) (rndI 1 maxHP)
 
 
 randomTargets : Generator (List Target)
@@ -166,9 +178,6 @@ randomTargets =
     let
         randomTargetPositions =
             rnd2 List.drop (rndI 0 3) (rndShuffle targetConfig.gps)
-
-        randomTarget (( _, y ) as gp) =
-            rnd1 (Target (gridToWorld targetConfig gp) y targetConfig.tr) (rndI 1 maxHP)
     in
     randomTargetPositions
         |> rndAndThen
@@ -429,16 +438,6 @@ updateTargetsAndInitEmitter model =
 
     else
         model
-
-
-maximumTargetGYOr : Int -> List Target -> Int
-maximumTargetGYOr or targets =
-    Debug.log
-        "List.map .gy targets ..."
-        (List.map .gy targets
-            |> maximum
-            |> Maybe.withDefault or
-        )
 
 
 stepTargetRows : Model -> Model
