@@ -529,10 +529,6 @@ viewEdgeNormal edge =
     Svg.polyline [ points [ from, to ], strokeP blue, Px.strokeWidth 5 ] []
 
 
-points =
-    List.map vecToTuple >> T.points
-
-
 viewBalls : List Ball -> Svg Msg
 viewBalls =
     let
@@ -580,6 +576,10 @@ rect w h xf aa =
             :: aa
         )
         []
+
+
+points =
+    List.map vecToTuple >> T.points
 
 
 fromHue hue =
