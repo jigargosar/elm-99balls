@@ -488,7 +488,7 @@ view model =
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ Svg.g [ T.transform [ scale 0.7 ] ]
+        [ Svg.g [ transform [ scale 0.7 ] ]
             [ rect sw sh [] [ S.stroke "black" ]
             , viewBalls model.floorBalls
             , viewTargets model.targets
@@ -505,7 +505,7 @@ viewTargets targets =
             toFloat target.hp / maxHP
 
         viewTarget target =
-            Svg.g [ T.transform [ vecApply Translate target.position ] ]
+            Svg.g [ transform [ vecApply translate target.position ] ]
                 [ Svg.circle
                     [ Px.r target.radius
                     , fillH (targetHue target)
@@ -515,7 +515,7 @@ viewTargets targets =
                     [ S.fill "#fff"
                     , T.alignmentBaseline TT.AlignmentCentral
                     , T.textAnchor TT.AnchorMiddle
-                    , T.transform [ scale (target.radius / 14) ]
+                    , transform [ scale (target.radius / 14) ]
                     ]
                     [ Svg.text (String.fromInt target.hp) ]
                 ]
@@ -573,7 +573,7 @@ viewBall ball =
     in
     Svg.g
         [ strokeH hue
-        , T.transform [ Translate x y ]
+        , transform [ translate x y ]
         , Px.strokeWidth strokeW
         ]
         [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
@@ -587,7 +587,7 @@ rect w h xf aa =
             :: Px.y (-h / 2)
             :: Px.width w
             :: Px.height h
-            :: T.transform xf
+            :: transform xf
             :: aa
         )
         []
@@ -611,3 +611,11 @@ fillH =
 
 scale s =
     Scale s s
+
+
+transform =
+    T.transform
+
+
+translate =
+    Translate
