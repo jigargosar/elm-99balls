@@ -361,8 +361,8 @@ updateSim model =
         |> moveBallsAndHandleCollision
         |> emitBalls
         |> convergeFloorBalls
-        |> reInitEmitterFromFlooredBalls model
         |> updateTargets model
+        |> reInitEmitterFromFlooredBalls model
         |> incFrame
 
 
