@@ -405,7 +405,12 @@ handleConvergedFloorBalls model =
             f :: rest ->
                 { model
                     | floorBalls = []
-                    , maybeEmitter = Just (Emitter model.frame f rest)
+                    , maybeEmitter =
+                        Just
+                            (Emitter model.frame
+                                f
+                                (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
+                            )
                 }
 
     else
