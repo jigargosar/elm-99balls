@@ -328,8 +328,8 @@ updateSim model =
         |> updateSimHelp
         |> emitBalls
         |> convergeFloorBalls
-        |> handleConvergedFloorBalls
         |> updateTargets
+        |> handleConvergedFloorBalls
         |> incFrame
 
 
@@ -445,12 +445,12 @@ areBallsCloseEnough a b =
 
 updateTargets : Model -> Model
 updateTargets model =
-    if model.targets == [] && model.balls == [] then
+    if (model.balls == []) && areFloorBallsSettled model then
         let
             ( targets, seed ) =
                 rndStep ( randomTargets, model.seed )
         in
-        { model | targets = targets, seed = seed }
+        { model | targets = targets ++ List.map moveTargetDown model.targets, seed = seed }
 
     else
         model
