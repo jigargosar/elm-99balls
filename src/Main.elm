@@ -503,6 +503,7 @@ viewEdges =
     group []
         [ group [] (List.map viewEdge edges)
         , group [] (List.map viewEdgeNormal edges)
+            |> always viewNone
         ]
 
 
@@ -610,3 +611,7 @@ fillH =
 
 group =
     Svg.g
+
+
+viewNone =
+    Svg.text ""
