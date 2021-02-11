@@ -313,7 +313,7 @@ init _ =
 randomLevel : Generator ( List Ball, List Target )
 randomLevel =
     rndPair
-        (rndList 10 randomBall)
+        (rndList 5 randomBall)
         randomTargets
 
 
