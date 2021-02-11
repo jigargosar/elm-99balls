@@ -550,6 +550,9 @@ viewEdgeNormal edge =
 viewBalls : List Ball -> Svg Msg
 viewBalls =
     let
+        do balls =
+            Svg.g [] (List.map viewBall balls)
+
         viewBall : Ball -> Svg Msg
         viewBall ball =
             let
@@ -578,8 +581,7 @@ viewBalls =
                 , Svg.line [ Px.x2 nx, Px.y2 ny ] []
                 ]
     in
-    \balls ->
-        Svg.g [] (List.map viewBall balls)
+    do
 
 
 rect w h xf aa =
