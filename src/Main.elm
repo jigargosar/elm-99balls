@@ -440,21 +440,9 @@ updateSimHelp model =
 updateTargetsAndInitEmitter : Model -> Model
 updateTargetsAndInitEmitter model =
     if model.balls == [] && areFloorBallsSettled model && model.maybeEmitter == Nothing then
-        case model.floorBalls |> List.reverse of
-            [] ->
-                model
-
-            f :: rest ->
-                { model
-                    | floorBalls = []
-                    , maybeEmitter =
-                        Just
-                            (Emitter model.frame
-                                f
-                                (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
-                            )
-                }
-                    |> stepTargetRows
+        model
+            |> initEmitterFromFloorBalls
+            |> stepTargetRows
 
     else
         model
