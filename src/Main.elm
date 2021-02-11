@@ -8,7 +8,7 @@ import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
-import TypedSvg.Types as TT exposing (Paint(..), Transform(..))
+import TypedSvg.Types as TT exposing (..)
 import Util exposing (..)
 
 
