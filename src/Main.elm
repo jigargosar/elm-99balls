@@ -309,9 +309,9 @@ updateSim : Model -> Model
 updateSim model =
     model
         |> updateSimHelp
+        |> handleEmptyTargets
         |> convergeFloorBalls
         |> handleConvergedFloorBalls
-        |> handleEmptyTargets
 
 
 convergeFloorBalls : Model -> Model
