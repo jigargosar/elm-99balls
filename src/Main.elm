@@ -115,11 +115,15 @@ initTarget gp hp =
     Target (toWorld gp) gc.tr hp
 
 
-maximumTargetGYOr : Int -> List Target -> Int
-maximumTargetGYOr or targets =
-    maximumBy (.position >> .y) targets
-        |> Maybe.map (.position >> fromWorld >> snd)
-        |> Maybe.withDefault or
+canTargetsSafelyMoveDown : List Target -> Bool
+canTargetsSafelyMoveDown targets =
+    let
+        maxGY =
+            maximumBy (.position >> .y) targets
+                |> Maybe.map (.position >> fromWorld >> snd)
+                |> Maybe.withDefault -1
+    in
+    maxGY < (gc.h - 2)
 
 
 type alias GridConf =
@@ -458,7 +462,7 @@ updateTargetsAndInitEmitter model =
 
 stepTargetRows : Model -> Model
 stepTargetRows model =
-    if maximumTargetGYOr -1 model.targets < (gc.h - 2) then
+    if canTargetsSafelyMoveDown model.targets then
         let
             ( targets, seed ) =
                 rndStep ( randomTargets, model.seed )
