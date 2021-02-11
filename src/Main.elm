@@ -339,7 +339,7 @@ emitBalls model =
             model
 
         Just emitter ->
-            if model.frame - emitter.start > 60 then
+            if model.frame - emitter.start > 10 then
                 { model
                     | balls = emitter.next :: model.balls
                     , maybeEmitter =
