@@ -4,6 +4,7 @@ import Browser
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
+import List exposing (maximum)
 import List.Extra exposing (maximumBy)
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -81,6 +82,7 @@ type alias Emitter =
 
 type alias Target =
     { position : Vec
+    , gy : Int
     , radius : Float
     , hp : Int
     }
@@ -108,7 +110,7 @@ type alias TargetConfig =
     , tr : Float
     , dx : Float
     , dy : Float
-    , gps : List Vec
+    , gps : List ( Int, Int )
     }
 
 
@@ -136,7 +138,6 @@ targetConfig =
         gps =
             List.range 0 (gw - 1)
                 |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
-                |> List.map (gridToWorld { cri = cri, dx = dx, dy = dy })
     in
     { gri = gri
     , gw = gw
@@ -164,8 +165,8 @@ randomTargets =
         randomTargetPositions =
             rnd2 List.drop (rndI 0 3) (rndShuffle targetConfig.gps)
 
-        randomTarget p =
-            rnd1 (Target p targetConfig.tr) (rndI 1 maxHP)
+        randomTarget (( _, y ) as gp) =
+            rnd1 (Target (gridToWorld targetConfig gp) y targetConfig.tr) (rndI 1 maxHP)
     in
     randomTargetPositions
         |> rndAndThen
@@ -422,18 +423,21 @@ updateTargetsAndInitEmitter model =
                                 (rest |> List.map (setBallPositionAndVelocity f.position (ballVelocity f)))
                             )
                 }
-                    |> stepTargetRow
+                    |> stepTargetRows
 
     else
         model
 
 
-stepTargetRow : Model -> Model
-stepTargetRow model =
-    if
-        (maximumBy (.position >> .y) model.targets |> Maybe.map (.position >> .y) |> Maybe.withDefault 0)
-            < (gridToWorld targetConfig ( 0, targetConfig.gh - 2 )).y
-    then
+maximumTargetGYOr or targets =
+    List.map .gy targets
+        |> maximum
+        |> Maybe.withDefault or
+
+
+stepTargetRows : Model -> Model
+stepTargetRows model =
+    if maximumTargetGYOr -1 model.targets < (targetConfig.gh - 2) then
         let
             ( targets, seed ) =
                 rndStep ( randomTargets, model.seed )
