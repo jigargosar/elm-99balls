@@ -4,6 +4,7 @@ import Browser
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
+import List.Extra exposing (maximumBy)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Tuple exposing (pair)
@@ -412,14 +413,8 @@ updateTargetsAndInitEmitter model =
                 model
 
             f :: rest ->
-                let
-                    ( targets, seed ) =
-                        rndStep ( randomTargets, model.seed )
-                in
                 { model
-                    | targets = targets ++ List.map moveTargetDown model.targets
-                    , seed = seed
-                    , floorBalls = []
+                    | floorBalls = []
                     , maybeEmitter =
                         Just
                             (Emitter model.frame
@@ -435,14 +430,21 @@ updateTargetsAndInitEmitter model =
 
 stepTargetRow : Model -> Model
 stepTargetRow model =
-    let
-        ( targets, seed ) =
-            rndStep ( randomTargets, model.seed )
-    in
-    { model
-        | targets = targets ++ List.map moveTargetDown model.targets
-        , seed = seed
-    }
+    if
+        (maximumBy (.position >> .y) model.targets |> Maybe.map (.position >> .y) |> Maybe.withDefault 0)
+            < (gridToWorld targetConfig ( 0, targetConfig.gh - 2 )).y
+    then
+        let
+            ( targets, seed ) =
+                rndStep ( randomTargets, model.seed )
+        in
+        { model
+            | targets = targets ++ List.map moveTargetDown model.targets
+            , seed = seed
+        }
+
+    else
+        model
 
 
 areFloorBallsSettled : Model -> Bool
