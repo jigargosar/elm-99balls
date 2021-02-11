@@ -420,6 +420,10 @@ eq =
     (==)
 
 
+toFloat2 =
+    mapEach toFloat
+
+
 roundFloat =
     round >> toFloat
 

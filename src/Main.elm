@@ -99,8 +99,19 @@ maxHP =
     20
 
 
-randomTargets : Generator (List Target)
-randomTargets =
+type alias TargetConfig =
+    { gri : Vec
+    , gw : Int
+    , gh : Int
+    , cri : Vec
+    , tr : Float
+    , dx : Float
+    , dy : Float
+    }
+
+
+targetConfig : TargetConfig
+targetConfig =
     let
         gri =
             sri
@@ -119,14 +130,28 @@ randomTargets =
 
         ( dx, dy ) =
             ( cri.x - gri.x, cri.y - gri.y )
+    in
+    { gri = gri
+    , gw = gw
+    , gh = gh
+    , cri = cri
+    , tr = targetRadius
+    , dx = dx
+    , dy = dy
+    }
 
-        gridToWorld ( x, y ) =
-            vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
 
+gridToWorld { cri, dy, dx } ( x, y ) =
+    vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
+
+
+randomTargets : Generator (List Target)
+randomTargets =
+    let
         gps =
-            List.range 0 (gw - 1)
+            List.range 0 (targetConfig.gw - 1)
                 |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
-                |> List.map gridToWorld
+                |> List.map (gridToWorld targetConfig)
 
         randomTargetPositions =
             rnd2 List.drop (rndI 0 3) (rndShuffle gps)
@@ -137,26 +162,11 @@ randomTargets =
                 ps
                     |> List.map
                         (\p ->
-                            rnd1 (Target p targetRadius)
+                            rnd1 (Target p targetConfig.tr)
                                 (rndI 1 (maxHP // 3))
                         )
                     |> rndCombine
             )
-
-
-toFloat2 =
-    mapEach toFloat
-
-
-
---randomTarget : Generator Target
---randomTarget =
---    Random.map3 Target
---        (randomVecInRadii (sri |> vecScale 0.7))
---        --radius
---        (Random.int 25 30 |> Random.map toFloat)
---        --hp
---        (Random.int (maxHP // 2) maxHP)
 
 
 type alias Ball =
