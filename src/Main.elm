@@ -74,7 +74,7 @@ type alias Model =
 
 
 type State
-    = Input
+    = TargetsEntering Float
     | Sim
 
 
@@ -340,7 +340,7 @@ init _ =
       , balls = balls
       , floorBalls = []
       , targets = targets
-      , state = Sim
+      , state = TargetsEntering 0
       , frame = 0
       , seed = seed
       }
@@ -359,7 +359,20 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick _ ->
-            ( updateSim model, Cmd.none )
+            ( updateOnTick model
+                |> incFrame
+            , Cmd.none
+            )
+
+
+updateOnTick : Model -> Model
+updateOnTick model =
+    case model.state of
+        TargetsEntering start ->
+            { model | state = Sim }
+
+        Sim ->
+            updateSim model
 
 
 updateSim : Model -> Model
@@ -370,7 +383,6 @@ updateSim model =
         |> convergeFloorBalls
         |> updateTargets model
         |> reInitEmitterFromFlooredBalls model
-        |> incFrame
 
 
 inc =
