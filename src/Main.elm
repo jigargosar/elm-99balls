@@ -109,7 +109,7 @@ hasHP target =
 
 
 maxHP =
-    20
+    10
 
 
 moveTargetDown : Target -> Target
@@ -339,12 +339,12 @@ init _ =
         initialSeed =
             seedFrom 0
 
-        ( ( balls, targets ), seed ) =
+        ( ( floorBalls, targets ), seed ) =
             rndStep ( randomLevel, initialSeed )
     in
     ( { maybeEmitter = Nothing
-      , balls = balls
-      , floorBalls = []
+      , balls = []
+      , floorBalls = floorBalls
       , targets = targets
       , state = TargetsEntering 0
       , frame = 0
@@ -375,22 +375,26 @@ updateOnTick : Model -> Model
 updateOnTick model =
     case model.state of
         TargetsEntering start ->
-            if model.frame - start > animDur then
-                { model | state = Sim }
+            if
+                (model.frame - start > animDur)
+                    && areFloorBallsSettled model
+            then
+                { model | state = Input }
 
             else
                 model
+                    |> convergeFloorBalls
 
         Input ->
-            model
+            { model | state = Sim }
+                |> reInitEmitterFromFlooredBalls
 
         Sim ->
             model
                 |> moveBallsAndHandleCollision
                 |> emitBalls
                 |> convergeFloorBalls
-                |> updateTargets model
-                |> reInitEmitterFromFlooredBalls model
+                |> updateTargets
 
 
 incFrame : Model -> Model
@@ -487,11 +491,10 @@ moveBallsAndHandleCollision model =
     }
 
 
-updateTargets : Model -> Model -> Model
-updateTargets old model =
+updateTargets : Model -> Model
+updateTargets model =
     if
-        (old.maybeEmitter == Nothing)
-            && (old.balls /= [])
+        (model.maybeEmitter == Nothing)
             && (model.balls == [])
     then
         if canTargetsSafelyMoveDown model.targets then
@@ -502,43 +505,35 @@ updateTargets old model =
             { model
                 | targets = targets ++ List.map moveTargetDown model.targets
                 , seed = seed
+                , state = TargetsEntering model.frame
             }
 
         else
+            { model | state = TargetsEntering model.frame }
+
+    else
+        model
+
+
+reInitEmitterFromFlooredBalls : Model -> Model
+reInitEmitterFromFlooredBalls model =
+    case model.floorBalls |> List.reverse of
+        [] ->
             model
 
-    else
-        model
-
-
-reInitEmitterFromFlooredBalls : Model -> Model -> Model
-reInitEmitterFromFlooredBalls old model =
-    if
-        (model.maybeEmitter == Nothing)
-            && (model.balls == [])
-            && areFloorBallsSettled old
-            && areFloorBallsSettled model
-    then
-        case model.floorBalls |> List.reverse of
-            [] ->
-                model
-
-            f :: rest ->
-                { model
-                    | floorBalls = []
-                    , maybeEmitter =
-                        Just
-                            (Emitter model.frame
-                                f
-                                (rest
-                                    |> List.map
-                                        (setBallPositionAndVelocity f.position (ballVelocity f))
-                                )
+        f :: rest ->
+            { model
+                | floorBalls = []
+                , maybeEmitter =
+                    Just
+                        (Emitter model.frame
+                            f
+                            (rest
+                                |> List.map
+                                    (setBallPositionAndVelocity f.position (ballVelocity f))
                             )
-                }
-
-    else
-        model
+                        )
+            }
 
 
 areFloorBallsSettled : Model -> Bool
