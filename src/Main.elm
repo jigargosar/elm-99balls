@@ -465,9 +465,9 @@ view model =
         , S.fill "none"
         , S.stroke "none"
         ]
-        [ group [ transform [ scale 0.7 ] ]
-            [ rect sri [ S.stroke "black" ]
-            , viewBalls model.floorBalls
+        [ rect sri [ strokeP black ]
+        , group [ transform [ scale 0.7 ] ]
+            [ viewBalls model.floorBalls
             , viewTargets model.targets
             , viewBalls model.balls
             , viewEdges
@@ -565,7 +565,7 @@ viewBalls =
 
 
 rect ri =
-    vecApply rectWH ri
+    vecApply rectWH (vecScale 2 ri)
 
 
 rectWH w h aa =
