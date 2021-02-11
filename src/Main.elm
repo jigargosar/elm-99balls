@@ -318,14 +318,14 @@ convergeFloorBalls model =
 updateSimHelp : Model -> Model
 updateSimHelp model =
     let
-        ( targets, balls, floorBalls ) =
+        ( targets, floorBalls, balls ) =
             model.balls
-                |> List.foldl updateBall ( model.targets, [], [] )
+                |> List.foldl updateBall ( model.targets, model.floorBalls, [] )
     in
     { model
-        | balls = balls
-        , targets = targets
-        , floorBalls = model.floorBalls ++ floorBalls
+        | targets = targets
+        , floorBalls = floorBalls
+        , balls = balls
     }
 
 
@@ -361,17 +361,17 @@ type BallUpdate
 
 
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall ball ( targets, acc, floored ) =
+updateBall ball ( targets, floored, acc ) =
     let
         ( bu, newBall ) =
             updateBallHelp targets ball
     in
     case bu of
         BallMoved ->
-            ( targets, newBall :: acc, floored )
+            ( targets, floored, newBall :: acc )
 
         BallHitBottomEdge ->
-            ( targets, acc, newBall :: floored )
+            ( targets, newBall :: floored, acc )
 
         BallHitTarget target ->
             let
@@ -380,7 +380,7 @@ updateBall ball ( targets, acc, floored ) =
                         |> mapWhenEq target decHP
                         |> keepWhen hasHP
             in
-            ( newTargets, newBall :: acc, floored )
+            ( newTargets, floored, newBall :: acc )
 
 
 type BallCollision
