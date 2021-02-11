@@ -1,6 +1,7 @@
 module Util exposing (..)
 
 import Basics.Extra exposing (atLeast, uncurry)
+import List.Extra as List
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Random.Extra as Random
@@ -430,6 +431,26 @@ propEmpty fn =
 
 propEq fn v x =
     fn x == v
+
+
+
+-- List
+
+
+mapWhen =
+    List.updateIf
+
+
+mapWhenEq v =
+    mapWhen (eq v)
+
+
+keepWhen =
+    List.filter
+
+
+reject =
+    List.filterNot
 
 
 

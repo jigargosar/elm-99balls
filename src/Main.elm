@@ -4,7 +4,6 @@ import Browser
 import Browser.Events
 import Color
 import Html exposing (Html)
-import List.Extra as List
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import TypedSvg.Attributes as T
@@ -397,8 +396,8 @@ updateBall ball ( targets, acc, floored ) =
             let
                 newTargets =
                     targets
-                        |> List.updateIf (eq target) decHP
-                        |> List.filter hasHP
+                        |> mapWhenEq target decHP
+                        |> keepWhen hasHP
             in
             ( newTargets, newBall :: acc, floored )
 
