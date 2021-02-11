@@ -107,6 +107,7 @@ type alias TargetConfig =
     , tr : Float
     , dx : Float
     , dy : Float
+    , gps : List Vec
     }
 
 
@@ -130,6 +131,11 @@ targetConfig =
 
         ( dx, dy ) =
             ( cri.x - gri.x, cri.y - gri.y )
+
+        gps =
+            List.range 0 (gw - 1)
+                |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
+                |> List.map (gridToWorld { cri = cri, dx = dx, dy = dy })
     in
     { gri = gri
     , gw = gw
@@ -138,6 +144,7 @@ targetConfig =
     , tr = targetRadius
     , dx = dx
     , dy = dy
+    , gps = gps
     }
 
 
@@ -148,24 +155,17 @@ gridToWorld { cri, dy, dx } ( x, y ) =
 randomTargets : Generator (List Target)
 randomTargets =
     let
-        gps =
-            List.range 0 (targetConfig.gw - 1)
-                |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
-                |> List.map (gridToWorld targetConfig)
-
         randomTargetPositions =
-            rnd2 List.drop (rndI 0 3) (rndShuffle gps)
+            rnd2 List.drop (rndI 0 3) (rndShuffle targetConfig.gps)
     in
     randomTargetPositions
         |> rndAndThen
-            (\ps ->
-                ps
-                    |> List.map
-                        (\p ->
-                            rnd1 (Target p targetConfig.tr)
-                                (rndI 1 (maxHP // 3))
-                        )
-                    |> rndCombine
+            (List.map
+                (\p ->
+                    rnd1 (Target p targetConfig.tr)
+                        (rndI 1 (maxHP // 3))
+                )
+                >> rndCombine
             )
 
 
