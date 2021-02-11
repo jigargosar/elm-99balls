@@ -489,7 +489,7 @@ viewTargets targets =
                     []
                 , words
                     (String.fromInt target.hp)
-                    [ fillP white
+                    [ fillP black
                     , transform [ scale (target.radius / 14) ]
                     ]
                 ]
