@@ -316,9 +316,43 @@ updateSim : Model -> Model
 updateSim model =
     model
         |> updateSimHelp
+        |> emitBalls
         |> handleEmptyTargets
         |> convergeFloorBalls
         |> handleConvergedFloorBalls
+        |> incFrame
+
+
+inc =
+    add 1
+
+
+incFrame : Model -> Model
+incFrame model =
+    { model | frame = inc model.frame }
+
+
+emitBalls : Model -> Model
+emitBalls model =
+    case model.maybeEmitter of
+        Nothing ->
+            model
+
+        Just emitter ->
+            if model.frame - emitter.start > 60 then
+                { model
+                    | balls = emitter.next :: model.balls
+                    , maybeEmitter =
+                        case emitter.rest of
+                            [] ->
+                                Nothing
+
+                            n :: r ->
+                                Just (Emitter model.frame n r)
+                }
+
+            else
+                model
 
 
 convergeFloorBalls : Model -> Model
