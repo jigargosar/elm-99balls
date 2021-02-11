@@ -129,7 +129,7 @@ randomTargets =
                 |> List.map gridToWorld
 
         randomTargetPositions =
-            rnd2 List.drop (rndConstant 2) (rndShuffle gps)
+            rnd2 List.drop (rndI 0 3) (rndShuffle gps)
     in
     randomTargetPositions
         |> rndAndThen
