@@ -381,17 +381,12 @@ updateOnTick model =
                 model
 
         Sim ->
-            updateSim model
-
-
-updateSim : Model -> Model
-updateSim model =
-    model
-        |> moveBallsAndHandleCollision
-        |> emitBalls
-        |> convergeFloorBalls
-        |> updateTargets model
-        |> reInitEmitterFromFlooredBalls model
+            model
+                |> moveBallsAndHandleCollision
+                |> emitBalls
+                |> convergeFloorBalls
+                |> updateTargets model
+                |> reInitEmitterFromFlooredBalls model
 
 
 inc =
