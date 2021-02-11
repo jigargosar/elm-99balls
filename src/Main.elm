@@ -505,7 +505,7 @@ viewTargets targets =
             toFloat target.hp / maxHP
 
         viewTarget target =
-            Svg.g [ transform [ vecApply translate target.position ] ]
+            Svg.g [ transform [ translate target.position ] ]
                 [ Svg.circle
                     [ Px.r target.radius
                     , fillH (targetHue target)
@@ -554,9 +554,8 @@ viewBalls balls =
 viewBall : Ball -> Svg Msg
 viewBall ball =
     let
-        ( x, y ) =
-            vecToTuple ball.position
-                |> roundFloat2
+        p =
+            vecRound ball.position
 
         ( nx, ny ) =
             ( ball.radius, ball.angle )
@@ -573,7 +572,7 @@ viewBall ball =
     in
     Svg.g
         [ strokeH hue
-        , transform [ translate x y ]
+        , transform [ translate p ]
         , Px.strokeWidth strokeW
         ]
         [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
@@ -617,5 +616,6 @@ transform =
     T.transform
 
 
+translate : Vec -> Transform
 translate =
-    Translate
+    vecApply Translate

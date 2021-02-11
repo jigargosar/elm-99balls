@@ -32,6 +32,11 @@ vecToTuple =
     vecApply Tuple.pair
 
 
+vecRound : Vec -> Vec
+vecRound =
+    vecMapEach roundFloat
+
+
 vecFromTo : Vec -> Vec -> Vec
 vecFromTo a b =
     vecSub b a
