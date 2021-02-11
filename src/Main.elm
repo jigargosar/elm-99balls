@@ -509,7 +509,7 @@ viewEdges =
 
 viewEdge : Edge -> Svg Msg
 viewEdge edge =
-    Svg.polyline [ points (edgePoints edge), strokeP red, Px.strokeWidth 1 ] []
+    polyline (edgePoints edge) [ strokeP red, Px.strokeWidth 1 ]
 
 
 edgeDebugNormal : Edge -> Seg
@@ -534,7 +534,7 @@ viewEdgeNormal edge =
         ( from, to ) =
             edgeDebugNormal edge
     in
-    Svg.polyline [ points [ from, to ], strokeP blue, Px.strokeWidth 5 ] []
+    polyline [ from, to ] [ strokeP blue, Px.strokeWidth 5 ]
 
 
 viewBalls : List Ball -> Svg Msg
@@ -572,6 +572,10 @@ viewBalls =
                 ]
     in
     do
+
+
+polyline pts aa =
+    Svg.polyline (points pts :: aa) []
 
 
 rect ri =
