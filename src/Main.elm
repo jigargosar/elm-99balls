@@ -298,9 +298,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick _ ->
-            ( updateSim model
-            , Cmd.none
-            )
+            ( updateSim model, Cmd.none )
 
 
 updateSim : Model -> Model
