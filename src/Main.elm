@@ -397,6 +397,12 @@ emitBalls model =
                 model
 
 
+type State
+    = Emitting { emitter : Emitter, moving : List Ball, floored : List Ball }
+    | Moving { moving : List Ball, floored : List Ball }
+    | Sweeping { floored : List Ball }
+
+
 convergeFloorBalls : Model -> Model
 convergeFloorBalls model =
     case model.floorBalls |> List.reverse of
