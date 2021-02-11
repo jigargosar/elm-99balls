@@ -558,7 +558,7 @@ viewBalls =
             in
             let
                 strokeW =
-                    4
+                    6
             in
             group
                 [ strokeH hue
@@ -567,6 +567,7 @@ viewBalls =
                 ]
                 [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
                 , Svg.line [ Px.x2 nx, Px.y2 ny ] []
+                    |> always viewNone
                 ]
     in
     do
