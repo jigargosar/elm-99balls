@@ -73,6 +73,11 @@ type alias Model =
     }
 
 
+animDur : Float
+animDur =
+    60
+
+
 type State
     = TargetsEntering Float
     | Sim
@@ -359,17 +364,21 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick _ ->
-            ( updateOnTick model
+            ( updateFrame model
                 |> incFrame
             , Cmd.none
             )
 
 
-updateOnTick : Model -> Model
-updateOnTick model =
+updateFrame : Model -> Model
+updateFrame model =
     case model.state of
         TargetsEntering start ->
-            { model | state = Sim }
+            if model.frame - start > animDur then
+                { model | state = Sim }
+
+            else
+                model
 
         Sim ->
             updateSim model
@@ -674,7 +683,7 @@ view model =
             , viewBalls model.floorBalls
             , case model.state of
                 TargetsEntering start ->
-                    viewTargets 0 model.targets
+                    viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
 
                 Sim ->
                     viewTargets 1 model.targets
@@ -697,7 +706,7 @@ viewTargets progress targets =
             toFloat target.hp / maxHP
 
         dy =
-            (1 - progress) * gc.cri.y * 2
+            (1 - progress) * -(gc.cri.y * 2)
 
         viewTarget target =
             group [ transform [ translate (target.position |> vecMapY (add dy)) ] ]
