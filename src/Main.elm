@@ -80,6 +80,7 @@ animDur =
 
 type State
     = TargetsEntering Float
+    | Input
     | Sim
 
 
@@ -380,6 +381,9 @@ updateOnTick model =
             else
                 model
 
+        Input ->
+            model
+
         Sim ->
             model
                 |> moveBallsAndHandleCollision
@@ -676,7 +680,7 @@ view model =
                 TargetsEntering start ->
                     viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
 
-                Sim ->
+                _ ->
                     viewTargets 1 model.targets
             , viewBalls model.balls
             , viewEdges
