@@ -120,16 +120,16 @@ randomTargets =
         ( dx, dy ) =
             ( cri.x - gri.x, cri.y - gri.y )
 
+        gridToWorld ( x, y ) =
+            vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
+
         gps =
             List.range 0 (gw - 1)
-                |> List.concatMap (\x -> List.range 1 4 |> List.map (pair x))
-                |> List.map toFloat2
-                |> List.map (\( x, y ) -> vec (x * cri.x * 2 + dx) (y * cri.y * 2 + dy))
+                |> List.concatMap (\x -> List.range 1 2 |> List.map (pair x))
+                |> List.map gridToWorld
 
         randomTargetPositions =
-            gps
-                |> rndShuffle
-                |> rnd2 List.drop (rndConstant 10)
+            rnd2 List.drop (rndConstant 2) (rndShuffle gps)
     in
     randomTargetPositions
         |> rndAndThen
