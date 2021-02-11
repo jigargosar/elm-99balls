@@ -157,10 +157,13 @@ randomTargets =
     let
         randomTargetPositions =
             rnd2 List.drop (rndI 0 3) (rndShuffle targetConfig.gps)
+
+        randomTarget p =
+            rnd1 (Target p targetConfig.tr) (rndI 1 maxHP)
     in
     randomTargetPositions
         |> rndAndThen
-            (List.map (\p -> rnd1 (Target p targetConfig.tr) (rndI 1 maxHP))
+            (List.map randomTarget
                 >> rndCombine
             )
 
