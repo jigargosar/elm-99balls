@@ -530,11 +530,8 @@ edgeDebugNormal { from, to } =
 
 viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
-    let
-        ( from, to ) =
-            edgeDebugNormal edge
-    in
-    polyline [ from, to ] [ strokeP blue, Px.strokeWidth 5 ]
+    polySeg (edgeDebugNormal edge)
+        [ strokeP blue, Px.strokeWidth 5 ]
 
 
 viewBalls : List Ball -> Svg Msg
@@ -576,6 +573,10 @@ viewBalls =
 
 polyline pts aa =
     Svg.polyline (points pts :: aa) []
+
+
+polySeg ( a, b ) =
+    polyline [ a, b ]
 
 
 rect ri =
