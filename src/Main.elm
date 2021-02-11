@@ -109,7 +109,7 @@ hasHP target =
 
 
 maxHP =
-    10
+    20
 
 
 moveTargetDown : Target -> Target
