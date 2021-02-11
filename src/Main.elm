@@ -61,7 +61,7 @@ type alias Flags =
 
 
 type alias Model =
-    { gun : Maybe { start : Float, next : Ball, rest : List Ball }
+    { maybeEmitter : Maybe { start : Float, next : Ball, rest : List Ball }
     , balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
@@ -279,7 +279,7 @@ init _ =
         ( ( balls, targets ), seed ) =
             rndStep ( randomLevel, initialSeed )
     in
-    ( { gun = Nothing
+    ( { maybeEmitter = Nothing
       , balls = balls
       , floorBalls = []
       , targets = targets
@@ -514,6 +514,12 @@ view model =
             , viewTargets model.targets
             , viewBalls model.balls
             , viewEdges
+            , case model.maybeEmitter of
+                Just emitter ->
+                    viewBalls [ emitter.next ]
+
+                Nothing ->
+                    viewNone
             ]
         ]
 
