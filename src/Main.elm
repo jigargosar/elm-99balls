@@ -6,6 +6,7 @@ import Color exposing (..)
 import Html exposing (Html)
 import Svg exposing (Svg)
 import Svg.Attributes as S
+import Tuple exposing (pair)
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (..)
@@ -121,18 +122,9 @@ randomTargets =
 
         gps =
             List.range 0 (gw - 1)
-                |> List.concatMap
-                    (toFloat
-                        >> (\x ->
-                                List.range 1 4
-                                    |> List.map
-                                        (toFloat
-                                            >> (\y ->
-                                                    vec (x * cri.x * 2 + dx) (y * cri.y * 2 + dy)
-                                               )
-                                        )
-                           )
-                    )
+                |> List.concatMap (\x -> List.range 1 4 |> List.map (pair x))
+                |> List.map toFloat2
+                |> List.map (\( x, y ) -> vec (x * cri.x * 2 + dx) (y * cri.y * 2 + dy))
 
         randomTargetPositions =
             gps
@@ -150,6 +142,10 @@ randomTargets =
                         )
                     |> rndCombine
             )
+
+
+toFloat2 =
+    mapEach toFloat
 
 
 
