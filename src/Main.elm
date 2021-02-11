@@ -222,9 +222,6 @@ setBallVelocityAndUpdatePosition rawVelocity ball =
 type alias Edge =
     { from : Vec
     , to : Vec
-    , midpoint : Vec
-    , offset : Vec
-    , normal : Vec
     }
 
 
@@ -235,18 +232,8 @@ edgeFromSeg ( a, b ) =
 
 edgeFromTo : Vec -> Vec -> Edge
 edgeFromTo from to =
-    let
-        midpoint =
-            vecMidpoint from to
-
-        offset =
-            vecFromTo midpoint to
-    in
     { from = from
     , to = to
-    , midpoint = midpoint
-    , offset = offset
-    , normal = vecUnitNormalFromTo from to
     }
 
 
@@ -530,7 +517,7 @@ viewEdgeNormal : Edge -> Svg Msg
 viewEdgeNormal edge =
     let
         from =
-            edge.midpoint
+            vecMidpoint edge.from edge.to
 
         velocity =
             vecUnitNormalFromTo edge.from edge.to
