@@ -364,14 +364,14 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         OnTick _ ->
-            ( updateFrame model
+            ( updateOnTick model
                 |> incFrame
             , Cmd.none
             )
 
 
-updateFrame : Model -> Model
-updateFrame model =
+updateOnTick : Model -> Model
+updateOnTick model =
     case model.state of
         TargetsEntering start ->
             if model.frame - start > animDur then
