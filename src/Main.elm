@@ -550,6 +550,7 @@ viewEdgeNormal edge =
 viewBalls : List Ball -> Svg Msg
 viewBalls =
     let
+        do : List Ball -> Svg Msg
         do balls =
             Svg.g [] (List.map viewBall balls)
 
