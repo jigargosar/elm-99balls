@@ -61,12 +61,19 @@ type alias Flags =
 
 
 type alias Model =
-    { maybeEmitter : Maybe { start : Float, next : Ball, rest : List Ball }
+    { maybeEmitter : Maybe Emitter
     , balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
     , frame : Float
     , seed : Seed
+    }
+
+
+type alias Emitter =
+    { start : Float
+    , next : Ball
+    , rest : List Ball
     }
 
 
@@ -357,10 +364,15 @@ updateSimHelp model =
 handleConvergedFloorBalls : Model -> Model
 handleConvergedFloorBalls model =
     if model.balls == [] && model.targets /= [] && areFloorBallsSettled model then
-        { model
-            | balls = model.floorBalls
-            , floorBalls = []
-        }
+        case model.floorBalls |> List.reverse of
+            [] ->
+                model
+
+            f :: rest ->
+                { model
+                    | floorBalls = []
+                    , maybeEmitter = Just (Emitter model.frame f rest)
+                }
 
     else
         model
