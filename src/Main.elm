@@ -353,6 +353,7 @@ isBottomEdge edge =
 type Msg
     = OnTick Float
     | PointerDown Bool
+    | PointerMoved Vec
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -400,6 +401,9 @@ update message model =
 
         PointerDown isDown ->
             ( { model | pointerDown = isDown }, Cmd.none )
+
+        PointerMoved pointer ->
+            ( { model | pointer = pointer }, Cmd.none )
 
 
 updateOnTick : Model -> Model
@@ -692,6 +696,11 @@ view model =
         , S.stroke "none"
         , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, True ))
         , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, True ))
+        , E.preventDefaultOn "pointermove"
+            (JD.map2 vec (JD.field "pageX" JD.float) (JD.field "pageY" JD.float)
+                |> JD.map PointerMoved
+                |> JD.map (pairTo True)
+            )
         ]
         [ rect sri [ strokeP black ]
         , group [ transform [ scale 0.7 ] ]
