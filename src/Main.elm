@@ -723,14 +723,13 @@ maxPathLen =
 ballTravelPathHelp2 : Model -> Ball -> Float -> List Vec -> List Vec
 ballTravelPathHelp2 model ball pathLen path =
     let
-        newBall : Ball
-        newBall =
-            updateBallHelp model.targets ball |> snd
+        ( bc, newBall ) =
+            updateBallHelp model.targets ball
 
         newPathLenSq =
             vecLenFromTo ball.position newBall.position + pathLen
     in
-    if newPathLenSq > maxPathLen then
+    if newPathLenSq > maxPathLen || bc == BallHitBottomEdge then
         path
 
     else
