@@ -29,6 +29,8 @@ import Util exposing (..)
 
   - [x] Clarify current sim update intent.
 
+  - [x] view input path
+
   - model input
 
   - add nice `ting` sound on target ball collision
