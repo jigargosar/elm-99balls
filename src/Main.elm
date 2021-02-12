@@ -393,13 +393,12 @@ updateOnTick model =
         Sim ->
             -- if sim done generate next state
             if (model.maybeEmitter == Nothing) && (model.balls == []) then
-                { model | state = TargetsEntering model.frame }
-                    |> (if canTargetsSafelyMoveDown model.targets then
-                            addNewTargetRow
+                if canTargetsSafelyMoveDown model.targets then
+                    { model | state = TargetsEntering model.frame }
+                        |> addNewTargetRow
 
-                        else
-                            identity
-                       )
+                else
+                    { model | state = TargetsEntering model.frame }
 
             else
                 model
