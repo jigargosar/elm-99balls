@@ -395,6 +395,7 @@ updateOnTick model =
             if (model.maybeEmitter == Nothing) && (model.balls == []) then
                 -- check for game over
                 if canTargetsSafelyMoveDown model.targets then
+                    -- game over : for now re-simulate current turn.
                     { model | state = TargetsEntering model.frame }
                         |> addNewTargetRow
 
