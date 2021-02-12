@@ -696,6 +696,11 @@ ballTravelPath model =
 
 ballTravelPathHelp : Model -> Ball -> List Vec
 ballTravelPathHelp model ball =
+    ballTravelPathHelp2 model ball [ ball.position ]
+
+
+ballTravelPathHelp2 : Model -> Ball -> List Vec -> List Vec
+ballTravelPathHelp2 model ball path =
     let
         from =
             ball.position
@@ -706,7 +711,7 @@ ballTravelPathHelp model ball =
         to =
             vecAdd from v
     in
-    [ from, to ]
+    to :: path
 
 
 simulatedBallTravelPath : Float -> Model -> List Vec
