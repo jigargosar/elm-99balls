@@ -705,8 +705,11 @@ simulatedBallTravelPath start model =
         progress =
             (model.frame - start) / inputDur |> clamp 0 1
 
+        angleOffset =
+            0.05
+
         angle =
-            turns -0.5 + turns 0.5 * progress
+            turns (-0.5 + angleOffset) + turns (0.5 - angleOffset * 2) * progress
     in
     List.last model.floorBalls
         |> Maybe.map (setBallAngle angle >> ballTravelPath)
