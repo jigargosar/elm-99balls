@@ -465,7 +465,7 @@ convergeFloorBalls model =
             { model
                 | floorBalls =
                     f
-                        :: List.map (convergeBallTowards f) rest
+                        :: List.map (convergeBallTowards f.position) rest
                         |> List.reverse
             }
 
