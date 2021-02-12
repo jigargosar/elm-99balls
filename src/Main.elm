@@ -4,6 +4,8 @@ import Browser
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
+import Html.Events as E
+import Json.Decode as JD
 import List.Extra as List
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -350,6 +352,7 @@ isBottomEdge edge =
 
 type Msg
     = OnTick Float
+    | PointerDown Bool
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -395,6 +398,9 @@ update message model =
             , Cmd.none
             )
 
+        PointerDown isDown ->
+            ( { model | pointerDown = isDown }, Cmd.none )
+
 
 updateOnTick : Model -> Model
 updateOnTick model =
@@ -421,7 +427,11 @@ updateOnTick model =
                 model
 
         DraggingPointer _ ->
-            model
+            if not model.pointerDown then
+                { model | state = MockInput model.frame }
+
+            else
+                model
 
         MockInput start ->
             if model.frame - start > inputDur then
@@ -680,6 +690,8 @@ view model =
         , Px.height sh
         , S.fill "none"
         , S.stroke "none"
+        , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, True ))
+        , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, True ))
         ]
         [ rect sri [ strokeP black ]
         , group [ transform [ scale 0.7 ] ]
