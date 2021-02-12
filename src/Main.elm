@@ -706,13 +706,12 @@ ballTravelPathHelp2 _ ball path =
             vecFromRTheta 1000 ball.angle
 
         maybeCollision =
-            edges
+            [ screenSeg.left, screenSeg.top, screenSeg.right ]
                 |> List.filterMap
-                    (edgeToSeg
-                        >> detectMovingCircleAndSegCollision
-                            ( ( ball.position, ball.radius )
-                            , velocity
-                            )
+                    (detectMovingCircleAndSegCollision
+                        ( ( ball.position, ball.radius )
+                        , velocity
+                        )
                     )
                 |> minimumBy .t
 
