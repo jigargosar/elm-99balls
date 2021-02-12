@@ -5,6 +5,7 @@ import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
 import List
+import List.Extra as List
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Tuple exposing (pair)
@@ -688,7 +689,9 @@ inputToPoints model { start, startAngle, endAngle } =
             startAngle + (endAngle - startAngle) * progress
 
         from =
-            vecMidpoint bottomEdge.from bottomEdge.to
+            List.last model.floorBalls
+                |> Maybe.map .position
+                |> Maybe.withDefault (vecMidpoint bottomEdge.from bottomEdge.to)
 
         v =
             vecFromRTheta 200 angle
@@ -697,20 +700,6 @@ inputToPoints model { start, startAngle, endAngle } =
             vecAdd from v
     in
     [ from, to ]
-
-
-viewInput angle =
-    let
-        from =
-            vecMidpoint bottomEdge.from bottomEdge.to
-
-        v =
-            vecFromRTheta 200 angle
-
-        to =
-            vecAdd from v
-    in
-    polySeg ( from, to ) [ strokeH 0.14, Px.strokeWidth 2 ]
 
 
 viewTargets : Float -> List Target -> Svg msg
