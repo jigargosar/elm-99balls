@@ -682,7 +682,7 @@ view model =
             , case model.state of
                 MockInput start ->
                     group []
-                        [ viewTravelPath model.frame (simulatedBallTravelPath start model)
+                        [ viewTravelPath model.frame (mockTravelPath start model)
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
@@ -738,8 +738,8 @@ ballTravelPathHelp2 model ball pathLen path =
         ballTravelPathHelp2 model newBall newPathLenSq (newBall.position :: path)
 
 
-simulatedBallTravelPath : Float -> Model -> List Vec
-simulatedBallTravelPath start model =
+mockTravelPath : Float -> Model -> List Vec
+mockTravelPath start model =
     let
         progress =
             (model.frame - start) / inputDur |> clamp 0 1
