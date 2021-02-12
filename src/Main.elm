@@ -91,7 +91,7 @@ inputDur =
 
 type State
     = TargetsEntering Float
-    | Input Float
+    | Input { start : Float, startAngle : Float, endAngle : Float }
     | Sim
 
 
@@ -388,12 +388,12 @@ updateOnTick model =
                 (model.frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model | state = Input model.frame }
+                { model | state = Input { start = model.frame, startAngle = turns -0.3, endAngle = -0.2 } }
 
             else
                 model
 
-        Input start ->
+        Input { start } ->
             if model.frame - start > inputDur then
                 { model | state = Sim }
                     |> startSim
