@@ -708,7 +708,7 @@ ballTravelPathHelp2 _ ball path =
         maybeCollision =
             [ screenSeg.left, screenSeg.top, screenSeg.right ]
                 |> List.filterMap
-                    (detectMovingCircleAndSegCollision2
+                    (detectMovingCircleAndSegCollision
                         ( ( ball.position, ball.radius )
                         , velocity
                         )

@@ -294,26 +294,6 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
             )
 
 
-detectMovingCircleAndSegCollision2 : MovingCircle -> ( Vec, Vec ) -> Maybe Collision
-detectMovingCircleAndSegCollision2 mc ( from, to ) =
-    testMovingSphereSphere mc ( ( from, 1 ), vecFromTo from to )
-        |> Maybe.andThen
-            (\t ->
-                let
-                    ( _, velocity ) =
-                        mc
-
-                    normal =
-                        vecUnitNormalFromTo from to
-                in
-                if vecDotProduct velocity normal < 0 then
-                    Just (Collision t normal)
-
-                else
-                    Nothing
-            )
-
-
 sqDistSegmentPoint : Seg -> Vec -> Float
 sqDistSegmentPoint ( a, b ) c =
     -- Book: realtime collision detection
