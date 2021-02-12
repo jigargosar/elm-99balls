@@ -94,6 +94,7 @@ inputDur =
 type State
     = TargetsEntering Float
     | MockInput Float
+    | Input Vec
     | Sim
 
 
@@ -402,6 +403,9 @@ updateOnTick model =
 
             else
                 model
+
+        Input _ ->
+            model
 
         MockInput start ->
             if model.frame - start > inputDur then
