@@ -406,7 +406,6 @@ update message model =
             ( { model
                 | pointer =
                     vecAdd pointer (vecNegate gc.ri)
-                        |> vecScale (inv globalScale)
               }
             , Cmd.none
             )
@@ -693,10 +692,6 @@ subscriptions _ =
         ]
 
 
-globalScale =
-    0.7
-
-
 view : Model -> Html Msg
 view model =
     Svg.svg
@@ -714,7 +709,7 @@ view model =
             )
         ]
         [ rect sri [ strokeP black ]
-        , group [ transform [ scale globalScale ] ]
+        , group [ transform [ scale 1 ] ]
             [ rect sri [ fillP black ]
             , viewBalls model.floorBalls
             , case model.state of
@@ -741,7 +736,7 @@ view model =
                 DraggingPointer _ ->
                     let
                         dx =
-                            model.pointer.x / (gc.ri.x * globalScale)
+                            model.pointer.x / gc.ri.x
 
                         angle =
                             turns -0.25 + dx * turns 0.25
