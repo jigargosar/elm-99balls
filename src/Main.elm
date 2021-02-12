@@ -81,12 +81,12 @@ type alias Model =
 
 animDur : Float
 animDur =
-    60
+    60 / 4
 
 
 inputDur : Float
 inputDur =
-    1120
+    120
 
 
 type State
