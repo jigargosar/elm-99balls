@@ -76,6 +76,8 @@ type alias Model =
     , floorBalls : List Ball
     , targets : List Target
     , state : State
+    , pointerDown : Bool
+    , pointer : Vec
     , frame : Float
     , seed : Seed
     }
@@ -363,6 +365,8 @@ init _ =
       , balls = []
       , floorBalls = floorBalls
       , targets = targets
+      , pointerDown = False
+      , pointer = vecZero
       , state = TargetsEntering 0
       , frame = 0
       , seed = seed
@@ -410,7 +414,11 @@ updateOnTick model =
                 model
 
         WaitingForInput ->
-            model
+            if model.pointerDown then
+                { model | state = DraggingPointer model.pointer }
+
+            else
+                model
 
         DraggingPointer _ ->
             model
