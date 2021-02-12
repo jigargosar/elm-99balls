@@ -363,6 +363,9 @@ init _ =
       , frame = 0
       , seed = seed
       }
+        |> addNewTargetRow
+        |> addNewTargetRow
+        |> addNewTargetRow
     , Cmd.none
     )
 
