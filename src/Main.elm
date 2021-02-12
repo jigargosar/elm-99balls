@@ -272,6 +272,11 @@ setBallPosition p ball =
     { ball | position = p }
 
 
+setBallAngle : Float -> Ball -> Ball
+setBallAngle a ball =
+    { ball | angle = a }
+
+
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
 setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
@@ -680,6 +685,21 @@ view model =
         ]
 
 
+ballTravelPath : Ball -> List Vec
+ballTravelPath ball =
+    let
+        from =
+            ball.position
+
+        v =
+            vecFromRTheta 200 ball.angle
+
+        to =
+            vecAdd from v
+    in
+    [ from, to ]
+
+
 inputToPoints model { start, startAngle, endAngle } =
     let
         progress =
@@ -687,19 +707,10 @@ inputToPoints model { start, startAngle, endAngle } =
 
         angle =
             startAngle + (endAngle - startAngle) * progress
-
-        from =
-            List.last model.floorBalls
-                |> Maybe.map .position
-                |> Maybe.withDefault (vecMidpoint bottomEdge.from bottomEdge.to)
-
-        v =
-            vecFromRTheta 200 angle
-
-        to =
-            vecAdd from v
     in
-    [ from, to ]
+    List.last model.floorBalls
+        |> Maybe.map (setBallAngle angle >> ballTravelPath)
+        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
 
 
 viewTargets : Float -> List Target -> Svg msg
