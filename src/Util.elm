@@ -98,6 +98,14 @@ vecLenSqFromTo a b =
     vecFromTo a b |> vecLenSq
 
 
+vecLenFromTo a b =
+    vecFromTo a b |> vecLen
+
+
+vecLen =
+    vecLenSq >> sqrt
+
+
 vecLenSq : Vec -> Float
 vecLenSq v =
     vecDotProduct v v
