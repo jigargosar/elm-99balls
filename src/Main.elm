@@ -700,24 +700,24 @@ ballTravelPathHelp model ball =
 
 
 maxPathSqLen =
-    100 ^ 2
+    120 ^ 2
 
 
 ballTravelPathHelp2 : Model -> Ball -> Float -> List Vec -> List Vec
-ballTravelPathHelp2 model ball pathSqLen path =
+ballTravelPathHelp2 model ball pathLenSq path =
     let
         newBall : Ball
         newBall =
             updateBallHelp model.targets ball |> snd
 
-        newPathSqLen =
-            vecLenSqFromTo ball.position newBall.position + pathSqLen
+        newPathLenSq =
+            vecLenSqFromTo ball.position newBall.position + pathLenSq
     in
-    if newPathSqLen > maxPathSqLen then
+    if newPathLenSq > maxPathSqLen then
         path
 
     else
-        ballTravelPathHelp2 model newBall newPathSqLen (newBall.position :: path)
+        ballTravelPathHelp2 model newBall newPathLenSq (newBall.position :: path)
 
 
 simulatedBallTravelPath : Float -> Model -> List Vec
