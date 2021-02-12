@@ -84,9 +84,14 @@ animDur =
     60
 
 
+inputDur : Float
+inputDur =
+    120
+
+
 type State
     = TargetsEntering Float
-    | Input
+    | Input Float
     | Sim
 
 
@@ -383,14 +388,18 @@ updateOnTick model =
                 (model.frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model | state = Input }
+                { model | state = Input model.frame }
 
             else
                 model
 
-        Input ->
-            { model | state = Sim }
-                |> simulateUserInput
+        Input start ->
+            if model.frame - start > inputDur then
+                { model | state = Sim }
+                    |> startSim
+
+            else
+                model
 
         Sim ->
             -- check for turn over
@@ -490,8 +499,8 @@ addNewTargetRow model =
     }
 
 
-simulateUserInput : Model -> Model
-simulateUserInput model =
+startSim : Model -> Model
+startSim model =
     case model.floorBalls |> List.reverse of
         [] ->
             model
