@@ -687,6 +687,7 @@ view model =
         ]
 
 
+viewTravelPath : Float -> List Vec -> Svg msg
 viewTravelPath frame pts =
     let
         dash =
