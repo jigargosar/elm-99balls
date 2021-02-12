@@ -727,6 +727,11 @@ view model =
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
+                DraggingPointer _ ->
+                    group []
+                        [ viewTravelPath model.frame (ballTravelPath model)
+                        ]
+
                 _ ->
                     viewNone
             ]
