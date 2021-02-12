@@ -432,7 +432,7 @@ updateOnTick model =
 
         DraggingPointer _ ->
             if not model.pointerDown then
-                { model | state = MockInput model.frame }
+                { model | state = Sim }
 
             else
                 model
