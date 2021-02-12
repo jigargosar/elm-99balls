@@ -388,7 +388,7 @@ updateOnTick model =
 
         Input ->
             { model | state = Sim }
-                |> reInitEmitterFromFlooredBalls
+                |> simulateUserInput
 
         Sim ->
             -- check for turn over
@@ -514,8 +514,8 @@ addNewTargetRow model =
     }
 
 
-reInitEmitterFromFlooredBalls : Model -> Model
-reInitEmitterFromFlooredBalls model =
+simulateUserInput : Model -> Model
+simulateUserInput model =
     case model.floorBalls |> List.reverse of
         [] ->
             model
