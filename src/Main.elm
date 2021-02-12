@@ -688,11 +688,15 @@ view model =
 
 
 viewTravelPath frame pts =
+    let
+        dash =
+            10
+    in
     polyline (List.reverse pts)
         [ strokeH 0.14
         , Px.strokeWidth 2
-        , S.strokeDasharray "10"
-        , S.strokeDashoffset (round frame |> modBy 20 |> negate |> String.fromInt)
+        , S.strokeDasharray (String.fromInt dash)
+        , S.strokeDashoffset (round frame |> modBy (dash * 2) |> negate |> String.fromInt)
         ]
 
 
