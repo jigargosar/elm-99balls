@@ -4,7 +4,6 @@ import Browser
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
-import List
 import List.Extra as List
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -92,7 +91,7 @@ inputDur =
 
 type State
     = TargetsEntering Float
-    | Input { start : Float, startAngle : Float, endAngle : Float }
+    | Input Float
     | Sim
 
 
@@ -394,12 +393,12 @@ updateOnTick model =
                 (model.frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model | state = Input { start = model.frame, startAngle = turns -0.3, endAngle = -0.2 } }
+                { model | state = Input model.frame }
 
             else
                 model
 
-        Input { start } ->
+        Input start ->
             if model.frame - start > inputDur then
                 { model | state = Sim }
                     |> startSim
@@ -676,8 +675,8 @@ view model =
                 Nothing ->
                     viewNone
             , case model.state of
-                Input input ->
-                    polyline (inputToPoints model input) [ strokeH 0.14, Px.strokeWidth 2 ]
+                Input start ->
+                    polyline (simulatedBallTravelPath start model) [ strokeH 0.14, Px.strokeWidth 2 ]
 
                 _ ->
                     viewNone
@@ -700,7 +699,8 @@ ballTravelPath ball =
     [ from, to ]
 
 
-inputToPoints model { start } =
+simulatedBallTravelPath : Float -> Model -> List Vec
+simulatedBallTravelPath start model =
     let
         progress =
             (model.frame - start) / inputDur |> clamp 0 1
