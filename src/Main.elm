@@ -676,7 +676,10 @@ view model =
                     viewNone
             , case model.state of
                 Input start ->
-                    polyline (simulatedBallTravelPath start model) [ strokeH 0.14, Px.strokeWidth 2 ]
+                    group []
+                        [ polyline (simulatedBallTravelPath start model) [ strokeH 0.14, Px.strokeWidth 2 ]
+                        , polyline (ballTravelPath model) [ strokeH 0.14, Px.strokeWidth 2 ]
+                        ]
 
                 _ ->
                     viewNone
@@ -684,10 +687,10 @@ view model =
         ]
 
 
-ballTravelPath : Float -> Model -> List Vec
-ballTravelPath angle model =
+ballTravelPath : Model -> List Vec
+ballTravelPath model =
     List.last model.floorBalls
-        |> Maybe.map (setBallAngle angle >> ballTravelPathHelp)
+        |> Maybe.map ballTravelPathHelp
         |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
 
 
@@ -718,7 +721,9 @@ simulatedBallTravelPath start model =
         angle =
             turns (-0.5 + angleOffset) + turns (0.5 - angleOffset * 2) * progress
     in
-    ballTravelPath angle model
+    List.last model.floorBalls
+        |> Maybe.map (setBallAngle angle >> ballTravelPathHelp)
+        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
 
 
 viewTargets : Float -> List Target -> Svg msg
