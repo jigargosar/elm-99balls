@@ -696,34 +696,24 @@ ballTravelPath model =
 
 ballTravelPathHelp : Model -> Ball -> List Vec
 ballTravelPathHelp model ball =
-    ballTravelPathHelp2 model ball [ ball.position ]
+    ballTravelPathHelp2 model ball 0 [ ball.position ]
 
 
-ballTravelPathHelp2 : Model -> Ball -> List Vec -> List Vec
-ballTravelPathHelp2 _ ball path =
+ballTravelPathHelp2 : Model -> Ball -> Float -> List Vec -> List Vec
+ballTravelPathHelp2 model ball pathSqLen path =
     let
         velocity =
             vecFromRTheta 1000 ball.angle
 
-        maybeCollision =
-            [ screenSeg.left, screenSeg.top, screenSeg.right ]
-                |> List.filterMap
-                    (detectMovingCircleAndSegCollision
-                        ( ( ball.position, ball.radius )
-                        , velocity
-                        )
-                    )
-                |> minimumBy .t
+        newBall : Ball
+        newBall =
+            updateBallHelp model.targets ball
+                |> snd
 
-        newVelocity =
-            case maybeCollision of
-                Nothing ->
-                    velocity
-
-                Just { t } ->
-                    vecScale t velocity
+        travelSqLen =
+            vecLenSqFromTo ball.position newBall.position
     in
-    vecAdd ball.position newVelocity :: path
+    newBall.position :: path
 
 
 simulatedBallTravelPath : Float -> Model -> List Vec
