@@ -470,11 +470,11 @@ convergeFloorBalls model =
             }
 
 
-convergeBallTowards : Ball -> Ball -> Ball
+convergeBallTowards : Vec -> Ball -> Ball
 convergeBallTowards to ball =
     let
         p =
-            vecFromTo ball.position to.position
+            vecFromTo ball.position to
                 |> vecScale 0.1
                 |> vecAdd ball.position
     in
