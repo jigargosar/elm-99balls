@@ -731,9 +731,9 @@ view model =
                 DraggingPointer startPointer ->
                     let
                         dx =
-                            vecFromTo startPointer model.pointer
+                            vecFromTo (vec 0 startPointer.y) model.pointer
                                 |> .x
-                                |> mul (1 / gc.ri.x)
+                                |> mul (1 / (gc.ri.x * 2))
 
                         angle =
                             turns -0.25 + dx * turns 0.5
