@@ -669,8 +669,55 @@ view model =
 
                 Nothing ->
                     viewNone
+            , case model.state of
+                Input { start, startAngle, endAngle } ->
+                    let
+                        progress =
+                            (model.frame - start) / inputDur |> clamp 0 1
+
+                        angle =
+                            startAngle + (endAngle - startAngle) * progress
+                    in
+                    viewInput angle
+
+                _ ->
+                    viewNone
             ]
         ]
+
+
+inputToPoints model { start, startAngle, endAngle } =
+    let
+        progress =
+            (model.frame - start) / inputDur |> clamp 0 1
+
+        angle =
+            startAngle + (endAngle - startAngle) * progress
+
+        from =
+            vecMidpoint bottomEdge.from bottomEdge.to
+
+        v =
+            vecFromRTheta 200 angle
+
+        to =
+            vecAdd from v
+    in
+    [ from, to ]
+
+
+viewInput angle =
+    let
+        from =
+            vecMidpoint bottomEdge.from bottomEdge.to
+
+        v =
+            vecFromRTheta 200 angle
+
+        to =
+            vecAdd from v
+    in
+    polySeg ( from, to ) [ strokeH 0.14, Px.strokeWidth 2 ]
 
 
 viewTargets : Float -> List Target -> Svg msg
