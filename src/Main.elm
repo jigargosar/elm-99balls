@@ -700,13 +700,13 @@ ballTravelPath ball =
     [ from, to ]
 
 
-inputToPoints model { start, startAngle, endAngle } =
+inputToPoints model { start } =
     let
         progress =
             (model.frame - start) / inputDur |> clamp 0 1
 
         angle =
-            startAngle + (endAngle - startAngle) * progress
+            turns -0.5 + turns 0.5 * progress
     in
     List.last model.floorBalls
         |> Maybe.map (setBallAngle angle >> ballTravelPath)
