@@ -25,7 +25,9 @@ import Util exposing (..)
   - [x] bug: collision with multiple static balls, doesn't account for shortest collision.
     only the first found.
 
-  - generate targets in top row.
+  - [x] generate targets in top row.
+
+  - add nice `ting` sound on target ball collision
 
   - Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
 
