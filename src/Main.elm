@@ -739,7 +739,7 @@ view model =
                             model.pointer.x / gc.ri.x
 
                         angle =
-                            turns -0.25 + dx * turns 0.25
+                            turns -0.25 + dx * turns 0.24
 
                         _ =
                             if clamp -1 1 dx == dx then
