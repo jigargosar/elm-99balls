@@ -403,7 +403,7 @@ update message model =
             ( { model | pointerDown = isDown }, Cmd.none )
 
         PointerMoved pointer ->
-            ( { model | pointer = pointer }, Cmd.none )
+            ( { model | pointer = vecSub pointer gc.ri }, Cmd.none )
 
 
 updateOnTick : Model -> Model
@@ -698,7 +698,7 @@ view model =
         , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, True ))
         , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, True ))
         , E.preventDefaultOn "pointermove"
-            (JD.map2 vec (JD.field "pageX" JD.float) (JD.field "pageY" JD.float)
+            (JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
                 |> JD.map PointerMoved
                 |> JD.map (pairTo True)
             )
@@ -728,15 +728,13 @@ view model =
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
-                DraggingPointer startPointer ->
+                DraggingPointer _ ->
                     let
                         dx =
-                            vecFromTo (vec 0 startPointer.y) model.pointer
-                                |> .x
-                                |> mul (1 / (gc.ri.x * 2))
+                            model.pointer.x / gc.ri.x
 
                         angle =
-                            turns -0.25 + dx * turns 0.5
+                            turns -0.25 + dx * turns 0.4
                     in
                     group []
                         [ viewTravelPath model.frame (ballTravelPathAtAngle angle model)
@@ -744,6 +742,8 @@ view model =
 
                 _ ->
                     viewNone
+            , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
+            , polySeg ( vecZero, model.pointer ) [ strokeH 0.6 ]
             ]
         ]
 
@@ -924,6 +924,10 @@ polyline pts aa =
 
 polySeg ( a, b ) =
     polyline [ a, b ]
+
+
+circle r aa =
+    Svg.circle (Px.r r :: aa) []
 
 
 rect ri =
