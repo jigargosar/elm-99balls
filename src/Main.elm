@@ -734,26 +734,8 @@ view model =
                         ]
 
                 DraggingPointer _ ->
-                    let
-                        dx =
-                            model.pointer.x / gc.ri.x
-
-                        angle =
-                            turns -0.25 + dx * turns 0.24
-
-                        _ =
-                            if clamp -1 1 dx == dx then
-                                ()
-
-                            else
-                                let
-                                    _ =
-                                        Debug.log "dx" dx
-                                in
-                                ()
-                    in
                     group []
-                        [ viewTravelPath model.frame (ballTravelPathAtAngle angle model)
+                        [ viewTravelPath model.frame (ballTravelPathAtAngle (inputAngle model.pointer) model)
                         ]
 
                 _ ->
@@ -762,6 +744,28 @@ view model =
             , polySeg ( vecZero, model.pointer ) [ strokeH 0.6 ]
             ]
         ]
+
+
+inputAngle pointer =
+    let
+        dx =
+            pointer.x / gc.ri.x
+
+        angle =
+            turns -0.25 + dx * turns 0.24
+
+        _ =
+            if clamp -1 1 dx == dx then
+                ()
+
+            else
+                let
+                    _ =
+                        Debug.log "dx" dx
+                in
+                ()
+    in
+    angle
 
 
 viewTravelPath : Float -> List Vec -> Svg msg
