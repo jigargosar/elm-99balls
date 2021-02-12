@@ -391,11 +391,15 @@ updateOnTick model =
                 |> reInitEmitterFromFlooredBalls
 
         Sim ->
-            model
-                |> moveBallsAndHandleCollision
-                |> emitBalls
-                |> convergeFloorBalls
-                |> updateTargets
+            -- if sim done generate next state
+            if (model.maybeEmitter == Nothing) && (model.balls == []) then
+                updateTargets model
+
+            else
+                model
+                    |> moveBallsAndHandleCollision
+                    |> emitBalls
+                    |> convergeFloorBalls
 
 
 incFrame : Model -> Model
@@ -494,10 +498,7 @@ moveBallsAndHandleCollision model =
 
 updateTargets : Model -> Model
 updateTargets model =
-    if
-        (model.maybeEmitter == Nothing)
-            && (model.balls == [])
-    then
+    if (model.maybeEmitter == Nothing) && (model.balls == []) then
         if canTargetsSafelyMoveDown model.targets then
             let
                 ( targets, seed ) =
