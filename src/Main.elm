@@ -433,6 +433,7 @@ updateOnTick model =
         DraggingPointer _ ->
             if not model.pointerDown then
                 { model | state = Sim }
+                    |> startSim
 
             else
                 model
