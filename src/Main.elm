@@ -400,7 +400,11 @@ updateOnTick model =
                 (model.frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model | state = MockInput model.frame }
+                { model
+                    | state =
+                        --MockInput model.frame
+                        WaitingForInput
+                }
 
             else
                 model
