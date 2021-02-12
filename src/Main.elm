@@ -86,7 +86,7 @@ animDur =
 
 inputDur : Float
 inputDur =
-    120
+    200
 
 
 type State
