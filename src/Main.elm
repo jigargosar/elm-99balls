@@ -741,10 +741,21 @@ view model =
                 DraggingPointer _ ->
                     let
                         dx =
-                            (model.pointer.x / gc.ri.x) * globalScale
+                            model.pointer.x / (gc.ri.x * globalScale)
 
                         angle =
-                            turns -0.25 + dx * turns 0.4
+                            turns -0.25 + dx * turns 0.25
+
+                        _ =
+                            if clamp -1 1 dx == dx then
+                                ()
+
+                            else
+                                let
+                                    _ =
+                                        Debug.log "dx" dx
+                                in
+                                ()
                     in
                     group []
                         [ viewTravelPath model.frame (ballTravelPathAtAngle angle model)
