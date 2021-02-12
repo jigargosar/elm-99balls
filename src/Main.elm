@@ -86,7 +86,7 @@ animDur =
 
 inputDur : Float
 inputDur =
-    120
+    1120
 
 
 type State
@@ -700,18 +700,31 @@ ballTravelPathHelp model ball =
 
 
 ballTravelPathHelp2 : Model -> Ball -> List Vec -> List Vec
-ballTravelPathHelp2 model ball path =
+ballTravelPathHelp2 _ ball path =
     let
-        from =
-            ball.position
+        velocity =
+            vecFromRTheta 1000 ball.angle
 
-        v =
-            vecFromRTheta 200 ball.angle
+        maybeCollision =
+            edges
+                |> List.filterMap
+                    (edgeToSeg
+                        >> detectMovingCircleAndSegCollision
+                            ( ( ball.position, ball.radius )
+                            , velocity
+                            )
+                    )
+                |> minimumBy .t
 
-        to =
-            vecAdd from v
+        newVelocity =
+            case maybeCollision of
+                Nothing ->
+                    velocity
+
+                Just { t } ->
+                    vecScale t velocity
     in
-    to :: path
+    vecAdd ball.position newVelocity :: path
 
 
 simulatedBallTravelPath : Float -> Model -> List Vec
