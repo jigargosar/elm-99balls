@@ -289,6 +289,11 @@ setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
 
 
+setBallPositionAndAngle : Vec -> Float -> Ball -> Ball
+setBallPositionAndAngle p angle ball =
+    { ball | position = p, angle = angle }
+
+
 setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
 setBallVelocityAndUpdatePosition rawVelocity ball =
     let
@@ -547,6 +552,27 @@ addNewTargetRow model =
         | targets = targets ++ List.map moveTargetDown model.targets
         , seed = seed
     }
+
+
+startSimAtAngle : Float -> Model -> Model
+startSimAtAngle angle model =
+    case model.floorBalls |> List.reverse of
+        [] ->
+            model
+
+        f :: rest ->
+            { model
+                | floorBalls = []
+                , maybeEmitter =
+                    Just
+                        (Emitter model.frame
+                            (setBallAngle angle f)
+                            (rest
+                                |> List.map
+                                    (setBallPositionAndAngle f.position angle)
+                            )
+                        )
+            }
 
 
 startSim : Model -> Model
