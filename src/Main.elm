@@ -677,13 +677,22 @@ view model =
             , case model.state of
                 Input start ->
                     group []
-                        [ polyline (simulatedBallTravelPath start model) [ strokeH 0.14, Px.strokeWidth 2 ]
-                        , polyline (ballTravelPath model) [ strokeH 0.14, Px.strokeWidth 2 ]
+                        [ viewTravelPath model.frame (simulatedBallTravelPath start model)
+                        , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
                 _ ->
                     viewNone
             ]
+        ]
+
+
+viewTravelPath frame pts =
+    polyline (List.reverse pts)
+        [ strokeH 0.14
+        , Px.strokeWidth 2
+        , S.strokeDasharray "10"
+        , S.strokeDashoffset (round frame |> modBy 20 |> negate |> String.fromInt)
         ]
 
 
