@@ -728,9 +728,18 @@ view model =
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
-                DraggingPointer _ ->
+                DraggingPointer startPointer ->
+                    let
+                        dx =
+                            vecFromTo startPointer model.pointer
+                                |> .x
+                                |> mul (1 / gc.ri.x)
+
+                        angle =
+                            turns -0.25 + dx * turns 0.5
+                    in
                     group []
-                        [ viewTravelPath model.frame (ballTravelPath model)
+                        [ viewTravelPath model.frame (ballTravelPathAtAngle angle model)
                         ]
 
                 _ ->
@@ -758,6 +767,13 @@ ballTravelPath model =
     List.last model.floorBalls
         |> Maybe.map (ballTravelPathHelp model)
         |> Maybe.withDefault []
+
+
+ballTravelPathAtAngle : Float -> Model -> List Vec
+ballTravelPathAtAngle angle model =
+    List.last model.floorBalls
+        |> Maybe.map (setBallAngle angle >> ballTravelPathHelp model)
+        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
 
 
 ballTravelPathHelp : Model -> Ball -> List Vec
@@ -797,9 +813,7 @@ mockTravelPath start model =
         angle =
             turns (-0.5 + angleOffset) + turns (0.5 - angleOffset * 2) * progress
     in
-    List.last model.floorBalls
-        |> Maybe.map (setBallAngle angle >> ballTravelPathHelp model)
-        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
+    ballTravelPathAtAngle angle model
 
 
 viewTargets : Float -> List Target -> Svg msg
