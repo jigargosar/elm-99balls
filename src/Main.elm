@@ -391,8 +391,9 @@ updateOnTick model =
                 |> reInitEmitterFromFlooredBalls
 
         Sim ->
-            -- if sim done generate next state
+            -- check for turn over
             if (model.maybeEmitter == Nothing) && (model.balls == []) then
+                -- check for game over
                 if canTargetsSafelyMoveDown model.targets then
                     { model | state = TargetsEntering model.frame }
                         |> addNewTargetRow
