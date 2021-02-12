@@ -700,7 +700,7 @@ ballTravelPathHelp model ball =
 
 
 maxPathSqLen =
-    120 ^ 2
+    100 ^ 2
 
 
 ballTravelPathHelp2 : Model -> Ball -> Float -> List Vec -> List Vec
