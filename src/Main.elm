@@ -406,7 +406,7 @@ update message model =
             ( { model
                 | pointer =
                     vecAdd pointer (vecNegate gc.ri)
-                        |> vecScale (inv 0.7)
+                        |> vecScale (inv globalScale)
               }
             , Cmd.none
             )
@@ -693,6 +693,10 @@ subscriptions _ =
         ]
 
 
+globalScale =
+    0.7
+
+
 view : Model -> Html Msg
 view model =
     Svg.svg
@@ -710,7 +714,7 @@ view model =
             )
         ]
         [ rect sri [ strokeP black ]
-        , group [ transform [ scale 0.7 ] ]
+        , group [ transform [ scale globalScale ] ]
             [ rect sri [ fillP black ]
             , viewBalls model.floorBalls
             , case model.state of
