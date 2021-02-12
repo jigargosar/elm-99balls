@@ -29,6 +29,8 @@ import Util exposing (..)
 
   - [x] Clarify current sim update intent.
 
+  - input
+
   - add nice `ting` sound on target ball collision
 
   - Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
