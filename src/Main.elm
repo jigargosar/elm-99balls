@@ -691,7 +691,7 @@ ballTravelPath : Model -> List Vec
 ballTravelPath model =
     List.last model.floorBalls
         |> Maybe.map ballTravelPathHelp
-        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
+        |> Maybe.withDefault []
 
 
 ballTravelPathHelp : Ball -> List Vec
