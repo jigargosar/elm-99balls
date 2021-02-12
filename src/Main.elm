@@ -413,34 +413,8 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
-stepEmitter frame emitter =
-    if frame - emitter.start > 10 then
-        Just
-            ( emitter.next
-            , case emitter.rest of
-                [] ->
-                    Nothing
-
-                n :: r ->
-                    Just (Emitter frame n r)
-            )
-
-    else
-        Nothing
-
-
 emitBalls : Model -> Model
 emitBalls model =
-    let
-        _ =
-            model.maybeEmitter
-                |> Maybe.andThen (stepEmitter model.frame)
-                |> Maybe.map
-                    (\( ball, maybeEmitter ) ->
-                        { model | balls = ball :: model.balls, maybeEmitter = maybeEmitter }
-                    )
-                |> Maybe.withDefault model
-    in
     case model.maybeEmitter of
         Nothing ->
             model
