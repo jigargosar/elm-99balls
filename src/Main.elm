@@ -94,7 +94,8 @@ inputDur =
 type State
     = TargetsEntering Float
     | MockInput Float
-    | Input Vec
+    | WaitingForInput
+    | DraggingPointer Vec
     | Sim
 
 
@@ -404,7 +405,10 @@ updateOnTick model =
             else
                 model
 
-        Input _ ->
+        WaitingForInput ->
+            model
+
+        DraggingPointer _ ->
             model
 
         MockInput start ->
