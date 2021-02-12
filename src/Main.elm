@@ -27,7 +27,7 @@ import Util exposing (..)
 
   - [x] generate targets in top row.
 
-  - Clarify current sim update intent.
+  - [x] Clarify current sim update intent.
 
   - add nice `ting` sound on target ball collision
 
