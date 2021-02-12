@@ -394,7 +394,12 @@ updateOnTick model =
             -- if sim done generate next state
             if (model.maybeEmitter == Nothing) && (model.balls == []) then
                 { model | state = TargetsEntering model.frame }
-                    |> updateTargets
+                    |> (if canTargetsSafelyMoveDown model.targets then
+                            addNewTargetRow
+
+                        else
+                            identity
+                       )
 
             else
                 model
@@ -497,20 +502,16 @@ moveBallsAndHandleCollision model =
     }
 
 
-updateTargets : Model -> Model
-updateTargets model =
-    if canTargetsSafelyMoveDown model.targets then
-        let
-            ( targets, seed ) =
-                rndStep ( randomTargets, model.seed )
-        in
-        { model
-            | targets = targets ++ List.map moveTargetDown model.targets
-            , seed = seed
-        }
-
-    else
-        model
+addNewTargetRow : Model -> Model
+addNewTargetRow model =
+    let
+        ( targets, seed ) =
+            rndStep ( randomTargets, model.seed )
+    in
+    { model
+        | targets = targets ++ List.map moveTargetDown model.targets
+        , seed = seed
+    }
 
 
 reInitEmitterFromFlooredBalls : Model -> Model
