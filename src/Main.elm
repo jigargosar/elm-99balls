@@ -93,7 +93,7 @@ inputDur =
 
 type State
     = TargetsEntering Float
-    | Input Float
+    | MockInput Float
     | Sim
 
 
@@ -398,12 +398,12 @@ updateOnTick model =
                 (model.frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model | state = Input model.frame }
+                { model | state = MockInput model.frame }
 
             else
                 model
 
-        Input start ->
+        MockInput start ->
             if model.frame - start > inputDur then
                 { model | state = Sim }
                     |> startSim
@@ -680,7 +680,7 @@ view model =
                 Nothing ->
                     viewNone
             , case model.state of
-                Input start ->
+                MockInput start ->
                     group []
                         [ viewTravelPath model.frame (simulatedBallTravelPath start model)
                         , viewTravelPath model.frame (ballTravelPath model)
