@@ -367,6 +367,7 @@ update message model =
     case message of
         OnTick _ ->
             ( updateOnTick model
+                |> convergeFloorBalls
                 |> incFrame
             , Cmd.none
             )
@@ -384,7 +385,6 @@ updateOnTick model =
 
             else
                 model
-                    |> convergeFloorBalls
 
         Input ->
             { model | state = Sim }
@@ -405,7 +405,6 @@ updateOnTick model =
                 model
                     |> moveBallsAndHandleCollision
                     |> emitBalls
-                    |> convergeFloorBalls
 
 
 incFrame : Model -> Model
