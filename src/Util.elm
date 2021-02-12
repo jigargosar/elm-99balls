@@ -166,6 +166,11 @@ vecScale s =
     vecMapEach (mul s)
 
 
+vecUnscale : Float -> Vec -> Vec
+vecUnscale s =
+    vecScale (inv s)
+
+
 vecNegate : Vec -> Vec
 vecNegate =
     vecScale -1
@@ -422,6 +427,10 @@ sub =
 
 mul =
     (*)
+
+
+inv n =
+    1 / n
 
 
 fdiv =

@@ -403,7 +403,13 @@ update message model =
             ( { model | pointerDown = isDown }, Cmd.none )
 
         PointerMoved pointer ->
-            ( { model | pointer = vecSub pointer gc.ri }, Cmd.none )
+            ( { model
+                | pointer =
+                    vecAdd pointer (vecNegate gc.ri)
+                        |> vecScale (inv 0.7)
+              }
+            , Cmd.none
+            )
 
 
 updateOnTick : Model -> Model
