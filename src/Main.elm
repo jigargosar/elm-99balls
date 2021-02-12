@@ -670,15 +670,8 @@ view model =
                 Nothing ->
                     viewNone
             , case model.state of
-                Input { start, startAngle, endAngle } ->
-                    let
-                        progress =
-                            (model.frame - start) / inputDur |> clamp 0 1
-
-                        angle =
-                            startAngle + (endAngle - startAngle) * progress
-                    in
-                    viewInput angle
+                Input input ->
+                    polyline (inputToPoints model input) [ strokeH 0.14, Px.strokeWidth 2 ]
 
                 _ ->
                     viewNone
