@@ -465,18 +465,22 @@ convergeFloorBalls model =
             { model
                 | floorBalls =
                     f
-                        :: List.map (convergeBallTowards f.position) rest
+                        :: List.map (convergeBallTowards f) rest
                         |> List.reverse
             }
 
 
-convergeBallTowards : Vec -> Ball -> Ball
+convergeBallTowards : Ball -> Ball -> Ball
 convergeBallTowards to ball =
     let
         p =
-            vecFromTo ball.position to
-                |> vecScale 0.1
-                |> vecAdd ball.position
+            if areBallsCloseEnough to ball then
+                to.position
+
+            else
+                vecFromTo ball.position to.position
+                    |> vecScale 0.1
+                    |> vecAdd ball.position
     in
     setBallPosition p ball
 
