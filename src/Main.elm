@@ -741,7 +741,7 @@ view model =
                 DraggingPointer _ ->
                     let
                         dx =
-                            model.pointer.x / gc.ri.x
+                            (model.pointer.x / gc.ri.x) * globalScale
 
                         angle =
                             turns -0.25 + dx * turns 0.4
