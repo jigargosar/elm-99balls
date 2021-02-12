@@ -684,8 +684,15 @@ view model =
         ]
 
 
-ballTravelPath : Ball -> List Vec
-ballTravelPath ball =
+ballTravelPath : Float -> Model -> List Vec
+ballTravelPath angle model =
+    List.last model.floorBalls
+        |> Maybe.map (setBallAngle angle >> ballTravelPathHelp)
+        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
+
+
+ballTravelPathHelp : Ball -> List Vec
+ballTravelPathHelp ball =
     let
         from =
             ball.position
@@ -711,9 +718,7 @@ simulatedBallTravelPath start model =
         angle =
             turns (-0.5 + angleOffset) + turns (0.5 - angleOffset * 2) * progress
     in
-    List.last model.floorBalls
-        |> Maybe.map (setBallAngle angle >> ballTravelPath)
-        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
+    ballTravelPath angle model
 
 
 viewTargets : Float -> List Target -> Svg msg
