@@ -474,13 +474,9 @@ convergeBallTowards : Ball -> Ball -> Ball
 convergeBallTowards to ball =
     let
         p =
-            if areBallsCloseEnough to ball then
-                to.position
-
-            else
-                vecFromTo ball.position to.position
-                    |> vecScale 0.1
-                    |> vecAdd ball.position
+            vecFromTo ball.position to.position
+                |> vecScale 0.1
+                |> vecAdd ball.position
     in
     setBallPosition p ball
 
