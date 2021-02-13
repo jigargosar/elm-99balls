@@ -460,7 +460,7 @@ updateOnTick model =
 
         DraggingPointer angle ->
             if not model.pointerDown then
-                if model.pointer.y >= 0 then
+                if shouldCancelInput model.pointer then
                     { model | state = Sim }
                         |> startSimAtAngle angle
 
@@ -494,6 +494,11 @@ updateOnTick model =
                 model
                     |> moveBallsAndHandleCollision
                     |> emitBalls
+
+
+shouldCancelInput : Vec -> Bool
+shouldCancelInput { y } =
+    y >= 0
 
 
 inputAngle : Vec -> Float
