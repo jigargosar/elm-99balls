@@ -460,15 +460,18 @@ updateOnTick model =
 
         DraggingPointer angle ->
             if not model.pointerDown then
-                { model | state = Sim }
-                    |> startSimAtAngle angle
+                if model.pointer.y >= 0 then
+                    { model | state = Sim }
+                        |> startSimAtAngle angle
+
+                else
+                    { model | state = WaitingForInput }
 
             else
                 let
                     dx =
                         vecFromTo model.prevPointer model.pointer
                             |> .x
-                            |> Debug.log "dx"
 
                     offset =
                         turns 0.23
