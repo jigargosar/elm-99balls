@@ -829,11 +829,6 @@ offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
 
 
-alwaysPreventDefaultOn : String -> Decoder a -> Html.Attribute a
-alwaysPreventDefaultOn eventName decoder =
-    E.preventDefaultOn eventName (JD.map (pairTo False) decoder)
-
-
 view : Model -> Html Msg
 view model =
     Svg.svg
@@ -842,13 +837,9 @@ view model =
         , Px.height sh
         , S.fill "none"
         , S.stroke "none"
-        , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, False ))
-        , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, False ))
-        , E.preventDefaultOn "pointermove"
-            (offsetDecoder
-                |> JD.map PointerMoved
-                |> JD.map (pairTo False)
-            )
+        , E.on "pointerdown" (JD.succeed (PointerDown True))
+        , E.on "pointerup" (JD.succeed (PointerDown False))
+        , E.on "pointermove" (offsetDecoder |> JD.map PointerMoved)
         , style "touch-action" "none"
         , style "use-select" "none"
         ]

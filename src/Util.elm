@@ -1,6 +1,9 @@
 module Util exposing (..)
 
 import Basics.Extra exposing (atLeast)
+import Html
+import Html.Events as E
+import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
@@ -634,3 +637,12 @@ transform =
 translate : Vec -> Transform
 translate =
     vecApply Translate
+
+
+
+-- Events
+
+
+alwaysPreventDefaultOn : String -> Decoder a -> Html.Attribute a
+alwaysPreventDefaultOn eventName decoder =
+    E.preventDefaultOn eventName (JD.map (pairTo True) decoder)
