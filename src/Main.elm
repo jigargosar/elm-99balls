@@ -532,6 +532,15 @@ inputAngle a b =
         |> clampInputAngle
 
 
+validInputAngle : Vec -> Vec -> Maybe Float
+validInputAngle a b =
+    if isInputValid a b then
+        Just (inputAngle a b)
+
+    else
+        Nothing
+
+
 clampInputAngle =
     clampMO (turns -0.25) (turns 0.24)
 
