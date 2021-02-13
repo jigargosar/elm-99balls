@@ -808,7 +808,7 @@ view model =
         , E.on "pointerup" (offsetDecoder |> JD.map (PointerDown False))
         , E.on "pointermove" (offsetDecoder |> JD.map PointerMoved)
         , style "touch-action" "none"
-        , style "use-select" "none"
+        , style "user-select" "none"
         ]
         [ rect sri [ strokeP black ]
         , group [ transform [ scale 1 ] ]
