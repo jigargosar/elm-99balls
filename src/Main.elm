@@ -46,8 +46,8 @@ import Util exposing (..)
       - Desktop Case for self:
           - holding down lmb is not cool.
           - tap to start.
-          - tap again to fire.
-          - tap right to cancel.
+          - tap again to fire or cancel, based on y.
+          - hold shift for minor angle change.
 
   - add nice `ting` sound on target ball collision
 
