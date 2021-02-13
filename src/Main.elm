@@ -527,11 +527,6 @@ updateOnTick model =
                     |> emitBalls
 
 
-validInput1 : Vec -> Bool
-validInput1 { y } =
-    y >= 0
-
-
 validInput2 : Vec -> Vec -> Bool
 validInput2 a b =
     b.y > a.y
@@ -542,17 +537,15 @@ inputAngle3 a b =
     vecAngleFromTo a b
 
 
-inputAngle2 : Vec -> Vec -> Float -> Float
-inputAngle2 f t a =
+clampMO midA offA =
     let
-        dx =
-            (vecFromTo f t).x / (gc.ri.x * 2)
+        minA =
+            midA - offA
 
-        da =
-            dx * turns 0.24
+        maxA =
+            midA + offA
     in
-    (a + da)
-        |> clampInputAngle
+    clamp minA maxA
 
 
 clampInputAngle =
@@ -570,21 +563,6 @@ clampInputAngle =
             midA + offA
     in
     clamp minA maxA
-
-
-inputAngle : Vec -> Float
-inputAngle pointer =
-    let
-        dx =
-            pointer.x / gc.ri.x
-
-        offset =
-            ((pointer.y / gc.ri.y) * 2) + -1
-
-        angle =
-            (turns -0.25 + dx * turns 0.24) + turns (offset * 0.001)
-    in
-    angle
 
 
 incFrame : Model -> Model
