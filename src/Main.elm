@@ -829,6 +829,11 @@ offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
 
 
+alwaysPreventDefaultOn : String -> Decoder a -> Html.Attribute a
+alwaysPreventDefaultOn eventName decoder =
+    E.preventDefaultOn eventName (JD.map (pairTo False) decoder)
+
+
 view : Model -> Html Msg
 view model =
     Svg.svg
