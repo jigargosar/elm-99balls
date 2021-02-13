@@ -497,7 +497,7 @@ updateOnTick model =
                     | state =
                         DraggingPointer
                             { startPointer = startPointer
-                            , angle = inputAngle3 model.pointer startPointer
+                            , angle = inputAngle model.pointer startPointer
                             }
                 }
 
@@ -532,20 +532,14 @@ validInput2 a b =
     b.y > a.y
 
 
-inputAngle3 : Vec -> Vec -> Float
-inputAngle3 a b =
+inputAngle : Vec -> Vec -> Float
+inputAngle a b =
     vecAngleFromTo a b
+        |> clampInputAngle
 
 
 clampInputAngle =
-    let
-        midA =
-            turns -0.25
-
-        offA =
-            turns 0.24
-    in
-    clampMO midA offA
+    clampMO (turns -0.25) (turns 0.24)
 
 
 incFrame : Model -> Model
