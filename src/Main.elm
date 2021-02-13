@@ -40,7 +40,9 @@ import Util exposing (..)
 
   - [x] model input
 
-  - Improve input precision
+  - [x] Improve input precision
+      - Epiphany: use vec from start to current to compute angle.
+        -- Archive
       - we need to be able to map entire range
       - also for small movements we need smaller angle changes.
           - Desktop Case for self:
@@ -51,7 +53,6 @@ import Util exposing (..)
           - Try Use y for precision and dx for change
               - changing y changes x too, so no help here.
           - cache angle, use shift for precision.
-          - Epiphany: use vec from start to current to compute angle.
 
   - add nice `ting` sound on target ball collision
 
