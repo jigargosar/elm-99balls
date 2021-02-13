@@ -46,6 +46,12 @@ import Util exposing (..)
 
   - Understand exactly how collision computes time `t` and document or return clarifying types.
 
+  - Understand what happens, currently, when objects are already colliding,
+    i.e. when objects already intersecting, what is effect on collision response.
+
+  - Invalid states, that can be represented.
+      - ball outside screen edges.
+
 -}
 sw =
     600
