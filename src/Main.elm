@@ -39,6 +39,8 @@ import Util exposing (..)
   - [x] bug: ball edge tunnelling problem, since we are not doing continuous collision
 
   - model input
+      - map mouse dx to aim angle.
+          - try relative diff.
 
   - add nice `ting` sound on target ball collision
 
