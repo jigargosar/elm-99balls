@@ -485,7 +485,7 @@ updateOnTick model =
 
         DraggingPointer { startPointer, angle } ->
             if not model.pointerDown then
-                if validInput2 startPointer model.pointer then
+                if validInput startPointer model.pointer then
                     { model | state = Sim }
                         |> startSimAtAngle angle
 
@@ -527,8 +527,8 @@ updateOnTick model =
                     |> emitBalls
 
 
-validInput2 : Vec -> Vec -> Bool
-validInput2 a b =
+validInput : Vec -> Vec -> Bool
+validInput a b =
     b.y > a.y
 
 
@@ -831,7 +831,7 @@ view model =
                         ]
 
                 DraggingPointer { startPointer, angle } ->
-                    if validInput2 startPointer model.pointer then
+                    if validInput startPointer model.pointer then
                         group []
                             [ viewTravelPath model.frame
                                 (ballTravelPathAtAngle angle model)
