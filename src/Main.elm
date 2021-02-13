@@ -461,7 +461,7 @@ updateOnTick model =
         DraggingPointer angle ->
             if not model.pointerDown then
                 { model | state = Sim }
-                    |> startSim
+                    |> startSimAtAngle angle
 
             else
                 let
@@ -477,7 +477,7 @@ updateOnTick model =
                         (angle + dx * 0.005)
                             |> clamp (turns -0.25 - offset) (turns -0.25 + offset)
                 in
-                { model | state = DraggingPointer newAngle }
+                { model | state = DraggingPointer (inputAngle model.pointer) }
 
         MockInput start ->
             if model.frame - start > inputDur then
@@ -503,6 +503,28 @@ updateOnTick model =
                 model
                     |> moveBallsAndHandleCollision
                     |> emitBalls
+
+
+inputAngle pointer =
+    let
+        dx =
+            pointer.x / gc.ri.x
+
+        angle =
+            turns -0.25 + dx * turns 0.24
+
+        _ =
+            if clamp -1 1 dx == dx then
+                ()
+
+            else
+                let
+                    _ =
+                        Debug.log "dx" dx
+                in
+                ()
+    in
+    angle
 
 
 incFrame : Model -> Model
@@ -793,12 +815,7 @@ view model =
                 DraggingPointer angle ->
                     group []
                         [ viewTravelPath model.frame
-                            (ballTravelPathAtAngle
-                                (inputAngle model.pointer
-                                    |> always angle
-                                )
-                                model
-                            )
+                            (ballTravelPathAtAngle angle model)
                         ]
 
                 _ ->
@@ -807,28 +824,6 @@ view model =
             , polySeg ( vecZero, model.pointer ) [ strokeH 0.6 ]
             ]
         ]
-
-
-inputAngle pointer =
-    let
-        dx =
-            pointer.x / gc.ri.x
-
-        angle =
-            turns -0.25 + dx * turns 0.24
-
-        _ =
-            if clamp -1 1 dx == dx then
-                ()
-
-            else
-                let
-                    _ =
-                        Debug.log "dx" dx
-                in
-                ()
-    in
-    angle
 
 
 viewTravelPath : Float -> List Vec -> Svg msg
