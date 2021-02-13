@@ -385,7 +385,7 @@ isBottomEdge edge =
 
 type Msg
     = OnTick Float
-    | PointerDown Bool
+    | PointerDown Bool Vec
     | PointerMoved Vec
 
 
@@ -434,8 +434,15 @@ update message model =
             , Cmd.none
             )
 
-        PointerDown isDown ->
-            ( { model | pointerDown = isDown }, Cmd.none )
+        PointerDown isDown pointer ->
+            ( { model
+                | pointerDown = isDown
+                , pointer =
+                    -- svg cords to world cords
+                    vecAdd pointer (vecNegate gc.ri)
+              }
+            , Cmd.none
+            )
 
         PointerMoved pointer ->
             ( { model
@@ -837,8 +844,8 @@ view model =
         , Px.height sh
         , S.fill "none"
         , S.stroke "none"
-        , E.on "pointerdown" (JD.succeed (PointerDown True))
-        , E.on "pointerup" (JD.succeed (PointerDown False))
+        , E.on "pointerdown" (offsetDecoder |> JD.map (PointerDown True))
+        , E.on "pointerup" (offsetDecoder |> JD.map (PointerDown False))
         , E.on "pointermove" (offsetDecoder |> JD.map PointerMoved)
         , style "touch-action" "none"
         , style "use-select" "none"
