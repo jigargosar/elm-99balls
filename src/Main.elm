@@ -813,9 +813,13 @@ view model =
                 _ ->
                     viewNone
             , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
-            , polySeg ( vecZero, model.pointer ) [ strokeH 0.6 ]
+            , viewDebugPointer model.pointer |> always viewNone
             ]
         ]
+
+
+viewDebugPointer pointer =
+    polySeg ( vecZero, pointer ) [ strokeH 0.6 ]
 
 
 viewTravelPath : Float -> List Vec -> Svg msg
