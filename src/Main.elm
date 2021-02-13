@@ -49,6 +49,7 @@ import Util exposing (..)
               - tap again to fire or cancel, based on y.
               - hold shift for minor angle change.
           - Try Use y for precision and dx for change
+              - changing y changes x too, so no help here.
 
   - add nice `ting` sound on target ball collision
 
@@ -515,19 +516,11 @@ inputAngle pointer =
         dx =
             pointer.x / gc.ri.x
 
+        offset =
+            ((pointer.y / gc.ri.y) * 2) + -1
+
         angle =
-            turns -0.25 + dx * turns 0.24
-
-        _ =
-            if clamp -1 1 dx == dx then
-                ()
-
-            else
-                let
-                    _ =
-                        Debug.log "dx" dx
-                in
-                ()
+            (turns -0.25 + dx * turns 0.24) + turns (offset * 0.001)
     in
     angle
 
