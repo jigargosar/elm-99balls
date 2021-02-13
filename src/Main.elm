@@ -832,12 +832,12 @@ view model =
         , Px.height sh
         , S.fill "none"
         , S.stroke "none"
-        , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, True ))
-        , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, True ))
+        , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, False ))
+        , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, False ))
         , E.preventDefaultOn "pointermove"
             (JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
                 |> JD.map PointerMoved
-                |> JD.map (pairTo True)
+                |> JD.map (pairTo False)
             )
         , style "touch-action" "none"
         , style "use-select" "none"
