@@ -468,6 +468,21 @@ roundFloat2 =
     mapEach roundFloat
 
 
+clampMO midA offA =
+    if offA < 0 then
+        clampMO midA -offA
+
+    else
+        let
+            minA =
+                midA - offA
+
+            maxA =
+                midA + offA
+        in
+        clamp minA maxA
+
+
 map2 : (a -> b -> c) -> ( a, a ) -> ( b, b ) -> ( c, c )
 map2 fn ( a, b ) ( c, d ) =
     ( fn a c, fn b d )

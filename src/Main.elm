@@ -537,17 +537,6 @@ inputAngle3 a b =
     vecAngleFromTo a b
 
 
-clampMO midA offA =
-    let
-        minA =
-            midA - offA
-
-        maxA =
-            midA + offA
-    in
-    clamp minA maxA
-
-
 clampInputAngle =
     let
         midA =
