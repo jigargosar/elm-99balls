@@ -33,18 +33,18 @@ import Util exposing (..)
 
   - [x] view input path
 
+  - [x] fixed: using continuous collision. bug: multiple collision i.e with edge and static ball at the same time;
+    only respecting edge, and tunneling through static ball.
+
+  - [x] bug: ball edge tunnelling problem, since we are not doing continuous collision
+
   - model input
 
   - add nice `ting` sound on target ball collision
 
-  - Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
+  - +1: Annoying. Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
 
   - Understand exactly how collision computes time `t` and document or return clarifying types.
-
-  - bug: multiple collision i.e with edge and static ball at the same time;
-    only respecting edge, and tunneling through static ball.
-
-  - bug: ball edge tunnelling problem, since we are not doing continuous collision
 
 -}
 sw =
