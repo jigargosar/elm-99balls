@@ -51,6 +51,7 @@ import Util exposing (..)
           - Try Use y for precision and dx for change
               - changing y changes x too, so no help here.
           - cache angle, use shift for precision.
+          - Epiphany: use vec from start to current to compute angle.
 
   - add nice `ting` sound on target ball collision
 
@@ -514,12 +515,11 @@ validInput { y } =
 inputAngle2 : Vec -> Vec -> Float -> Float
 inputAngle2 f t a =
     let
-        _ =
-            vecFromTo f t
-                |> vecLen
+        dx =
+            (vecFromTo f t).x / (gc.ri.x * 2)
 
         da =
-            a
+            dx * turns 0.24
     in
     (a + da)
         |> clampInputAngle
