@@ -127,7 +127,7 @@ type State
     = TargetsEntering Float
     | MockInput Float
     | WaitingForInput
-    | DraggingPointer { startPointer : Vec, angle : Float }
+    | DraggingPointer Vec
     | Sim
 
 
@@ -478,28 +478,22 @@ updateOnTick model =
 
         WaitingForInput ->
             if model.pointerDown then
-                { model | state = DraggingPointer { startPointer = model.pointer, angle = turns -0.25 } }
+                { model | state = DraggingPointer model.pointer }
 
             else
                 model
 
-        DraggingPointer { startPointer, angle } ->
+        DraggingPointer startPointer ->
             if not model.pointerDown then
                 if isInputValid startPointer model.pointer then
                     { model | state = Sim }
-                        |> startSimAtAngle angle
+                        |> startSimAtAngle (inputAngle model.pointer startPointer)
 
                 else
                     { model | state = WaitingForInput }
 
             else
-                { model
-                    | state =
-                        DraggingPointer
-                            { startPointer = startPointer
-                            , angle = inputAngle model.pointer startPointer
-                            }
-                }
+                model
 
         MockInput start ->
             if model.frame - start > inputDur then
@@ -830,11 +824,11 @@ view model =
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
-                DraggingPointer { startPointer, angle } ->
+                DraggingPointer startPointer ->
                     if isInputValid startPointer model.pointer then
                         group []
                             [ viewTravelPath model.frame
-                                (ballTravelPathAtAngle angle model)
+                                (ballTravelPathAtAngle (inputAngle model.pointer startPointer) model)
                             , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
                             , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
                             ]
