@@ -484,7 +484,10 @@ updateOnTick model =
                 model
 
         DraggingPointer startPointer ->
-            if not model.pointerDown then
+            if model.pointerDown then
+                model
+
+            else
                 case validInputAngle startPointer model.pointer of
                     Nothing ->
                         { model | state = WaitingForInput }
@@ -492,9 +495,6 @@ updateOnTick model =
                     Just angle ->
                         { model | state = Sim }
                             |> startSimAtAngle angle
-
-            else
-                model
 
         MockInput start ->
             if model.frame - start > inputDur then
