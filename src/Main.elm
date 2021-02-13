@@ -511,6 +511,37 @@ validInput { y } =
     y >= 0
 
 
+inputAngle2 : Vec -> Vec -> Float -> Float
+inputAngle2 f t a =
+    let
+        _ =
+            vecFromTo f t
+                |> vecLen
+
+        da =
+            a
+    in
+    (a + da)
+        |> clampInputAngle
+
+
+clampInputAngle =
+    let
+        midA =
+            turns -0.25
+
+        offA =
+            turns 0.24
+
+        minA =
+            midA - offA
+
+        maxA =
+            midA + offA
+    in
+    clamp minA maxA
+
+
 inputAngle : Vec -> Float
 inputAngle pointer =
     let
