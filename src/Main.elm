@@ -54,6 +54,9 @@ import Util exposing (..)
               - changing y changes x too, so no help here.
           - cache angle, use shift for precision.
 
+  - Concern: Input handling is much better, but there is room for improvement.
+      - tap rather than drag, at least with mouse
+
   - add nice `ting` sound on target ball collision
 
   - +1: Annoying. Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
