@@ -458,13 +458,25 @@ updateOnTick model =
             else
                 model
 
-        DraggingPointer _ ->
+        DraggingPointer angle ->
             if not model.pointerDown then
                 { model | state = Sim }
                     |> startSim
 
             else
-                model
+                let
+                    dx =
+                        vecFromTo model.prevPointer model.pointer
+                            |> .x
+
+                    offset =
+                        turns 0.2
+
+                    newAngle =
+                        (angle + dx * 0.1)
+                            |> clamp (turns -0.25 - offset) (turns -0.25 + offset)
+                in
+                { model | state = DraggingPointer newAngle }
 
         MockInput start ->
             if model.frame - start > inputDur then
