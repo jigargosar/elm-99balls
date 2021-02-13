@@ -50,6 +50,7 @@ import Util exposing (..)
               - hold shift for minor angle change.
           - Try Use y for precision and dx for change
               - changing y changes x too, so no help here.
+          - cache angle, use shift for precision.
 
   - add nice `ting` sound on target ball collision
 
