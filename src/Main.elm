@@ -421,6 +421,7 @@ update message model =
         PointerMoved pointer ->
             ( { model
                 | pointer =
+                    -- svg cords to world cords
                     vecAdd pointer (vecNegate gc.ri)
               }
             , Cmd.none
