@@ -43,11 +43,12 @@ import Util exposing (..)
   - Improve input precision
       - we need to be able to map entire range
       - also for small movements we need smaller angle changes.
-      - Desktop Case for self:
-          - holding down lmb is not cool.
-          - tap to start.
-          - tap again to fire or cancel, based on y.
-          - hold shift for minor angle change.
+          - Desktop Case for self:
+              - holding down lmb is not cool.
+              - tap to start.
+              - tap again to fire or cancel, based on y.
+              - hold shift for minor angle change.
+          - Use y for precision and dx for change
 
   - add nice `ting` sound on target ball collision
 
