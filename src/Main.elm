@@ -485,12 +485,13 @@ updateOnTick model =
 
         DraggingPointer startPointer ->
             if not model.pointerDown then
-                if isInputValid startPointer model.pointer then
-                    { model | state = Sim }
-                        |> startSimAtAngle (inputAngle model.pointer startPointer)
+                case validInputAngle startPointer model.pointer of
+                    Nothing ->
+                        { model | state = WaitingForInput }
 
-                else
-                    { model | state = WaitingForInput }
+                    Just angle ->
+                        { model | state = Sim }
+                            |> startSimAtAngle angle
 
             else
                 model
@@ -524,27 +525,26 @@ updateOnTick model =
 validInputAngle : Vec -> Vec -> Maybe Float
 validInputAngle =
     let
-        do a b =
-            if isInputValid a b then
-                Just (inputAngle a b)
+        do start current =
+            if isInputValid start current then
+                Just (inputAngle start current)
 
             else
                 Nothing
 
         isInputValid : Vec -> Vec -> Bool
-        isInputValid a b =
-            b.y > a.y
+        isInputValid start current =
+            start.y < current.y
 
         inputAngle : Vec -> Vec -> Float
-        inputAngle a b =
-            vecAngleFromTo a b
+        inputAngle start current =
+            vecAngleFromTo current start
                 |> clampInputAngle
+
+        clampInputAngle =
+            clampMO (turns -0.25) (turns 0.24)
     in
     do
-
-
-clampInputAngle =
-    clampMO (turns -0.25) (turns 0.24)
 
 
 incFrame : Model -> Model
@@ -836,16 +836,17 @@ view model =
                         ]
 
                 DraggingPointer startPointer ->
-                    if isInputValid startPointer model.pointer then
-                        group []
-                            [ viewTravelPath model.frame
-                                (ballTravelPathAtAngle (inputAngle model.pointer startPointer) model)
-                            , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
-                            , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
-                            ]
+                    case validInputAngle startPointer model.pointer of
+                        Nothing ->
+                            viewNone
 
-                    else
-                        viewNone
+                        Just angle ->
+                            group []
+                                [ viewTravelPath model.frame
+                                    (ballTravelPathAtAngle angle model)
+                                , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
+                                , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
+                                ]
 
                 _ ->
                     viewNone
