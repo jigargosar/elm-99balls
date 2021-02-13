@@ -120,7 +120,7 @@ type State
     = TargetsEntering Float
     | MockInput Float
     | WaitingForInput
-    | DraggingPointer Float
+    | DraggingPointer { startPointer : Vec, angle : Float }
     | Sim
 
 
@@ -464,12 +464,12 @@ updateOnTick model =
 
         WaitingForInput ->
             if model.pointerDown then
-                { model | state = DraggingPointer (turns -0.25) }
+                { model | state = DraggingPointer { startPointer = model.pointer, angle = turns -0.25 } }
 
             else
                 model
 
-        DraggingPointer angle ->
+        DraggingPointer { startPointer, angle } ->
             if not model.pointerDown then
                 if validInput model.pointer then
                     { model | state = Sim }
@@ -479,7 +479,13 @@ updateOnTick model =
                     { model | state = WaitingForInput }
 
             else
-                { model | state = DraggingPointer (inputAngle model.pointer) }
+                { model
+                    | state =
+                        DraggingPointer
+                            { startPointer = startPointer
+                            , angle = inputAngle3 model.pointer startPointer
+                            }
+                }
 
         MockInput start ->
             if model.frame - start > inputDur then
@@ -510,6 +516,11 @@ updateOnTick model =
 validInput : Vec -> Bool
 validInput { y } =
     y >= 0
+
+
+inputAngle3 : Vec -> Vec -> Float
+inputAngle3 a b =
+    vecAngleFromTo a b
 
 
 inputAngle2 : Vec -> Vec -> Float -> Float
@@ -842,7 +853,7 @@ view model =
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
-                DraggingPointer angle ->
+                DraggingPointer { angle } ->
                     if validInput model.pointer then
                         group []
                             [ viewTravelPath model.frame
