@@ -521,24 +521,26 @@ updateOnTick model =
                     |> emitBalls
 
 
-isInputValid : Vec -> Vec -> Bool
-isInputValid a b =
-    b.y > a.y
-
-
-inputAngle : Vec -> Vec -> Float
-inputAngle a b =
-    vecAngleFromTo a b
-        |> clampInputAngle
-
-
 validInputAngle : Vec -> Vec -> Maybe Float
-validInputAngle a b =
-    if isInputValid a b then
-        Just (inputAngle a b)
+validInputAngle =
+    let
+        do a b =
+            if isInputValid a b then
+                Just (inputAngle a b)
 
-    else
-        Nothing
+            else
+                Nothing
+
+        isInputValid : Vec -> Vec -> Bool
+        isInputValid a b =
+            b.y > a.y
+
+        inputAngle : Vec -> Vec -> Float
+        inputAngle a b =
+            vecAngleFromTo a b
+                |> clampInputAngle
+    in
+    do
 
 
 clampInputAngle =
