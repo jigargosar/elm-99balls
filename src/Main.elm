@@ -470,10 +470,10 @@ updateOnTick model =
                             |> .x
 
                     offset =
-                        turns 0.2
+                        turns 0.22
 
                     newAngle =
-                        (angle + dx * 0.1)
+                        (angle + dx * 0.009)
                             |> clamp (turns -0.25 - offset) (turns -0.25 + offset)
                 in
                 { model | state = DraggingPointer newAngle }
