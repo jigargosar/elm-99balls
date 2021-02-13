@@ -544,14 +544,8 @@ clampInputAngle =
 
         offA =
             turns 0.24
-
-        minA =
-            midA - offA
-
-        maxA =
-            midA + offA
     in
-    clamp minA maxA
+    clampMO midA offA
 
 
 incFrame : Model -> Model
