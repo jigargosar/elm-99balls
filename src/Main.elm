@@ -89,6 +89,7 @@ type alias Model =
     , state : State
     , pointerDown : Bool
     , pointer : Vec
+    , prevPointer : Vec
     , frame : Float
     , seed : Seed
     }
@@ -385,6 +386,7 @@ init _ =
       , targets = targets
       , pointerDown = False
       , pointer = vecZero
+      , prevPointer = vecZero
       , state = TargetsEntering 0
       , frame = 0
       , seed = seed
