@@ -468,6 +468,7 @@ updateOnTick model =
                     dx =
                         vecFromTo model.prevPointer model.pointer
                             |> .x
+                            |> Debug.log "dx"
 
                     offset =
                         turns 0.23
