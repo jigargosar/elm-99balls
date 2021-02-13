@@ -6,7 +6,7 @@ import Color exposing (..)
 import Html exposing (Html)
 import Html.Attributes exposing (style)
 import Html.Events as E
-import Json.Decode as JD
+import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Svg exposing (Svg)
 import Svg.Attributes as S
@@ -824,6 +824,11 @@ subscriptions _ =
         ]
 
 
+offsetDecoder : Decoder Vec
+offsetDecoder =
+    JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
+
+
 view : Model -> Html Msg
 view model =
     Svg.svg
@@ -835,7 +840,7 @@ view model =
         , E.preventDefaultOn "pointerdown" (JD.succeed ( PointerDown True, False ))
         , E.preventDefaultOn "pointerup" (JD.succeed ( PointerDown False, False ))
         , E.preventDefaultOn "pointermove"
-            (JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
+            (offsetDecoder
                 |> JD.map PointerMoved
                 |> JD.map (pairTo False)
             )
