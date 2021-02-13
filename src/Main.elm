@@ -782,7 +782,7 @@ view model =
         [ rect sri [ strokeP black ]
         , group [ transform [ scale 1 ] ]
             [ rect sri [ fillP black ]
-            , viewBalls model.floorBalls
+            , viewFloorBalls model.floorBalls
             , case model.state of
                 TargetsEntering start ->
                     viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
@@ -815,6 +815,15 @@ view model =
             , viewDebugPointer model.pointer |> always viewNone
             ]
         ]
+
+
+viewFloorBalls floorBalls =
+    case floorBalls of
+        [] ->
+            viewNone
+
+        h :: t ->
+            viewBalls (h :: (t |> reject (areBallsCloseEnough h)))
 
 
 viewDebugPointer pointer =
