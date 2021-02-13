@@ -109,7 +109,7 @@ type State
     = TargetsEntering Float
     | MockInput Float
     | WaitingForInput
-    | DraggingPointer Vec
+    | DraggingPointer Float
     | Sim
 
 
@@ -453,7 +453,7 @@ updateOnTick model =
 
         WaitingForInput ->
             if model.pointerDown then
-                { model | state = DraggingPointer model.pointer }
+                { model | state = DraggingPointer (turns -0.25) }
 
             else
                 model
@@ -777,9 +777,15 @@ view model =
                         , viewTravelPath model.frame (ballTravelPath model)
                         ]
 
-                DraggingPointer _ ->
+                DraggingPointer angle ->
                     group []
-                        [ viewTravelPath model.frame (ballTravelPathAtAngle (inputAngle model.pointer) model)
+                        [ viewTravelPath model.frame
+                            (ballTravelPathAtAngle
+                                (inputAngle model.pointer
+                                    |> always angle
+                                )
+                                model
+                            )
                         ]
 
                 _ ->
