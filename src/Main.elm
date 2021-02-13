@@ -468,18 +468,6 @@ updateOnTick model =
                     { model | state = WaitingForInput }
 
             else
-                let
-                    dx =
-                        vecFromTo model.prevPointer model.pointer
-                            |> .x
-
-                    offset =
-                        turns 0.23
-
-                    newAngle =
-                        (angle + dx * 0.005)
-                            |> clamp (turns -0.25 - offset) (turns -0.25 + offset)
-                in
                 { model | state = DraggingPointer (inputAngle model.pointer) }
 
         MockInput start ->
