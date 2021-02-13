@@ -49,8 +49,9 @@ import Util exposing (..)
   - Understand what happens, currently, when objects are already colliding,
     i.e. when objects already intersecting, what is effect on collision response.
 
-  - Invalid states, that can be represented.
+  - Invalid states, that are representable.
       - ball outside screen edges.
+      - total number of balls before and after simulation are different.
 
 -}
 sw =
