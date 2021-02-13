@@ -496,6 +496,7 @@ updateOnTick model =
                     |> emitBalls
 
 
+inputAngle : Vec -> Float
 inputAngle pointer =
     let
         dx =
