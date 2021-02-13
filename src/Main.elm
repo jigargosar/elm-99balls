@@ -4,6 +4,7 @@ import Browser
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
+import Html.Attributes exposing (style)
 import Html.Events as E
 import Json.Decode as JD
 import List.Extra as List
@@ -838,6 +839,8 @@ view model =
                 |> JD.map PointerMoved
                 |> JD.map (pairTo False)
             )
+        , style "touch-action" "none"
+        , style "use-select" "none"
         ]
         [ rect sri [ strokeP black ]
         , group [ transform [ scale 1 ] ]
