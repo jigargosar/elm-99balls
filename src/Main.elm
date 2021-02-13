@@ -50,7 +50,7 @@ import Util exposing (..)
     i.e. when objects already intersecting, what is effect on collision response.
 
   - Invalid states, that are representable.
-      - ball outside screen edges.
+      - ball outside screen edges / sim never ending.
       - total number of balls before and after simulation are different.
 
 -}
