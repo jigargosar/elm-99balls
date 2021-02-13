@@ -810,10 +810,14 @@ view model =
                         ]
 
                 DraggingPointer angle ->
-                    group []
-                        [ viewTravelPath model.frame
-                            (ballTravelPathAtAngle angle model)
-                        ]
+                    if shouldCancelInput model.pointer then
+                        viewNone
+
+                    else
+                        group []
+                            [ viewTravelPath model.frame
+                                (ballTravelPathAtAngle angle model)
+                            ]
 
                 _ ->
                     viewNone
