@@ -54,6 +54,8 @@ import Util exposing (..)
               - changing y changes x too, so no help here.
           - cache angle, use shift for precision.
 
+  - test input handling on phone/touch device.
+
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
 
