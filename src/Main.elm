@@ -412,6 +412,7 @@ update message model =
             ( updateOnTick model
                 |> convergeFloorBalls
                 |> incFrame
+                |> cachePointer
             , Cmd.none
             )
 
@@ -426,6 +427,11 @@ update message model =
               }
             , Cmd.none
             )
+
+
+cachePointer : Model -> Model
+cachePointer model =
+    { model | prevPointer = model.pointer }
 
 
 updateOnTick : Model -> Model
