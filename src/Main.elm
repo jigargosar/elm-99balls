@@ -55,7 +55,7 @@ import Util exposing (..)
           - cache angle, use shift for precision.
 
   - Concern: Input handling is much better, but there is room for improvement.
-      - tap rather than drag, at least with mouse
+      - carpel tunnel pain: try tap rather than drag, at least with mouse
 
   - add nice `ting` sound on target ball collision
 
