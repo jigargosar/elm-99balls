@@ -41,8 +41,13 @@ import Util exposing (..)
   - [x] model input
 
   - Improve input precision
-    - we need to be able to map entire range
-    - also for small movements we need smaller angle changes.
+      - we need to be able to map entire range
+      - also for small movements we need smaller angle changes.
+      - Desktop Case:
+        holding down lmb is not cool.
+        tap to start.
+        tap again to fire.
+        tap right to cancel.
 
   - add nice `ting` sound on target ball collision
 
