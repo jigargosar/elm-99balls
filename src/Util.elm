@@ -425,7 +425,7 @@ test2dSegSegV2 ( a, b ) ( c, d ) =
                 numerator / denominator
 
             p =
-                vec (x1 + t * (x2 - x1)) (y1 + t (y2 - y1))
+                vec (x1 + t * (x2 - x1)) (y1 + t * (y2 - y1))
         in
         Just ( t, p )
 
