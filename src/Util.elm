@@ -328,31 +328,36 @@ detectMovingCircleAndSegCollision2 mc s =
 
         ( ( p, r ), v ) =
             mc
-
-        p2 =
-            vecAdd p v
-
-        vr =
-            vecScaleTo r v
-
-        s2 =
-            ( vecSub p vr, vecAdd p2 vr )
     in
-    test2dSegSeg s2 s
-        |> Maybe.map
-            (\( _, ipt ) ->
-                let
-                    iLen =
-                        vecLenFromTo p ipt
+    if vecDotProduct norm v < 0 then
+        let
+            p2 =
+                vecAdd p v
 
-                    vLen =
-                        vLen v
+            vr =
+                vecScaleTo r v
 
-                    t =
-                        iLen / vLen
-                in
-                { t = t, normal = norm }
-            )
+            s2 =
+                ( vecSub p vr, vecAdd p2 vr )
+        in
+        test2dSegSeg s2 s
+            |> Maybe.map
+                (\( _, ipt ) ->
+                    let
+                        iLen =
+                            vecLenFromTo p ipt
+
+                        vLen =
+                            vLen v
+
+                        t =
+                            iLen / vLen
+                    in
+                    { t = t, normal = norm }
+                )
+
+    else
+        Nothing
 
 
 signed2DTriArea : Vec -> Vec -> Vec -> Float
