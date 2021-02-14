@@ -348,7 +348,7 @@ detectMovingCircleAndSegCollision2 mc s =
                             vecLenFromTo p ipt
 
                         vLen =
-                            vLen v
+                            vecLen v
 
                         t =
                             iLen / vLen
