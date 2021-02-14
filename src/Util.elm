@@ -373,38 +373,41 @@ detectMovingCircleAndSegCollision2 mc s =
         Nothing
 
 
+signed2DTriArea : Vec -> Vec -> Vec -> Float
+signed2DTriArea a b c =
+    (a.x - c.y) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)
 
---signed2DTriArea : Vec -> Vec -> Vec -> Float
---signed2DTriArea a b c =
---    (a.x - c.y) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)
---
---
---test2dSegSeg : Seg -> Seg -> Maybe ( Float, Vec )
---test2dSegSeg ( a, b ) ( c, d ) =
---    let
---        ( a1, a2 ) =
---            ( signed2DTriArea a b d, signed2DTriArea a b c )
---    in
---    if a1 /= 0 && a2 /= 0 && a1 * a2 < 0 then
---        let
---            a3 =
---                signed2DTriArea c d a
---
---            a4 =
---                a3 + a2 - a1
---        in
---        if a3 * a4 < 0 then
---            let
---                t =
---                    a3 / (a3 - a4)
---            in
---            Just ( t, vecAdd a (vecScale t (vecSub b a)) )
---
---        else
---            Nothing
---
---    else
---        Nothing
+
+{-| Book: Realtime Collision Detection
+Page: 151
+Section: 2D segment intersection
+-}
+test2dSegSeg__DoesntWork : Seg -> Seg -> Maybe ( Float, Vec )
+test2dSegSeg__DoesntWork ( a, b ) ( c, d ) =
+    let
+        ( a1, a2 ) =
+            ( signed2DTriArea a b d, signed2DTriArea a b c )
+    in
+    if a1 /= 0 && a2 /= 0 && a1 * a2 < 0 then
+        let
+            a3 =
+                signed2DTriArea c d a
+
+            a4 =
+                a3 + a2 - a1
+        in
+        if a3 * a4 < 0 then
+            let
+                t =
+                    a3 / (a3 - a4)
+            in
+            Just ( t, vecAdd a (vecScale t (vecSub b a)) )
+
+        else
+            Nothing
+
+    else
+        Nothing
 
 
 {-| wikipedia: <https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line>
