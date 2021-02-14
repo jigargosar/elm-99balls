@@ -345,7 +345,7 @@ detectMovingCircleAndSegCollision2 mc s =
                 (\( _, ipt ) ->
                     let
                         iLen =
-                            vecLenFromTo p ipt
+                            vecLenFromTo p ipt - r
 
                         vLen =
                             vecLen velocity
