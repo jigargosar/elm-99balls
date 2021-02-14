@@ -310,6 +310,18 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
             )
 
 
+detectMovingCircleAndSegCollision2 : MovingCircle -> Seg -> Maybe Collision
+detectMovingCircleAndSegCollision2 mc ( from, to ) =
+    {-
+       - seg seg+r intersection
+       - id = dist from center to intersection - r
+       - if id < 0 already colliding, t = 0
+       - else t = id / v len -- double check formulae for t
+
+    -}
+    Debug.todo "Not Implemented"
+
+
 signed2DTriArea : Vec -> Vec -> Vec -> Float
 signed2DTriArea a b c =
     (a.x - c.y) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)
@@ -341,18 +353,6 @@ test2dSegSeg ( a, b ) ( c, d ) =
 
     else
         Nothing
-
-
-detectMovingCircleAndSegCollision2 : MovingCircle -> Seg -> Maybe Collision
-detectMovingCircleAndSegCollision2 mc ( from, to ) =
-    {-
-       - seg seg+r intersection
-       - id = dist from center to intersection - r
-       - if id < 0 already colliding, t = 0
-       - else t = id / v len -- double check formulae for t
-
-    -}
-    Debug.todo "Not Implemented"
 
 
 sqDistSegmentPoint : Seg -> Vec -> Float
