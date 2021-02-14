@@ -339,7 +339,6 @@ detectMovingCircleAndSegCollision2 mc s =
 
             s2 =
                 ( vecSub p vr, vecAdd p2 vr )
-                    |> always ( p, p2 )
         in
         test2dSegSegV2 s2 s
             |> Maybe.andThen
