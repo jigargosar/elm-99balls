@@ -58,6 +58,8 @@ import Util exposing (..)
   - +2: Annoying. Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
 
   - test input handling on phone/touch device.
+      - scale view to mobile screen
+      - improve accuracy
 
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
