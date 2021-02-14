@@ -766,7 +766,7 @@ detectBallCollision targets velocity ball =
             edges
                 |> List.filterMap
                     (\e ->
-                        detectMovingCircleAndSegCollision2 mc ( e.from, e.to )
+                        detectMovingCircleAndSegCollision mc ( e.from, e.to )
                             |> Maybe.map (pairTo (BallEdgeCollision e))
                     )
 
@@ -785,7 +785,7 @@ detectBallCollision targets velocity ball =
 
 
 tst2 =
-    detectMovingCircleAndSegCollision2 ( ( vecZero, 20 ), vecFromRTheta 1 (turns 0.25) ) screenSeg.right
+    detectMovingCircleAndSegCollision ( ( vecZero, 20 ), vecFromRTheta 1 (turns 0.25) ) screenSeg.right
         |> Debug.log "tst"
 
 

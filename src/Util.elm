@@ -289,8 +289,8 @@ detectMovingCircleAndCircleCollision mc c =
             )
 
 
-detectMovingCircleAndSegCollision : MovingCircle -> ( Vec, Vec ) -> Maybe Collision
-detectMovingCircleAndSegCollision mc ( from, to ) =
+detectMovingCircleAndSegCollision__Hack : MovingCircle -> ( Vec, Vec ) -> Maybe Collision
+detectMovingCircleAndSegCollision__Hack mc ( from, to ) =
     testMovingSphereSphere mc ( ( from, 1 ), vecFromTo from to )
         |> Maybe.filter (\t -> t >= 0 && t <= 1)
         |> Maybe.andThen
@@ -310,8 +310,8 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
             )
 
 
-detectMovingCircleAndSegCollision2 : MovingCircle -> Seg -> Maybe Collision
-detectMovingCircleAndSegCollision2 mc s =
+detectMovingCircleAndSegCollision : MovingCircle -> Seg -> Maybe Collision
+detectMovingCircleAndSegCollision mc s =
     let
         ( from, to ) =
             s
