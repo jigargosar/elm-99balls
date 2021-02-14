@@ -341,7 +341,7 @@ detectMovingCircleAndSegCollision2 mc s =
                 ( vecSub p vr, vecAdd p2 vr )
                     |> always ( p, p2 )
         in
-        test2dSegSeg s2 s
+        test2dSegSegV2 s2 s
             |> Maybe.map
                 (\( _, ipt ) ->
                     let
@@ -376,7 +376,7 @@ test2dSegSeg ( a, b ) ( c, d ) =
         ( a1, a2 ) =
             ( signed2DTriArea a b d, signed2DTriArea a b c )
     in
-    if a1 * a2 < 0 then
+    if a1 /= 0 && a2 /= 0 && a1 * a2 < 0 then
         let
             a3 =
                 signed2DTriArea c d a
@@ -393,6 +393,41 @@ test2dSegSeg ( a, b ) ( c, d ) =
 
         else
             Nothing
+
+    else
+        Nothing
+
+
+test2dSegSegV2 : Seg -> Seg -> Maybe ( Float, Vec )
+test2dSegSegV2 ( a, b ) ( c, d ) =
+    let
+        ( x1, y1 ) =
+            vecToTuple a
+
+        ( x2, y2 ) =
+            vecToTuple b
+
+        ( x3, y3 ) =
+            vecToTuple c
+
+        ( x4, y4 ) =
+            vecToTuple d
+
+        numerator =
+            (x1 - x3) * (y3 - y4) - (y1 - y3) * (x3 - x4)
+
+        denominator =
+            (x1 - x2) * (y3 - y4) - (y1 - y2) * (x3 - x4)
+    in
+    if denominator /= 0 then
+        let
+            t =
+                numerator / denominator
+
+            p =
+                vec (x1 + t * (x2 - x1)) (y1 + t (y2 - y1))
+        in
+        Just ( t, p )
 
     else
         Nothing
