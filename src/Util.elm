@@ -312,6 +312,11 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
 
 detectMovingCircleAndSegCollision2 : MovingCircle -> ( Vec, Vec ) -> Maybe Collision
 detectMovingCircleAndSegCollision2 mc ( from, to ) =
+    {-
+       - check approaching
+         - then 2
+         - then 4
+    -}
     Debug.todo "Not Implemented"
 
 
