@@ -340,7 +340,8 @@ detectMovingCircleAndSegCollision2 mc s =
                 vecScaleTo r velocity
 
             s2 =
-                ( vecSub p vr, vecAdd p2 vr )
+                --( vecSub p vr, vecAdd p2 vr )
+                ( p, p2 )
         in
         test2dSegSegV2 s2 s
             |> Maybe.andThen
