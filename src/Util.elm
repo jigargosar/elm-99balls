@@ -328,28 +328,15 @@ detectMovingCircleAndSegCollision2 mc s =
         normal =
             vecUnitNormalFromTo from to
 
-        ( ( p, r ), velocity ) =
+        ( ( p, r ), v ) =
             mc
     in
-    if vecDotProduct velocity normal < 0 then
+    if vecDotProduct v normal < 0 then
         let
             normalR =
                 vecScale r normal
-
-            s1 =
-                ( vecAdd from normalR, vecAdd to normalR )
-
-            p2 =
-                vecAdd p velocity
-
-            vr =
-                vecScaleTo r velocity
-
-            s2 =
-                ( vecSub p vr, vecAdd p2 vr )
-                    |> always ( p, p2 )
         in
-        test2dSegSeg s2 s1
+        test2dSegSeg ( p, vecAdd p v ) ( vecAdd from normalR, vecAdd to normalR )
             |> Maybe.andThen
                 (\( t, ipt ) ->
                     let
@@ -357,7 +344,7 @@ detectMovingCircleAndSegCollision2 mc s =
                             vecLenFromTo p ipt - r
 
                         vLen =
-                            vecLen velocity
+                            vecLen v
 
                         t_ =
                             iLen / vLen
