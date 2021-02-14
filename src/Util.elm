@@ -352,8 +352,7 @@ detectMovingCircleAndSegCollision2 mc s =
                             vecLen v
 
                         t =
-                            (iLen / vLen)
-                                |> Debug.log "t"
+                            iLen / vLen
                     in
                     if t >= 0 && t <= 1 then
                         { t = t, normal = norm }
