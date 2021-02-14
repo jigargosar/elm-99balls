@@ -55,7 +55,7 @@ import Util exposing (..)
               - changing y changes x too, so no help here.
           - cache angle, use shift for precision.
 
-  - +2: Annoying. Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
+  - [x] +2: Annoying. Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
 
   - test input handling on phone/touch device.
       - scale view to mobile screen
