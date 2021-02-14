@@ -333,22 +333,15 @@ detectMovingCircleAndSegCollision2 mc s =
     in
     if vecDotProduct v normal < 0 then
         let
-            normalR =
-                vecScale r normal
+            shiftedSeg =
+                s |> mapEach (vecAdd (vecScale r normal))
+
+            circleSeg =
+                ( p, vecAdd p v )
         in
-        test2dSegSeg ( p, vecAdd p v ) ( vecAdd from normalR, vecAdd to normalR )
+        test2dSegSeg circleSeg shiftedSeg
             |> Maybe.andThen
-                (\( t, ipt ) ->
-                    let
-                        iLen =
-                            vecLenFromTo p ipt - r
-
-                        vLen =
-                            vecLen v
-
-                        t_ =
-                            iLen / vLen
-                    in
+                (\( t, _ ) ->
                     if t >= 0 && t <= 1 then
                         Just { t = t, normal = normal }
 
