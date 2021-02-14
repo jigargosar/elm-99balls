@@ -311,7 +311,7 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
 
 
 detectMovingCircleAndSegCollision2 : MovingCircle -> Seg -> Maybe Collision
-detectMovingCircleAndSegCollision2 mc ( from, to ) =
+detectMovingCircleAndSegCollision2 mc s =
     {-
        - seg seg+r intersection
        - id = dist from center to intersection - r
@@ -319,7 +319,40 @@ detectMovingCircleAndSegCollision2 mc ( from, to ) =
        - else t = id / v len -- double check formulae for t
 
     -}
-    Debug.todo "Not Implemented"
+    let
+        ( from, to ) =
+            s
+
+        norm =
+            vecUnitNormalFromTo from to
+
+        ( ( p, r ), v ) =
+            mc
+
+        p2 =
+            vecAdd p v
+
+        vr =
+            vecScaleTo r v
+
+        s2 =
+            ( vecSub p vr, vecAdd p2 vr )
+    in
+    test2dSegSeg s2 s
+        |> Maybe.map
+            (\( _, ipt ) ->
+                let
+                    iLen =
+                        vecLenFromTo p ipt
+
+                    vLen =
+                        vLen v
+
+                    t =
+                        iLen / vLen
+                in
+                { t = t, normal = norm }
+            )
 
 
 signed2DTriArea : Vec -> Vec -> Vec -> Float
