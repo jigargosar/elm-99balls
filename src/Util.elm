@@ -310,6 +310,11 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
             )
 
 
+detectMovingCircleAndSegCollision2 : MovingCircle -> ( Vec, Vec ) -> Maybe Collision
+detectMovingCircleAndSegCollision2 mc ( from, to ) =
+    Debug.todo "Not Implemented"
+
+
 sqDistSegmentPoint : Seg -> Vec -> Float
 sqDistSegmentPoint ( a, b ) c =
     -- Book: realtime collision detection
