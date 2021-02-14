@@ -323,19 +323,19 @@ detectMovingCircleAndSegCollision2 mc s =
         ( from, to ) =
             s
 
-        norm =
+        normal =
             vecUnitNormalFromTo from to
 
-        ( ( p, r ), v ) =
+        ( ( p, r ), velocity ) =
             mc
     in
-    if vecDotProduct norm v < 0 then
+    if vecDotProduct velocity normal < 0 then
         let
             p2 =
-                vecAdd p v
+                vecAdd p velocity
 
             vr =
-                vecScaleTo r v
+                vecScaleTo r velocity
 
             s2 =
                 ( vecSub p vr, vecAdd p2 vr )
@@ -349,13 +349,13 @@ detectMovingCircleAndSegCollision2 mc s =
                             vecLenFromTo p ipt
 
                         vLen =
-                            vecLen v
+                            vecLen velocity
 
                         t =
                             iLen / vLen
                     in
                     if t >= 0 && t <= 1 then
-                        { t = t, normal = norm }
+                        { t = t, normal = normal }
 
                     else
                         Debug.todo "Not Implemented"
