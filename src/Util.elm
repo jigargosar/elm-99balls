@@ -312,15 +312,6 @@ detectMovingCircleAndSegCollision mc ( from, to ) =
 
 detectMovingCircleAndSegCollision2 : MovingCircle -> Seg -> Maybe Collision
 detectMovingCircleAndSegCollision2 mc s =
-    {-
-       - seg seg+r intersection
-       - id = dist from center to intersection - r
-       - if id < 0 already colliding, t = 0
-       - else t = id / v len -- this formulae doesn't work
-       - we need to ensure that at t the distance to seg is r
-       - shifting the line seg along its normal by r might help
-
-    -}
     let
         ( from, to ) =
             s
