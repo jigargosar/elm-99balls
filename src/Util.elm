@@ -340,9 +340,6 @@ detectMovingCircleAndSegCollision2 mc s =
             s2 =
                 --( vecSub p vr, vecAdd p2 vr )
                 ( p, p2 )
-
-            _ =
-                Debug.log "seg" s
         in
         test2dSegSeg s2 s
             |> Maybe.map
