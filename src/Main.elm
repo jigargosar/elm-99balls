@@ -785,7 +785,7 @@ detectBallCollision targets velocity ball =
 
 
 tst2 =
-    detectMovingCircleAndSegCollision2 ( ( vecZero, 20 ), vecFromRTheta 400 (turns 0.5) ) screenSeg.left
+    detectMovingCircleAndSegCollision2 ( ( vecZero, 20 ), vecFromRTheta 1 (turns 0.25) ) screenSeg.right
         |> Debug.log "tst"
 
 
