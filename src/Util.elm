@@ -342,7 +342,7 @@ detectMovingCircleAndSegCollision2 mc s =
                     |> always ( p, p2 )
         in
         test2dSegSegV2 s2 s
-            |> Maybe.map
+            |> Maybe.andThen
                 (\( _, ipt ) ->
                     let
                         iLen =
@@ -355,10 +355,10 @@ detectMovingCircleAndSegCollision2 mc s =
                             iLen / vLen
                     in
                     if t >= 0 && t <= 1 then
-                        { t = t, normal = normal }
+                        Just { t = t, normal = normal }
 
                     else
-                        Debug.todo "Not Implemented"
+                        Nothing
                 )
 
     else
