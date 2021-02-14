@@ -338,7 +338,11 @@ detectMovingCircleAndSegCollision2 mc s =
                 vecScaleTo r v
 
             s2 =
-                ( vecSub p vr, vecAdd p2 vr )
+                --( vecSub p vr, vecAdd p2 vr )
+                ( p, p2 )
+
+            _ =
+                Debug.log "seg" s
         in
         test2dSegSeg s2 s
             |> Maybe.map
@@ -351,9 +355,14 @@ detectMovingCircleAndSegCollision2 mc s =
                             vecLen v
 
                         t =
-                            iLen / vLen
+                            (iLen / vLen)
+                                |> Debug.log "t"
                     in
-                    { t = t, normal = norm }
+                    if t >= 0 && t <= 1 then
+                        { t = t, normal = norm }
+
+                    else
+                        Debug.todo "Not Implemented"
                 )
 
     else
