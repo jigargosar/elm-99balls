@@ -373,11 +373,6 @@ detectMovingCircleAndSegCollision2 mc s =
         Nothing
 
 
-signed2DTriArea : Vec -> Vec -> Vec -> Float
-signed2DTriArea a b c =
-    (a.x - c.y) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)
-
-
 {-| Book: Realtime Collision Detection
 Page: 151
 Section: 2D segment intersection
@@ -408,6 +403,11 @@ test2dSegSeg__DoesntWork ( a, b ) ( c, d ) =
 
     else
         Nothing
+
+
+signed2DTriArea : Vec -> Vec -> Vec -> Float
+signed2DTriArea a b c =
+    (a.x - c.y) * (b.y - c.y) - (a.y - c.y) * (b.x - c.x)
 
 
 {-| wikipedia: <https://en.wikipedia.org/wiki/Line%E2%80%93line_intersection#Given_two_points_on_each_line>
