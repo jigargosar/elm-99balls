@@ -628,17 +628,15 @@ emitBalls model =
 
 convergeFloorBalls : Model -> Model
 convergeFloorBalls model =
-    case model.floorBalls |> List.reverse of
-        [] ->
-            model
-
-        f :: rest ->
-            { model
-                | floorBalls =
-                    f
-                        :: List.map (convergeBallTowards f.position) rest
-                        |> List.reverse
-            }
+    List.unconsLast model.floorBalls
+        |> Maybe.map
+            (\( last, others ) ->
+                { model
+                    | floorBalls =
+                        List.map (convergeBallTowards last.position) others ++ [ last ]
+                }
+            )
+        |> Maybe.withDefault model
 
 
 convergeBallTowards : Vec -> Ball -> Ball
