@@ -67,6 +67,8 @@ import Util exposing (..)
 
   - refactor viewport code
 
+  - scale view to mobile screen
+
   - test input handling on phone/touch device.
       - scale view to mobile screen
       - improve accuracy,
