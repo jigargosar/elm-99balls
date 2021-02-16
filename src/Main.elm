@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import Html exposing (Html)
+import Html exposing (Html, div, node, text)
 import Html.Attributes exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -866,59 +866,62 @@ view model =
         sceneWidth =
             sceneHeight * ar
     in
-    Svg.svg
-        [ T.viewBox (-sw / 2) (-sh / 2) sw sh
-        , Px.width sceneWidth
-        , Px.height sceneHeight
-        , S.fill "none"
-        , S.stroke "none"
-        , E.on "pointerdown" (offsetDecoder |> JD.map (PointerDown True))
-        , E.on "pointerup" (offsetDecoder |> JD.map (PointerDown False))
-        , E.on "pointermove" (offsetDecoder |> JD.map PointerMoved)
-        , style "touch-action" "none"
-        , style "user-select" "none"
-        ]
-        [ rect sri [ strokeP black ]
-        , group [ transform [ scale 1 ] ]
-            [ rect sri [ fillP black ]
-            , viewFloorBalls model.floorBalls
-            , case model.state of
-                TargetsEntering start ->
-                    viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
+    div [ style "display" "flex", style "flex-align" "center", style "height" "100%" ]
+        [ node "style" [] [ text "html,body{height:100%;}" ]
+        , Svg.svg
+            [ T.viewBox (-sw / 2) (-sh / 2) sw sh
+            , Px.width sceneWidth
+            , Px.height sceneHeight
+            , S.fill "none"
+            , S.stroke "none"
+            , E.on "pointerdown" (offsetDecoder |> JD.map (PointerDown True))
+            , E.on "pointerup" (offsetDecoder |> JD.map (PointerDown False))
+            , E.on "pointermove" (offsetDecoder |> JD.map PointerMoved)
+            , style "touch-action" "none"
+            , style "user-select" "none"
+            ]
+            [ rect sri [ strokeP black ]
+            , group [ transform [ scale 1 ] ]
+                [ rect sri [ fillP black ]
+                , viewFloorBalls model.floorBalls
+                , case model.state of
+                    TargetsEntering start ->
+                        viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
 
-                _ ->
-                    viewTargets 1 model.targets
-            , viewBalls model.balls
-            , viewEdges
-            , case model.maybeEmitter of
-                Just emitter ->
-                    viewBalls [ emitter.next ]
+                    _ ->
+                        viewTargets 1 model.targets
+                , viewBalls model.balls
+                , viewEdges
+                , case model.maybeEmitter of
+                    Just emitter ->
+                        viewBalls [ emitter.next ]
 
-                Nothing ->
-                    viewNone
-            , case model.state of
-                MockInput start ->
-                    group []
-                        [ viewTravelPath model.frame (mockTravelPath start model)
-                        , viewTravelPath model.frame (ballTravelPath model)
-                        ]
+                    Nothing ->
+                        viewNone
+                , case model.state of
+                    MockInput start ->
+                        group []
+                            [ viewTravelPath model.frame (mockTravelPath start model)
+                            , viewTravelPath model.frame (ballTravelPath model)
+                            ]
 
-                DraggingPointer startPointer ->
-                    case validInputAngle model startPointer of
-                        Nothing ->
-                            viewNone
+                    DraggingPointer startPointer ->
+                        case validInputAngle model startPointer of
+                            Nothing ->
+                                viewNone
 
-                        Just angle ->
-                            group []
-                                [ viewTravelPath model.frame
-                                    (ballTravelPathAtAngle angle model)
-                                , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
-                                , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
-                                ]
+                            Just angle ->
+                                group []
+                                    [ viewTravelPath model.frame
+                                        (ballTravelPathAtAngle angle model)
+                                    , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
+                                    , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
+                                    ]
 
-                _ ->
-                    viewNone
-            , viewDebugPointer model.pointer |> always viewNone
+                    _ ->
+                        viewNone
+                , viewDebugPointer model.pointer |> always viewNone
+                ]
             ]
         ]
 
