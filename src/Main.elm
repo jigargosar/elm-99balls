@@ -621,15 +621,25 @@ emitBalls model =
                 model
 
 
-convergeFloorBalls : Model -> Model
-convergeFloorBalls model =
+mapFloorBalls : (Ball -> List Ball -> ( Ball, List Ball )) -> Model -> Maybe Model
+mapFloorBalls fn model =
     List.unconsLast model.floorBalls
         |> Maybe.map
-            (\( last, others ) ->
-                { model
-                    | floorBalls =
-                        List.map (convergeBallTowards last.position) others ++ [ last ]
-                }
+            (\( last, rest ) ->
+                let
+                    ( nLast, nRest ) =
+                        fn last rest
+                in
+                { model | floorBalls = nRest ++ [ nLast ] }
+            )
+
+
+convergeFloorBalls : Model -> Model
+convergeFloorBalls model =
+    model
+        |> mapFloorBalls
+            (\last others ->
+                ( last, List.map (convergeBallTowards last.position) others )
             )
         |> Maybe.withDefault model
 
