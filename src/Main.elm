@@ -870,23 +870,20 @@ sceneSize model =
 
         sceneAR =
             vecApply fdiv vri
-
-        ( sceneWidth, sceneHeight ) =
-            if ar < sceneAR then
-                let
-                    height =
-                        (vri.y * 2) * 0.95
-                in
-                ( height * ar, height )
-
-            else
-                let
-                    width =
-                        (vri.x * 2) * 0.95
-                in
-                ( width, width / ar )
     in
-    ( sceneWidth, sceneHeight )
+    if ar < sceneAR then
+        let
+            height =
+                (vri.y * 2) * 0.95
+        in
+        ( height * ar, height )
+
+    else
+        let
+            width =
+                (vri.x * 2) * 0.95
+        in
+        ( width, width / ar )
 
 
 view : Model -> Html Msg
