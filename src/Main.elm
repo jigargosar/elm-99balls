@@ -235,8 +235,8 @@ gc =
         br =
             20
 
-        ( dx, dy ) =
-            ( cri.x - ri.x, cri.y - ri.y )
+        cell0Center =
+            vecSub cri ri
 
         topRowPS =
             List.range 0 (w - 1)
@@ -248,8 +248,8 @@ gc =
     , cri = cri
     , targetR = tr
     , ballR = br
-    , dx = dx
-    , dy = dy
+    , dx = cell0Center.x
+    , dy = cell0Center.y
     , aspectRatio = ar
     , topRowPS = topRowPS
     }
