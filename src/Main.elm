@@ -318,11 +318,6 @@ setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
 
 
-setBallPositionAndAngle : Vec -> Float -> Ball -> Ball
-setBallPositionAndAngle p angle ball =
-    { ball | position = p, angle = angle }
-
-
 setBallVelocityAndUpdatePosition : Vec -> Ball -> Ball
 setBallVelocityAndUpdatePosition rawVelocity ball =
     let
@@ -678,33 +673,30 @@ addNewTargetRow model =
 
 startSimAtAngle : Float -> Model -> Model
 startSimAtAngle angle model =
-    case model.floorBalls |> List.reverse of
-        [] ->
-            model
-
-        f :: rest ->
-            { model
-                | floorBalls = []
-                , maybeEmitter =
-                    Just
-                        (Emitter model.frame
-                            (setBallAngle angle f)
-                            (rest
-                                |> List.map
-                                    (setBallPositionAndAngle f.position angle)
-                            )
-                        )
-            }
+    let
+        ball =
+            initBall angle
+    in
+    { model
+        | floorBalls = []
+        , maybeEmitter =
+            Just
+                (Emitter model.frame
+                    ball
+                    (List.repeat (List.length model.floorBalls - 1) ball)
+                )
+    }
 
 
 areFloorBallsSettled : Model -> Bool
 areFloorBallsSettled model =
-    case model.floorBalls |> List.reverse of
-        [] ->
-            False
-
-        f :: rest ->
-            List.all (areBallsCloseEnough f) rest
+    model.floorBalls
+        |> List.unconsLast
+        |> Maybe.map
+            (\( first, rest ) ->
+                List.all (areBallsCloseEnough first) rest
+            )
+        |> Maybe.withDefault False
 
 
 areBallsCloseEnough : Ball -> Ball -> Bool
@@ -949,22 +941,19 @@ viewTravelPath frame pts =
 
 ballTravelPathAtAngle : Float -> Model -> List Vec
 ballTravelPathAtAngle angle model =
-    List.last model.floorBalls
-        |> Maybe.map (setBallAngle angle >> ballTravelPathHelp model)
-        |> Maybe.withDefault []
-
-
-ballTravelPathHelp : Model -> Ball -> List Vec
-ballTravelPathHelp model ball =
-    ballTravelPathHelp2 model ball 0 [ ball.position ]
+    let
+        ball =
+            initBall angle
+    in
+    ballTravelPathHelp model ball 0 [ ball.position ]
 
 
 maxPathLen =
     gc.ri.y * 2.2
 
 
-ballTravelPathHelp2 : Model -> Ball -> Float -> List Vec -> List Vec
-ballTravelPathHelp2 model ball pathLen path =
+ballTravelPathHelp : Model -> Ball -> Float -> List Vec -> List Vec
+ballTravelPathHelp model ball pathLen path =
     let
         ( bc, newBall ) =
             updateBallHelp model.targets ball
@@ -976,7 +965,7 @@ ballTravelPathHelp2 model ball pathLen path =
         path
 
     else
-        ballTravelPathHelp2 model newBall newPathLenSq (newBall.position :: path)
+        ballTravelPathHelp model newBall newPathLenSq (newBall.position :: path)
 
 
 viewTargets : Float -> List Target -> Svg msg
