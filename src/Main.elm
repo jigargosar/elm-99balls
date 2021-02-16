@@ -392,6 +392,7 @@ isBottomEdge edge =
 
 type Msg
     = GotDomViewPort Dom.Viewport
+    | OnDomResize Int Int
     | OnTick Float
     | PointerDown Bool Vec
     | PointerMoved Vec
@@ -440,6 +441,9 @@ update message model =
     case message of
         GotDomViewPort { scene } ->
             ( { model | sri = vec scene.width scene.height |> vecScale 0.5 }, Cmd.none )
+
+        OnDomResize w h ->
+            ( { model | sri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
 
         OnTick _ ->
             ( updateOnTick model
@@ -845,6 +849,7 @@ subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
         [ Browser.Events.onAnimationFrameDelta OnTick
+        , Browser.Events.onResize OnDomResize
         ]
 
 
