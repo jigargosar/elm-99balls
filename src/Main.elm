@@ -914,7 +914,7 @@ view model =
         ]
         [ node "style" [] [ text "html,body{height:100%;}" ]
         , Svg.svg
-            [ T.viewBox -gc.ri.x -gc.ri.y (-gc.ri.x * 2) (-gc.ri.y * 2)
+            [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
             , Px.width sceneWidth
             , Px.height sceneHeight
             , S.fill "none"
