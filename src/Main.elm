@@ -546,7 +546,8 @@ validInputAngle =
                             f.position
 
                         angleOffset =
-                            1
+                            vecAngleFromTo current start
+                                |> mul 0.1
                     in
                     if start.y < current.y then
                         Just
