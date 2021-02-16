@@ -67,6 +67,8 @@ import Util exposing (..)
 
   - refactor viewport code
 
+  - cleanup mock input
+
   - scale view to mobile screen
 
   - allow multiple input handling mode for quick switch during testing
@@ -124,14 +126,8 @@ animDur =
     60 / 4
 
 
-inputDur : Float
-inputDur =
-    200
-
-
 type State
     = TargetsEntering Float
-    | MockInput Float
     | WaitingForInput
     | DraggingPointer Vec
     | Sim
@@ -519,14 +515,6 @@ updateOnTick model =
                         { model | state = Sim }
                             |> startSimAtAngle angle
 
-        MockInput start ->
-            if model.frame - start > inputDur then
-                { model | state = Sim }
-                    |> startSim
-
-            else
-                model
-
         Sim ->
             -- check for turn over
             if (model.maybeEmitter == Nothing) && (model.balls == []) then
@@ -703,27 +691,6 @@ startSimAtAngle angle model =
                             (rest
                                 |> List.map
                                     (setBallPositionAndAngle f.position angle)
-                            )
-                        )
-            }
-
-
-startSim : Model -> Model
-startSim model =
-    case model.floorBalls |> List.reverse of
-        [] ->
-            model
-
-        f :: rest ->
-            { model
-                | floorBalls = []
-                , maybeEmitter =
-                    Just
-                        (Emitter model.frame
-                            f
-                            (rest
-                                |> List.map
-                                    (setBallPositionAndVelocity f.position (ballVelocity f))
                             )
                         )
             }
@@ -928,12 +895,6 @@ view model =
                     Nothing ->
                         viewNone
                 , case model.state of
-                    MockInput start ->
-                        group []
-                            [ viewTravelPath model.frame (mockTravelPath start model)
-                            , viewTravelPath model.frame (ballTravelPath model)
-                            ]
-
                     DraggingPointer startPointer ->
                         case validInputAngle model startPointer of
                             Nothing ->
@@ -985,13 +946,6 @@ viewTravelPath frame pts =
         ]
 
 
-ballTravelPath : Model -> List Vec
-ballTravelPath model =
-    List.last model.floorBalls
-        |> Maybe.map (ballTravelPathHelp model)
-        |> Maybe.withDefault []
-
-
 ballTravelPathAtAngle : Float -> Model -> List Vec
 ballTravelPathAtAngle angle model =
     List.last model.floorBalls
@@ -1022,21 +976,6 @@ ballTravelPathHelp2 model ball pathLen path =
 
     else
         ballTravelPathHelp2 model newBall newPathLenSq (newBall.position :: path)
-
-
-mockTravelPath : Float -> Model -> List Vec
-mockTravelPath start model =
-    let
-        progress =
-            (model.frame - start) / inputDur |> clamp 0 1
-
-        angleOffset =
-            0.05
-
-        angle =
-            turns (-0.5 + angleOffset) + turns (0.5 - angleOffset * 2) * progress
-    in
-    ballTravelPathAtAngle angle model
 
 
 viewTargets : Float -> List Target -> Svg msg
