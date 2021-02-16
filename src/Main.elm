@@ -308,11 +308,6 @@ setBallPosition p ball =
     { ball | position = p }
 
 
-setBallAngle : Float -> Ball -> Ball
-setBallAngle a ball =
-    { ball | angle = a }
-
-
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
 setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
