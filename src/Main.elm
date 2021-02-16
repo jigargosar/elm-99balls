@@ -67,6 +67,9 @@ import Util exposing (..)
 
   - [x] cleanup mock input
 
+  - Concern: Floor Balls: need direct access to first ball at some places.
+      - perhaps we could just write helper method.
+
   - refactor viewport code
 
   - scale view to mobile screen
@@ -74,9 +77,6 @@ import Util exposing (..)
   - allow multiple input handling mode for quick switch during testing
 
   - test input handling on phone/touch device.
-
-  - Concern: Floor Balls: need direct access to first ball at some places.
-      - perhaps we could just write helper method.
 
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
@@ -533,35 +533,41 @@ updateOnTick model =
                     |> emitBalls
 
 
+firstFloorBall : Model -> Maybe Ball
+firstFloorBall model =
+    model.floorBalls |> List.head
+
+
+firstFloorBallPosition : Model -> Maybe Vec
+firstFloorBallPosition model =
+    firstFloorBall model |> Maybe.map .position
+
+
 validInputAngle : Model -> Vec -> Maybe Float
 validInputAngle =
     let
         do model start =
-            case model.floorBalls of
-                [] ->
-                    Nothing
+            firstFloorBallPosition model
+                |> Maybe.andThen
+                    (\ballCenter ->
+                        let
+                            current =
+                                model.pointer
 
-                f :: _ ->
-                    let
-                        current =
-                            model.pointer
+                            angleOffset =
+                                angleABC current start ballCenter
+                                    |> mul 0.1
+                        in
+                        if start.y < current.y then
+                            Just
+                                (vecAngleFromTo ballCenter start
+                                    |> add angleOffset
+                                    |> clampInputAngle
+                                )
 
-                        ballCenter =
-                            f.position
-
-                        angleOffset =
-                            angleABC current start ballCenter
-                                |> mul 0.1
-                    in
-                    if start.y < current.y then
-                        Just
-                            (vecAngleFromTo ballCenter start
-                                |> add angleOffset
-                                |> clampInputAngle
-                            )
-
-                    else
-                        Nothing
+                        else
+                            Nothing
+                    )
 
         clampInputAngle =
             clampMO (turns -0.25) (turns 0.24)
