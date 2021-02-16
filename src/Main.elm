@@ -69,11 +69,9 @@ import Util exposing (..)
 
   - scale view to mobile screen
 
+  - allow multiple input handling mode for quick switch during testing
+
   - test input handling on phone/touch device.
-      - scale view to mobile screen
-      - improve accuracy,
-        perhaps we could assume that start point is further away than the actual start.
-        along the same angle.
 
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
