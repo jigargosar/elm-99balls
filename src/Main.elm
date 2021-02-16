@@ -59,6 +59,10 @@ import Util exposing (..)
 
   - [x] bug: initial ball position is outside edges.
 
+  - try alternate input handling,
+      - angle is from ball center to drag start
+      - drag for minor adjustment
+
   - test input handling on phone/touch device.
       - scale view to mobile screen
       - improve accuracy,
