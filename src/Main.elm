@@ -545,20 +545,14 @@ validInputAngle =
                         ballCenter =
                             f.position
                     in
-                    if isInputValid start current then
-                        Just (inputAngle start ballCenter)
+                    if start.y < current.y then
+                        Just
+                            (vecAngleFromTo ballCenter start
+                                |> clampInputAngle
+                            )
 
                     else
                         Nothing
-
-        isInputValid : Vec -> Vec -> Bool
-        isInputValid start current =
-            start.y < current.y
-
-        inputAngle : Vec -> Vec -> Float
-        inputAngle start current =
-            vecAngleFromTo current start
-                |> clampInputAngle
 
         clampInputAngle =
             clampMO (turns -0.25) (turns 0.24)
