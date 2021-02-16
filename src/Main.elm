@@ -552,6 +552,7 @@ validInputAngle =
                     if start.y < current.y then
                         Just
                             (vecAngleFromTo ballCenter start
+                                |> add angleOffset
                                 |> clampInputAngle
                             )
 
