@@ -121,7 +121,7 @@ type alias Model =
     , pointer : Vec
     , prevPointer : Vec
     , frame : Float
-    , sri : Vec
+    , vri : Vec
     , seed : Seed
     }
 
@@ -419,7 +419,7 @@ init _ =
       , prevPointer = vecZero
       , state = TargetsEntering 0
       , frame = 0
-      , sri = sri
+      , vri = sri
       , seed = seed
       }
         |> addNewTargetRow
@@ -440,10 +440,10 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         GotDomViewPort { viewport } ->
-            ( { model | sri = vec viewport.width viewport.height |> vecScale 0.5 }, Cmd.none )
+            ( { model | vri = vec viewport.width viewport.height |> vecScale 0.5 }, Cmd.none )
 
         OnDomResize w h ->
-            ( { model | sri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
+            ( { model | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
 
         OnTick _ ->
             ( updateOnTick model
@@ -865,21 +865,24 @@ ar =
 sceneSize : Model -> ( Float, Float )
 sceneSize model =
     let
+        vri =
+            model.vri
+
         sceneAR =
-            vecApply fdiv model.sri
+            vecApply fdiv vri
 
         ( sceneWidth, sceneHeight ) =
             if ar < sceneAR then
                 let
                     mh =
-                        (model.sri.y * 2) * 0.95
+                        (vri.y * 2) * 0.95
                 in
                 ( mh * ar, mh )
 
             else
                 let
                     mw =
-                        (model.sri.x * 2) * 0.95
+                        (vri.x * 2) * 0.95
                 in
                 ( mw, mw / ar )
     in
