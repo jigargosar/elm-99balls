@@ -86,18 +86,6 @@ import Util exposing (..)
       - total number of balls before and after simulation are different.
 
 -}
-sw =
-    600
-
-
-sh =
-    800
-
-
-sri =
-    vec sw sh |> vecScale 0.5
-
-
 main =
     Browser.element
         { init = init
@@ -207,6 +195,7 @@ type alias GridConf =
     , br : Float
     , dx : Float
     , dy : Float
+    , ar : Float
     , topRowPS : List ( Int, Int )
     }
 
@@ -214,6 +203,18 @@ type alias GridConf =
 gc : GridConf
 gc =
     let
+        sw =
+            600
+
+        sh =
+            800
+
+        sri =
+            vec sw sh |> vecScale 0.5
+
+        ar =
+            sw / sh
+
         ri =
             sri
 
@@ -247,6 +248,7 @@ gc =
     , br = br
     , dx = dx
     , dy = dy
+    , ar = ar
     , topRowPS = topRowPS
     }
 
@@ -368,7 +370,7 @@ edgeToSeg { from, to } =
 
 
 screenSeg =
-    boundingSegFromRadii sri
+    boundingSegFromRadii gc.ri
 
 
 edges : List Edge
@@ -419,7 +421,7 @@ init _ =
       , prevPointer = vecZero
       , state = TargetsEntering 0
       , frame = 0
-      , vri = sri
+      , vri = gc.ri
       , seed = seed
       }
         |> addNewTargetRow
@@ -862,13 +864,12 @@ offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
 
 
-ar =
-    sw / sh
-
-
 sceneSize : Model -> ( Float, Float )
 sceneSize model =
     let
+        ar =
+            gc.ar
+
         vri =
             model.vri
 
@@ -896,7 +897,7 @@ sceneScale model =
         ( sceneWidth, _ ) =
             sceneSize model
     in
-    sw / sceneWidth
+    gc.ri.x / sceneWidth
 
 
 view : Model -> Html Msg
@@ -913,7 +914,7 @@ view model =
         ]
         [ node "style" [] [ text "html,body{height:100%;}" ]
         , Svg.svg
-            [ T.viewBox (-sw / 2) (-sh / 2) sw sh
+            [ T.viewBox -gc.ri.x -gc.ri.y (-gc.ri.x * 2) (-gc.ri.y * 2)
             , Px.width sceneWidth
             , Px.height sceneHeight
             , S.fill "none"
@@ -924,9 +925,9 @@ view model =
             , style "touch-action" "none"
             , style "user-select" "none"
             ]
-            [ rect sri [ strokeP black ]
+            [ rect gc.ri [ strokeP black ]
             , group [ transform [ scale 1 ] ]
-                [ rect sri [ fillP black ]
+                [ rect gc.ri [ fillP black ]
                 , viewFloorBalls model.floorBalls
                 , case model.state of
                     TargetsEntering start ->
@@ -1108,7 +1109,7 @@ viewEdges =
 
                 velocity =
                     vecUnitNormalFromTo from to
-                        |> vecScale (sw * 0.1)
+                        |> vecScale (gc.ri.x * 0.1)
 
                 end =
                     vecAdd start velocity
