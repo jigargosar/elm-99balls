@@ -65,9 +65,9 @@ import Util exposing (..)
       - angle is from ball center to drag start
       - drag for minor adjustment
 
-  - refactor viewport code
+  - [x] cleanup mock input
 
-  - cleanup mock input
+  - refactor viewport code
 
   - scale view to mobile screen
 
