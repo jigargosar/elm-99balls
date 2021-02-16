@@ -439,7 +439,7 @@ update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
         GotDomViewPort { scene } ->
-            ( { model | sri = vec scene.width scene.height }, Cmd.none )
+            ( { model | sri = vec scene.width scene.height |> vecScale 0.5 }, Cmd.none )
 
         OnTick _ ->
             ( updateOnTick model
@@ -859,10 +859,17 @@ ar =
 
 view : Model -> Html Msg
 view model =
+    let
+        sceneHeight =
+            (model.sri.y * 2) * 0.95
+
+        sceneWidth =
+            sceneHeight * ar
+    in
     Svg.svg
         [ T.viewBox (-sw / 2) (-sh / 2) sw sh
-        , Px.width (sh * ar)
-        , Px.height sh
+        , Px.width sceneWidth
+        , Px.height sceneHeight
         , S.fill "none"
         , S.stroke "none"
         , E.on "pointerdown" (offsetDecoder |> JD.map (PointerDown True))
