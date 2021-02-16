@@ -463,8 +463,15 @@ update message model =
 
 svgToWorld : Model -> Vec -> Vec
 svgToWorld model =
-    vecScale (sceneScale model)
-        >> vecAdd (vecNegate gc.ri)
+    let
+        sz =
+            svgSize model
+
+        svgRI =
+            vecFromTuple sz |> vecScale 0.5
+    in
+    vecAdd (vecNegate svgRI)
+        >> vecScale (gc.ri.x / svgRI.x)
 
 
 cachePointer : Model -> Model
@@ -847,8 +854,8 @@ offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
 
 
-sceneSize : Model -> ( Float, Float )
-sceneSize model =
+svgSize : Model -> ( Float, Float )
+svgSize model =
     let
         ar =
             gc.aspectRatio
@@ -874,20 +881,11 @@ sceneSize model =
         ( width, width / ar )
 
 
-sceneScale : Model -> Float
-sceneScale model =
-    let
-        ( sceneWidth, _ ) =
-            sceneSize model
-    in
-    gc.ri.x / sceneWidth
-
-
 view : Model -> Html Msg
 view model =
     let
         ( sceneWidth, sceneHeight ) =
-            sceneSize model
+            svgSize model
     in
     div
         [ style "display" "flex"
