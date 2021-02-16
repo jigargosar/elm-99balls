@@ -845,11 +845,15 @@ offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
 
 
+ar =
+    sw / sh
+
+
 view : Model -> Html Msg
 view model =
     Svg.svg
         [ T.viewBox (-sw / 2) (-sh / 2) sw sh
-        , Px.width sw
+        , Px.width (sh * ar)
         , Px.height sh
         , S.fill "none"
         , S.stroke "none"
