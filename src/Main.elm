@@ -177,7 +177,7 @@ randomTarget gp =
 
 initTarget : ( Int, Int ) -> Int -> Target
 initTarget gp hp =
-    Target (toWorld gp) gc.tr hp
+    Target (toWorld gp) gc.targetR hp
 
 
 canTargetsSafelyMoveDown : List Target -> Bool
@@ -196,11 +196,11 @@ type alias GridConf =
     , w : Int
     , h : Int
     , cri : Vec
-    , tr : Float
-    , br : Float
+    , targetR : Float
+    , ballR : Float
     , dx : Float
     , dy : Float
-    , ar : Float
+    , aspectRatio : Float
     , topRowPS : List ( Int, Int )
     }
 
@@ -249,11 +249,11 @@ gc =
     , w = w
     , h = h
     , cri = cri
-    , tr = tr
-    , br = br
+    , targetR = tr
+    , ballR = br
     , dx = dx
     , dy = dy
-    , ar = ar
+    , aspectRatio = ar
     , topRowPS = topRowPS
     }
 
@@ -298,10 +298,10 @@ type alias Ball =
 
 initBall : Float -> Ball
 initBall angle =
-    { position = vec 0 (gc.ri.y - gc.br)
+    { position = vec 0 (gc.ri.y - gc.ballR)
     , angle = angle
     , hue = 0.15
-    , radius = gc.br
+    , radius = gc.ballR
     , speed = 15
     }
 
@@ -865,7 +865,7 @@ sceneSize : Model -> ( Float, Float )
 sceneSize model =
     let
         ar =
-            gc.ar
+            gc.aspectRatio
 
         vri =
             model.vri
