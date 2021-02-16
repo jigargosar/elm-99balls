@@ -866,7 +866,12 @@ view model =
         sceneWidth =
             sceneHeight * ar
     in
-    div [ style "display" "flex", style "flex-align" "center", style "height" "100%" ]
+    div
+        [ style "display" "flex"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , style "height" "100%"
+        ]
         [ node "style" [] [ text "html,body{height:100%;}" ]
         , Svg.svg
             [ T.viewBox (-sw / 2) (-sh / 2) sw sh
