@@ -1127,7 +1127,7 @@ viewBalls =
             in
             let
                 strokeW =
-                    ball.radius * 0.3
+                    radius * 0.3
             in
             group
                 [ strokeH hue
