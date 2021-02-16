@@ -1059,7 +1059,7 @@ viewTargets progress targets =
                 , words
                     (String.fromInt target.hp)
                     [ fillP black
-                    , transform [ scale (target.radius / 14) ]
+                    , transform [ scale (target.radius / 12) ]
                     ]
                 ]
     in
@@ -1128,13 +1128,16 @@ viewBalls =
             let
                 strokeW =
                     radius * 0.3
+
+                innerRadius =
+                    radius - strokeW / 2
             in
             group
                 [ strokeH hue
                 , transform [ translate p ]
                 , Px.strokeWidth strokeW
                 ]
-                [ Svg.circle [ Px.r (radius - strokeW / 2) ] []
+                [ Svg.circle [ Px.r innerRadius ] []
                 , Svg.line [ Px.x2 nx, Px.y2 ny ] []
                     |> always viewNone
                 ]
