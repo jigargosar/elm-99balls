@@ -214,14 +214,11 @@ gc =
         sh =
             800
 
-        sri =
+        ri =
             vec sw sh |> vecScale 0.5
 
         ar =
             sw / sh
-
-        ri =
-            sri
 
         w =
             6
