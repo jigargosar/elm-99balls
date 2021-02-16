@@ -860,11 +860,23 @@ ar =
 view : Model -> Html Msg
 view model =
     let
-        sceneHeight =
-            (model.sri.y * 2) * 0.95
+        sceneAR =
+            vecApply fdiv model.sri
 
-        sceneWidth =
-            sceneHeight * ar
+        ( sceneWidth, sceneHeight ) =
+            if ar < sceneAR then
+                let
+                    mh =
+                        (model.sri.y * 2) * 0.95
+                in
+                ( mh * ar, mh )
+
+            else
+                let
+                    mw =
+                        (model.sri.x * 2) * 0.95
+                in
+                ( mw, mw / ar )
     in
     div
         [ style "display" "flex"
