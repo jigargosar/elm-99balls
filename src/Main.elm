@@ -282,26 +282,19 @@ type alias Ball =
     }
 
 
+initBall : Float -> Ball
+initBall angle =
+    { position = vec 0 (gc.ri.y - gc.br)
+    , angle = angle
+    , hue = 0.15
+    , radius = gc.br
+    , speed = 15
+    }
+
+
 randomBall : Generator Ball
 randomBall =
-    rnd4 (Ball (vec 0 (gc.ri.y - gc.br)))
-        --(randomBallPositionAtBottom)
-        --angle
-        (rndF (turns 0.6) (turns 0.9))
-        --speed
-        (rndF 10 15 |> always (rndConstant 15))
-        --hue
-        (rndF 0 1 |> always (rndConstant 0.15))
-        --radius
-        (rndInt 15 25 |> rnd1 toFloat |> always (rndConstant gc.br))
-
-
-randomBallPositionAtBottom : Generator Vec
-randomBallPositionAtBottom =
-    --Random.map (vecScale 1)
-    rnd2 (\offset -> vecMapR (add -offset))
-        (rndF 0 10)
-        (randomPtOnSeg screenSeg.bottom)
+    rnd1 initBall (rndF (turns 0.6) (turns 0.9))
 
 
 ballVelocity : Ball -> Vec
