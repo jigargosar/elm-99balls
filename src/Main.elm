@@ -59,7 +59,7 @@ import Util exposing (..)
 
   - [x] bug: initial ball position is outside edges.
 
-  - try alternate input handling,
+  - [x] try alternate input handling,
       - angle is from ball center to drag start
       - drag for minor adjustment
 
@@ -565,29 +565,30 @@ validInputAngle =
     do
 
 
-validInputAngle1 : Vec -> Vec -> Maybe Float
-validInputAngle1 =
-    let
-        do start current =
-            if isInputValid start current then
-                Just (inputAngle start current)
 
-            else
-                Nothing
-
-        isInputValid : Vec -> Vec -> Bool
-        isInputValid start current =
-            start.y < current.y
-
-        inputAngle : Vec -> Vec -> Float
-        inputAngle start current =
-            vecAngleFromTo current start
-                |> clampInputAngle
-
-        clampInputAngle =
-            clampMO (turns -0.25) (turns 0.24)
-    in
-    do
+--validInputAngle1 : Vec -> Vec -> Maybe Float
+--validInputAngle1 =
+--    let
+--        do start current =
+--            if isInputValid start current then
+--                Just (inputAngle start current)
+--
+--            else
+--                Nothing
+--
+--        isInputValid : Vec -> Vec -> Bool
+--        isInputValid start current =
+--            start.y < current.y
+--
+--        inputAngle : Vec -> Vec -> Float
+--        inputAngle start current =
+--            vecAngleFromTo current start
+--                |> clampInputAngle
+--
+--        clampInputAngle =
+--            clampMO (turns -0.25) (turns 0.24)
+--    in
+--    do
 
 
 incFrame : Model -> Model
