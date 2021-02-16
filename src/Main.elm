@@ -233,7 +233,7 @@ gc =
             cri.x * 0.7
 
         br =
-            20
+            tr * 0.6
 
         cell0Center =
             vecSub cri ri
