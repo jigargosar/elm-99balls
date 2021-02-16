@@ -462,7 +462,7 @@ update message model =
 
 
 svgToWorld : Model -> Vec -> Vec
-svgToWorld model =
+svgToWorld model svgCord =
     let
         sz =
             svgSize model
@@ -470,8 +470,8 @@ svgToWorld model =
         svgRI =
             vecFromTuple sz |> vecScale 0.5
     in
-    vecAdd (vecNegate svgRI)
-        >> vecScale (gc.ri.x / svgRI.x)
+    vecSub svgCord svgRI
+        |> vecScale (gc.ri.x / svgRI.x)
 
 
 cachePointer : Model -> Model
