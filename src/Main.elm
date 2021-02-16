@@ -874,17 +874,17 @@ sceneSize model =
         ( sceneWidth, sceneHeight ) =
             if ar < sceneAR then
                 let
-                    mh =
+                    height =
                         (vri.y * 2) * 0.95
                 in
-                ( mh * ar, mh )
+                ( height * ar, height )
 
             else
                 let
-                    mw =
+                    width =
                         (vri.x * 2) * 0.95
                 in
-                ( mw, mw / ar )
+                ( width, width / ar )
     in
     ( sceneWidth, sceneHeight )
 
