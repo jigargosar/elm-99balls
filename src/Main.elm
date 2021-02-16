@@ -211,8 +211,11 @@ gc =
         ( w, h ) =
             ( 7, 10 )
 
+        cw =
+            50
+
         cri =
-            vec 100 100
+            vec cw cw
 
         ri =
             vec (toFloat w * cri.x) (toFloat h * cri.y)
