@@ -302,10 +302,6 @@ ballVelocity ball =
     vecFromRTheta ball.speed ball.angle
 
 
-
---noinspection ElmUnusedSymbol
-
-
 setBallPosition : Vec -> Ball -> Ball
 setBallPosition p ball =
     { ball | position = p }
