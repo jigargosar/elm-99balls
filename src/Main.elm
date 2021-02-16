@@ -533,15 +533,23 @@ validInputAngle : Model -> Vec -> Maybe Float
 validInputAngle =
     let
         do model start =
-            let
-                current =
-                    model.pointer
-            in
-            if isInputValid start current then
-                Just (inputAngle start current)
+            case model.floorBalls of
+                [] ->
+                    Nothing
 
-            else
-                Nothing
+                f :: _ ->
+                    let
+                        current =
+                            model.pointer
+
+                        ballCenter =
+                            f.position
+                    in
+                    if isInputValid start current then
+                        Just (inputAngle start ballCenter)
+
+                    else
+                        Nothing
 
         isInputValid : Vec -> Vec -> Bool
         isInputValid start current =
