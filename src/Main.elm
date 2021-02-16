@@ -57,7 +57,7 @@ import Util exposing (..)
 
   - [x] +2: Annoying. Bug: circle seg collision is causing penetration, maybe try seg-seg intersection.
 
-  - bug: initial ball position is outside edges.
+  - [x] bug: initial ball position is outside edges.
 
   - test input handling on phone/touch device.
       - scale view to mobile screen
