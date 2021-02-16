@@ -996,7 +996,7 @@ ballTravelPathAtAngle : Float -> Model -> List Vec
 ballTravelPathAtAngle angle model =
     List.last model.floorBalls
         |> Maybe.map (setBallAngle angle >> ballTravelPathHelp model)
-        |> Maybe.withDefault [ vecMidpoint bottomEdge.from bottomEdge.to ]
+        |> Maybe.withDefault []
 
 
 ballTravelPathHelp : Model -> Ball -> List Vec
