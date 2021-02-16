@@ -695,6 +695,10 @@ rnd5 =
     Random.map5
 
 
+rnd4 =
+    Random.map4
+
+
 rnd2 =
     Random.map2
 

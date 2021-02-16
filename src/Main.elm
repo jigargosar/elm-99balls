@@ -197,6 +197,7 @@ type alias GridConf =
     , h : Int
     , cri : Vec
     , tr : Float
+    , br : Float
     , dx : Float
     , dy : Float
     , topRowPS : List ( Int, Int )
@@ -221,6 +222,9 @@ gc =
         tr =
             cri.x * 0.7
 
+        br =
+            20
+
         ( dx, dy ) =
             ( cri.x - ri.x, cri.y - ri.y )
 
@@ -233,6 +237,7 @@ gc =
     , h = h
     , cri = cri
     , tr = tr
+    , br = br
     , dx = dx
     , dy = dy
     , topRowPS = topRowPS
@@ -279,8 +284,8 @@ type alias Ball =
 
 randomBall : Generator Ball
 randomBall =
-    rnd5 Ball
-        randomBallPositionAtBottom
+    rnd4 (Ball (vec 0 (gc.ri.y - gc.br)))
+        --(randomBallPositionAtBottom)
         --angle
         (rndF (turns 0.6) (turns 0.9))
         --speed
@@ -288,7 +293,7 @@ randomBall =
         --hue
         (rndF 0 1 |> always (rndConstant 0.15))
         --radius
-        (rndInt 15 25 |> rnd1 toFloat |> always (rndConstant 20))
+        (rndInt 15 25 |> rnd1 toFloat |> always (rndConstant gc.br))
 
 
 randomBallPositionAtBottom : Generator Vec
