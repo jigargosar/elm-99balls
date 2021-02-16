@@ -448,25 +448,23 @@ update message model =
         PointerDown isDown pointer ->
             ( { model
                 | pointerDown = isDown
-                , pointer =
-                    -- svg cords to world cords
-                    pointer
-                        |> vecScale (sceneScale model)
-                        |> vecAdd (vecNegate gc.ri)
+                , pointer = pointer |> svgToWorld model
               }
             , Cmd.none
             )
 
         PointerMoved pointer ->
             ( { model
-                | pointer =
-                    -- svg cords to world cords
-                    pointer
-                        |> vecScale (sceneScale model)
-                        |> vecAdd (vecNegate gc.ri)
+                | pointer = pointer |> svgToWorld model
               }
             , Cmd.none
             )
+
+
+svgToWorld : Model -> Vec -> Vec
+svgToWorld model =
+    vecScale (sceneScale model)
+        >> vecAdd (vecNegate gc.ri)
 
 
 cachePointer : Model -> Model
@@ -950,7 +948,7 @@ view model =
 
                     _ ->
                         viewNone
-                , viewDebugPointer model.pointer |> always viewNone
+                , viewDebugPointer model.pointer
                 ]
             ]
         ]
