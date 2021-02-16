@@ -208,23 +208,17 @@ type alias GridConf =
 gc : GridConf
 gc =
     let
-        sw =
-            600
-
-        sh =
-            800
-
-        ri =
-            vec sw sh |> vecScale 0.5
-
-        ar =
-            sw / sh
-
         ( w, h ) =
-            ( 6, 8 )
+            ( 7, 10 )
 
         cri =
-            vec (ri.x / toFloat w) (ri.y / toFloat h)
+            vec 100 100
+
+        ri =
+            vec (toFloat w * cri.x) (toFloat h * cri.y)
+
+        ar =
+            vecApply fdiv ri
 
         tr =
             cri.x * 0.7
