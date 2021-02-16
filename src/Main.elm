@@ -403,9 +403,6 @@ type Msg
 init : Flags -> ( Model, Cmd Msg )
 init _ =
     let
-        _ =
-            tst2
-
         initialSeed =
             seedFrom 4
 
@@ -837,11 +834,6 @@ detectBallCollision targets velocity ball =
         ++ c2
         |> minimumBy (fst >> .t)
         |> Maybe.map (mapFst (movingCircleCollisionResponse mc))
-
-
-tst2 =
-    detectMovingCircleAndSegCollision ( ( vecZero, 20 ), vecFromRTheta 1 (turns 0.25) ) screenSeg.right
-        |> Debug.log "tst"
 
 
 movingCircleCollisionResponse : MovingCircle -> Collision -> CollisionResponse
