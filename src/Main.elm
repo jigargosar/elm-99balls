@@ -544,6 +544,9 @@ validInputAngle =
 
                         ballCenter =
                             f.position
+
+                        angleOffset =
+                            1
                     in
                     if start.y < current.y then
                         Just
