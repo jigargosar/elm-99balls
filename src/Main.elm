@@ -1005,7 +1005,7 @@ ballTravelPathHelp model ball =
 
 
 maxPathLen =
-    gc.ri.y * 2
+    gc.ri.y * 2.2
 
 
 ballTravelPathHelp2 : Model -> Ball -> Float -> List Vec -> List Vec
