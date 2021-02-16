@@ -1,6 +1,7 @@
 module Main exposing (main)
 
 import Browser
+import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
 import Html exposing (Html)
@@ -10,6 +11,7 @@ import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Svg exposing (Svg)
 import Svg.Attributes as S
+import Task
 import Tuple exposing (pair)
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
@@ -389,7 +391,8 @@ isBottomEdge edge =
 
 
 type Msg
-    = OnTick Float
+    = GotDomViewPort Dom.Viewport
+    | OnTick Float
     | PointerDown Bool Vec
     | PointerMoved Vec
 
@@ -421,7 +424,7 @@ init _ =
         |> addNewTargetRow
         |> addNewTargetRow
         |> addNewTargetRow
-    , Cmd.none
+    , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
 
@@ -435,6 +438,9 @@ randomLevel =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
+        GotDomViewPort { scene } ->
+            ( { model | sri = vec scene.width scene.height }, Cmd.none )
+
         OnTick _ ->
             ( updateOnTick model
                 |> convergeFloorBalls
