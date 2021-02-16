@@ -119,6 +119,7 @@ type alias Model =
     , pointer : Vec
     , prevPointer : Vec
     , frame : Float
+    , sri : Vec
     , seed : Seed
     }
 
@@ -414,6 +415,7 @@ init _ =
       , prevPointer = vecZero
       , state = TargetsEntering 0
       , frame = 0
+      , sri = sri
       , seed = seed
       }
         |> addNewTargetRow
