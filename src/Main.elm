@@ -73,6 +73,9 @@ import Util exposing (..)
 
   - test input handling on phone/touch device.
 
+  - Concern: Floor Balls: need direct access to first ball at some places.
+      - perhaps we could just write helper method.
+
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
 
