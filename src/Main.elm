@@ -857,8 +857,8 @@ ar =
     sw / sh
 
 
-view : Model -> Html Msg
-view model =
+sceneSize : Model -> ( Float, Float )
+sceneSize model =
     let
         sceneAR =
             vecApply fdiv model.sri
@@ -877,6 +877,15 @@ view model =
                         (model.sri.x * 2) * 0.95
                 in
                 ( mw, mw / ar )
+    in
+    ( sceneWidth, sceneHeight )
+
+
+view : Model -> Html Msg
+view model =
+    let
+        ( sceneWidth, sceneHeight ) =
+            sceneSize model
     in
     div
         [ style "display" "flex"
