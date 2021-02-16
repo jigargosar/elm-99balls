@@ -458,7 +458,9 @@ update message model =
                 | pointerDown = isDown
                 , pointer =
                     -- svg cords to world cords
-                    vecAdd pointer (vecNegate gc.ri)
+                    pointer
+                        |> vecScale (sceneScale model)
+                        |> vecAdd (vecNegate gc.ri)
               }
             , Cmd.none
             )
@@ -467,7 +469,9 @@ update message model =
             ( { model
                 | pointer =
                     -- svg cords to world cords
-                    vecAdd pointer (vecNegate gc.ri)
+                    pointer
+                        |> vecScale (sceneScale model)
+                        |> vecAdd (vecNegate gc.ri)
               }
             , Cmd.none
             )
@@ -884,6 +888,15 @@ sceneSize model =
                 (vri.x * 2) * 0.95
         in
         ( width, width / ar )
+
+
+sceneScale : Model -> Float
+sceneScale model =
+    let
+        ( sceneWidth, _ ) =
+            sceneSize model
+    in
+    sw / sceneWidth
 
 
 view : Model -> Html Msg
