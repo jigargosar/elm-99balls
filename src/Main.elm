@@ -290,7 +290,7 @@ initBall angle =
     , angle = angle
     , hue = 0.15
     , radius = gc.ballR
-    , speed = 15
+    , speed = gc.ballR * 0.9
     }
 
 
