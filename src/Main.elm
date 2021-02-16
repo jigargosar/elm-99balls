@@ -67,7 +67,7 @@ import Util exposing (..)
 
   - [x] cleanup mock input
 
-  - Concern: Floor Balls: need direct access to first ball at some places.
+  - [x] Concern: Floor Balls: need direct access to first ball at some places.
       - perhaps we could just write helper method.
 
   - refactor viewport code
