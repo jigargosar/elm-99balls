@@ -220,14 +220,11 @@ gc =
         ar =
             sw / sh
 
-        w =
-            6
-
-        h =
-            8
+        ( w, h ) =
+            ( 6, 8 )
 
         cri =
-            vec (ri.x / w) (ri.y / h)
+            vec (ri.x / toFloat w) (ri.y / toFloat h)
 
         tr =
             cri.x * 0.7
