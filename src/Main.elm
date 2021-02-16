@@ -1059,7 +1059,10 @@ viewTargets progress targets =
                 , words
                     (String.fromInt target.hp)
                     [ fillP black
-                    , transform [ scale (target.radius / 12) ]
+                    , T.fontFamily [ "monospace" ]
+                    , Px.fontSize (target.radius * 1.5)
+
+                    --, T.fontWeight FontWeightBold
                     ]
                 ]
     in
