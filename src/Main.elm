@@ -495,7 +495,7 @@ updateOnTick model =
                 model
 
             else
-                case validInputAngle startPointer model.pointer of
+                case validInputAngle model startPointer of
                     Nothing ->
                         { model | state = WaitingForInput }
 
@@ -529,8 +529,37 @@ updateOnTick model =
                     |> emitBalls
 
 
-validInputAngle : Vec -> Vec -> Maybe Float
+validInputAngle : Model -> Vec -> Maybe Float
 validInputAngle =
+    let
+        do model start =
+            let
+                current =
+                    model.pointer
+            in
+            if isInputValid start current then
+                Just (inputAngle start current)
+
+            else
+                Nothing
+
+        isInputValid : Vec -> Vec -> Bool
+        isInputValid start current =
+            start.y < current.y
+
+        inputAngle : Vec -> Vec -> Float
+        inputAngle start current =
+            vecAngleFromTo current start
+                |> clampInputAngle
+
+        clampInputAngle =
+            clampMO (turns -0.25) (turns 0.24)
+    in
+    do
+
+
+validInputAngle1 : Vec -> Vec -> Maybe Float
+validInputAngle1 =
     let
         do start current =
             if isInputValid start current then
@@ -848,7 +877,7 @@ view model =
                         ]
 
                 DraggingPointer startPointer ->
-                    case validInputAngle startPointer model.pointer of
+                    case validInputAngle model startPointer of
                         Nothing ->
                             viewNone
 
