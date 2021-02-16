@@ -544,35 +544,32 @@ firstFloorBallPosition model =
 
 
 validInputAngle : Model -> Vec -> Maybe Float
-validInputAngle =
-    let
-        do model start =
-            firstFloorBallPosition model
-                |> Maybe.andThen
-                    (\ballCenter ->
-                        let
-                            current =
-                                model.pointer
+validInputAngle model start =
+    firstFloorBallPosition model
+        |> Maybe.andThen
+            (\ballCenter ->
+                let
+                    current =
+                        model.pointer
 
-                            angleOffset =
-                                angleABC current start ballCenter
-                                    |> mul 0.1
-                        in
-                        if start.y < current.y then
-                            Just
-                                (vecAngleFromTo ballCenter start
-                                    |> add angleOffset
-                                    |> clampInputAngle
-                                )
+                    angleOffset =
+                        angleABC current start ballCenter
+                            |> mul 0.1
+                in
+                if start.y < current.y then
+                    Just
+                        (vecAngleFromTo ballCenter start
+                            |> add angleOffset
+                            |> clampInputAngle
+                        )
 
-                        else
-                            Nothing
-                    )
+                else
+                    Nothing
+            )
 
-        clampInputAngle =
-            clampMO (turns -0.25) (turns 0.24)
-    in
-    do
+
+clampInputAngle =
+    clampMO (turns -0.25) (turns 0.24)
 
 
 
