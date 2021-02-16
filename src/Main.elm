@@ -439,8 +439,8 @@ randomLevel =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message model =
     case message of
-        GotDomViewPort { scene } ->
-            ( { model | sri = vec scene.width scene.height |> vecScale 0.5 }, Cmd.none )
+        GotDomViewPort { viewport } ->
+            ( { model | sri = vec viewport.width viewport.height |> vecScale 0.5 }, Cmd.none )
 
         OnDomResize w h ->
             ( { model | sri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
