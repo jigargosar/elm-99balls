@@ -636,23 +636,24 @@ addNewTargetRow model =
 
 startSimAtAngle : Float -> Model -> Model
 startSimAtAngle angle model =
-    let
-        ballPosition =
-            firstFloorBallPosition model
-                |> Maybe.withDefault initialBallPosition
+    case firstFloorBallPosition model of
+        Nothing ->
+            model
 
-        ball =
-            initBall ballPosition angle
-    in
-    { model
-        | floorBalls = []
-        , maybeEmitter =
-            Just
-                (Emitter model.frame
-                    ball
-                    (List.repeat (List.length model.floorBalls - 1) ball)
-                )
-    }
+        Just ballPosition ->
+            let
+                ball =
+                    initBall ballPosition angle
+            in
+            { model
+                | floorBalls = []
+                , maybeEmitter =
+                    Just
+                        (Emitter model.frame
+                            ball
+                            (List.repeat (List.length model.floorBalls - 1) ball)
+                        )
+            }
 
 
 areFloorBallsSettled : Model -> Bool
@@ -900,15 +901,16 @@ viewTravelPath frame pts =
 
 ballTravelPathAtAngle : Float -> Model -> List Vec
 ballTravelPathAtAngle angle model =
-    let
-        ballPosition =
-            firstFloorBallPosition model
-                |> Maybe.withDefault initialBallPosition
+    case firstFloorBallPosition model of
+        Nothing ->
+            []
 
-        ball =
-            initBall ballPosition angle
-    in
-    ballTravelPathHelp model ball 0 [ ball.position ]
+        Just ballPosition ->
+            let
+                ball =
+                    initBall ballPosition angle
+            in
+            ballTravelPathHelp model ball 0 [ ball.position ]
 
 
 maxPathLen =
