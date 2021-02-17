@@ -522,6 +522,17 @@ intersectRaySphere ( p, d ) ( sc, sr ) =
                 |> Just
 
 
+type alias CollisionResponse =
+    { position : Vec, velocity : Vec }
+
+
+movingCircleCollisionResponse : MovingCircle -> Collision -> CollisionResponse
+movingCircleCollisionResponse ( ( position, _ ), velocity ) { t, normal } =
+    { position = vecAdd position (velocity |> vecScale t)
+    , velocity = vecSub velocity (vecScale 2 (vecAlong normal velocity))
+    }
+
+
 
 -- Basics
 

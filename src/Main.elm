@@ -714,7 +714,7 @@ updateBall ball acc =
         Nothing ->
             { acc | updated = setBallVelocityAndUpdatePosition velocity ball :: acc.updated }
 
-        Just ( response, ballCollision ) ->
+        Just ( collision, ballCollision ) ->
             let
                 isCollisionElastic =
                     case ballCollision of
@@ -732,12 +732,18 @@ updateBall ball acc =
                                 StarTarget ->
                                     False
 
-                newBall =
+                newPosition =
+                    vecAdd ball.position (velocity |> vecScale collision.t)
+
+                newVelocity =
                     if isCollisionElastic then
-                        setBallPositionAndVelocity response.position response.velocity ball
+                        vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
 
                     else
-                        setBallPosition response.position ball
+                        vecZero
+
+                newBall =
+                    setBallPositionAndVelocity newPosition newVelocity ball
             in
             case ballCollision of
                 BallEdgeCollision e ->
@@ -781,11 +787,7 @@ type BallCollision
     | BallTargetCollision Target
 
 
-type alias CollisionResponse =
-    { position : Vec, velocity : Vec }
-
-
-detectBallCollision : List Target -> Vec -> Ball -> Maybe ( CollisionResponse, BallCollision )
+detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
 detectBallCollision targets velocity ball =
     let
         mc =
@@ -810,7 +812,6 @@ detectBallCollision targets velocity ball =
     c1
         ++ c2
         |> minimumBy (fst >> .t)
-        |> Maybe.map (mapFst (movingCircleCollisionResponse mc))
 
 
 targetToCircle t =
@@ -825,13 +826,6 @@ targetToCircle t =
         StarTarget ->
             gc.ballR
     )
-
-
-movingCircleCollisionResponse : MovingCircle -> Collision -> CollisionResponse
-movingCircleCollisionResponse ( ( position, _ ), velocity ) { t, normal } =
-    { position = vecAdd position (velocity |> vecScale t)
-    , velocity = vecSub velocity (vecScale 2 (vecAlong normal velocity))
-    }
 
 
 subscriptions : Model -> Sub Msg
