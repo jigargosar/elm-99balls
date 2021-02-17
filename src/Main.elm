@@ -135,9 +135,9 @@ randomTargets =
 randomTarget : ( Int, Int ) -> Generator (Maybe Target)
 randomTarget gp =
     Random.frequency
-        ( 20, Random.constant Nothing )
-        [ ( 100, randomSolidTarget gp |> Random.map Just )
-        , ( 10, Random.constant (Just (Target (toWorld gp) ExtraBallTarget)) )
+        ( 25, Random.constant Nothing )
+        [ ( 70, randomSolidTarget gp |> Random.map Just )
+        , ( 5, Random.constant (Just (Target (toWorld gp) ExtraBallTarget)) )
         ]
 
 
