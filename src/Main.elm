@@ -867,8 +867,7 @@ view model =
             , style "touch-action" "none"
             , style "user-select" "none"
             ]
-            [ rect gc.ri [ strokeP black ]
-            , group [ transform [ scale 1 ] ]
+            [ group []
                 [ rect gc.ri [ fillP black ]
                 , viewFloorBalls model.floorBalls
                 , case model.state of
