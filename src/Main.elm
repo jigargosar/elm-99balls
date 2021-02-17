@@ -814,6 +814,7 @@ detectBallCollision targets velocity ball =
         |> minimumBy (fst >> .t)
 
 
+targetToCircle : Target -> Circle
 targetToCircle t =
     ( t.position
     , case t.kind of
