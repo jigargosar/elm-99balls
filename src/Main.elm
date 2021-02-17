@@ -716,7 +716,7 @@ updateBall ball acc =
 
         Just ( collision, ballCollision ) ->
             let
-                isCollisionElastic =
+                isCollisionWithSolidObject =
                     case ballCollision of
                         BallEdgeCollision _ ->
                             True
@@ -736,11 +736,11 @@ updateBall ball acc =
                     vecAdd ball.position (velocity |> vecScale collision.t)
 
                 newVelocity =
-                    if isCollisionElastic then
+                    if isCollisionWithSolidObject then
                         vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
 
                     else
-                        vecZero
+                        velocity
 
                 newBall =
                     setBallPositionAndVelocity newPosition newVelocity ball
