@@ -696,6 +696,14 @@ type BallUpdate
     | BallHitBottomEdge
 
 
+type alias BallUpdateAcc =
+    { targets : List Target
+    , floored : List Ball
+    , updated : List Ball
+    , extraBallsCollected : Int
+    }
+
+
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
 updateBall ball ( targets, floored, acc ) =
     let
