@@ -724,31 +724,6 @@ updateBall ball acc =
             { acc | floored = newBall :: acc.floored }
 
         BallHitTarget target ->
-            let
-                newTargets =
-                    acc.targets
-                        |> List.filterMap
-                            (\t ->
-                                if t == target then
-                                    case t.kind of
-                                        SolidTarget hp ->
-                                            if hp <= 1 then
-                                                Nothing
-
-                                            else
-                                                Just { t | kind = SolidTarget (hp - 1) }
-
-                                        ExtraBallTarget ->
-                                            Nothing
-
-                                        StarTarget ->
-                                            Nothing
-
-                                else
-                                    Just t
-                            )
-            in
-            --{ acc | targets = newTargets, updated = newBall :: acc.updated }
             case target.kind of
                 SolidTarget hp ->
                     if hp <= 1 then
