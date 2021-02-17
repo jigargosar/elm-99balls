@@ -262,11 +262,15 @@ initBallAtBottomCenter =
     initBall (vec 0 (gc.ri.y - gc.ballR)) (turns -0.25)
 
 
+ballHue =
+    0.15
+
+
 initBall : Vec -> Float -> Ball
 initBall position angle =
     { position = position
     , angle = angle
-    , hue = 0.15
+    , hue = ballHue
     , radius = gc.ballR
     , speed = gc.ballR * 0.9
     }
@@ -1009,7 +1013,7 @@ viewTargets progress targets =
                     viewSolidTarget position hp
 
                 ExtraBallTarget ->
-                    viewSolidTarget position -1
+                    viewBallAt position
 
                 StarTarget ->
                     viewSolidTarget position -1
@@ -1092,26 +1096,30 @@ viewBalls =
                 p =
                     vecRound ball.position
             in
-            let
-                { radius, hue } =
-                    ball
-            in
-            let
-                strokeW =
-                    radius * 0.3
-
-                innerRadius =
-                    radius - strokeW / 2
-            in
-            group
-                [ strokeH hue
-                , transform [ translate p ]
-                , Px.strokeWidth strokeW
-                ]
-                [ Svg.circle [ Px.r innerRadius ] []
-                ]
+            viewBallAt p
     in
     do
+
+
+viewBallAt : Vec -> Svg msg
+viewBallAt p =
+    let
+        radius =
+            gc.ballR
+
+        strokeW =
+            radius * 0.3
+
+        innerRadius =
+            radius - strokeW / 2
+    in
+    group
+        [ strokeH ballHue
+        , transform [ translate p ]
+        , Px.strokeWidth strokeW
+        ]
+        [ Svg.circle [ Px.r innerRadius ] []
+        ]
 
 
 polyline pts aa =
