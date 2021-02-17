@@ -101,8 +101,15 @@ type alias Emitter =
     }
 
 
+type TargetKind
+    = SolidTarget Int
+    | ExtraBallTarget
+    | StarTarget
+
+
 type alias Target =
     { position : Vec
+    , kind : TargetKind
     , radius : Float
     , hp : Int
     }
@@ -129,12 +136,12 @@ moveTargetDown target =
 
 randomTarget : ( Int, Int ) -> Generator Target
 randomTarget gp =
-    rnd1 (initTarget gp) (rndInt 1 maxHP)
+    rnd1 (initSolidTarget gp) (rndInt 1 maxHP)
 
 
-initTarget : ( Int, Int ) -> Int -> Target
-initTarget gp hp =
-    Target (toWorld gp) gc.targetR hp
+initSolidTarget : ( Int, Int ) -> Int -> Target
+initSolidTarget gp hp =
+    Target (toWorld gp) (SolidTarget hp) gc.targetR hp
 
 
 canTargetsSafelyMoveDown : List Target -> Bool
