@@ -238,13 +238,9 @@ type alias Ball =
     }
 
 
-initialBallPosition =
-    vec 0 (gc.ri.y - gc.ballR)
-
-
 initBallAtBottomCenter : Ball
 initBallAtBottomCenter =
-    initBall initialBallPosition (turns -0.25)
+    initBall (vec 0 (gc.ri.y - gc.ballR)) (turns -0.25)
 
 
 initBall : Vec -> Float -> Ball
