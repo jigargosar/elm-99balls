@@ -831,10 +831,10 @@ svgSize model =
         vri =
             model.vri
 
-        sceneAR =
+        viewportAR =
             vecApply fdiv vri
     in
-    if ar < sceneAR then
+    if ar < viewportAR then
         let
             height =
                 (vri.y * 2) * 0.95
@@ -852,7 +852,7 @@ svgSize model =
 view : Model -> Html Msg
 view model =
     let
-        ( sceneWidth, sceneHeight ) =
+        ( svgWidth, svgHeight ) =
             svgSize model
     in
     div
@@ -864,8 +864,8 @@ view model =
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , Svg.svg
             [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
-            , Px.width sceneWidth
-            , Px.height sceneHeight
+            , Px.width svgWidth
+            , Px.height svgHeight
             , S.fill "none"
             , S.stroke "none"
             , E.on "pointerdown" (offsetDecoder |> JD.map (PointerDown True))
