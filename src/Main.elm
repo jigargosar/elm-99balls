@@ -70,9 +70,9 @@ import Util exposing (..)
   - [x] Concern: Floor Balls: need direct access to first ball at some places.
       - perhaps we could just write helper method.
 
-  - refactor viewport code
+  - [x] refactor viewport code
 
-  - scale view to mobile screen
+  - [x] scale view to mobile screen
 
   - allow multiple input handling mode for quick switch during testing
 
