@@ -453,14 +453,14 @@ update message model =
 svgToWorld : Model -> Vec -> Vec
 svgToWorld model svgCord =
     let
-        sz =
-            svgSize model
-
         svgRI =
-            vecFromTuple sz |> vecScale 0.5
+            computeSvgRI model
+
+        svgScale =
+            gc.ri.x / svgRI.x
     in
     vecSub svgCord svgRI
-        |> vecScale (gc.ri.x / svgRI.x)
+        |> vecScale svgScale
 
 
 cachePointer : Model -> Model
@@ -822,38 +822,31 @@ offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
 
 
-svgSize : Model -> ( Float, Float )
-svgSize model =
+computeSvgRI : Model -> Vec
+computeSvgRI model =
     let
         ar =
             gc.aspectRatio
 
         vri =
             model.vri
+                |> vecScale 0.95
 
         viewportAR =
             vecApply fdiv vri
     in
     if ar < viewportAR then
-        let
-            height =
-                (vri.y * 2) * 0.95
-        in
-        ( height * ar, height )
+        vec (vri.y * ar) vri.y
 
     else
-        let
-            width =
-                (vri.x * 2) * 0.95
-        in
-        ( width, width / ar )
+        vec vri.x (vri.x / ar)
 
 
 view : Model -> Html Msg
 view model =
     let
-        ( svgWidth, svgHeight ) =
-            svgSize model
+        svgRi =
+            computeSvgRI model
     in
     div
         [ style "display" "flex"
@@ -864,8 +857,8 @@ view model =
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , Svg.svg
             [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
-            , Px.width svgWidth
-            , Px.height svgHeight
+            , Px.width (svgRi.x * 2)
+            , Px.height (svgRi.y * 2)
             , S.fill "none"
             , S.stroke "none"
             , E.on "pointerdown" (offsetDecoder |> JD.map (PointerDown True))
