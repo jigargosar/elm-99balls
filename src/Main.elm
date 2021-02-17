@@ -122,8 +122,8 @@ moveTargetDown target =
     { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
 
 
-randomTarget : ( Int, Int ) -> Generator Target
-randomTarget gp =
+randomSolidTarget : ( Int, Int ) -> Generator Target
+randomSolidTarget gp =
     rnd1 (initSolidTarget gp) (rndInt 1 maxHP)
 
 
@@ -227,7 +227,7 @@ randomTargets =
             rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
     in
     randomTargetPositions
-        |> rndAndThen (List.map randomTarget >> rndCombine)
+        |> rndAndThen (List.map randomSolidTarget >> rndCombine)
 
 
 type alias Ball =
