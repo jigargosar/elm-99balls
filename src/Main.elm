@@ -676,10 +676,10 @@ type BallUpdate
 updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
 updateBall ball ( targets, floored, acc ) =
     let
-        ( bu, newBall ) =
+        ( ballUpdate, newBall ) =
             updateBallHelp targets ball
     in
-    case bu of
+    case ballUpdate of
         BallMoved ->
             ( targets, floored, newBall :: acc )
 
