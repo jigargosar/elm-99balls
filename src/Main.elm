@@ -30,6 +30,8 @@ import Util exposing (..)
   - [x] allow multiple input handling mode for quick switch during testing
       - for now we are using hardcoded constant for switching
 
+  - goodies: extra ball
+
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
