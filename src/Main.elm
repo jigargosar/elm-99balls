@@ -663,7 +663,7 @@ areFloorBallsSettled model =
 areBallsCloseEnough : Ball -> Ball -> Bool
 areBallsCloseEnough a b =
     vecLenSqFromTo a.position b.position
-        |> eqByAtLeast 1 0
+        |> eqByAtLeast 0.1 0
 
 
 type BallUpdate
