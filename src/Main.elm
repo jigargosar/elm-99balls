@@ -27,7 +27,8 @@ import Util exposing (..)
   - [x] Bug: angle always showing at center
       - for v1 on mobile, check other cases.
 
-  - allow multiple input handling mode for quick switch during testing
+  - [x] allow multiple input handling mode for quick switch during testing
+    - for now we are using hardcoded constant for switching
 
   - test input handling on phone/touch device.
       - Bug: ball outside world, invariant failed during mobile testing InputV1
