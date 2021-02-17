@@ -725,6 +725,34 @@ updateBall ball acc =
 
         BallHitTarget target ->
             let
+                _ =
+                    case target.kind of
+                        SolidTarget hp ->
+                            if hp <= 1 then
+                                { acc
+                                    | targets = reject (eq target) acc.targets
+                                    , updated = newBall :: acc.updated
+                                }
+
+                            else
+                                { acc
+                                    | targets = List.setIf (eq target) { target | kind = SolidTarget (hp - 1) } acc.targets
+                                    , updated = newBall :: acc.updated
+                                }
+
+                        ExtraBallTarget ->
+                            { acc
+                                | targets = reject (eq target) acc.targets
+                                , updated = newBall :: acc.updated
+                                , extraBallsCollected = acc.extraBallsCollected + 1
+                            }
+
+                        StarTarget ->
+                            { acc
+                                | targets = reject (eq target) acc.targets
+                                , updated = newBall :: acc.updated
+                            }
+
                 newTargets =
                     acc.targets
                         |> List.filterMap
