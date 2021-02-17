@@ -31,6 +31,7 @@ import Util exposing (..)
 
   - test input handling on phone/touch device.
       - Bug: ball outside world, invariant failed during mobile testing InputV1
+      - Concern: angle flickering on touch release
 
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
