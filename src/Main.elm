@@ -737,6 +737,7 @@ updateBall ball acc =
 
                 newVelocity =
                     if isCollisionWithSolidObject then
+                        -- compute fully elastic response velocity
                         vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
 
                     else
