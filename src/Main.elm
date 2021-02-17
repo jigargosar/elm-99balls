@@ -1091,11 +1091,6 @@ viewBalls =
             let
                 p =
                     vecRound ball.position
-
-                ( nx, ny ) =
-                    ( ball.radius, ball.angle )
-                        |> fromPolar
-                        |> roundFloat2
             in
             let
                 { radius, hue } =
@@ -1114,8 +1109,6 @@ viewBalls =
                 , Px.strokeWidth strokeW
                 ]
                 [ Svg.circle [ Px.r innerRadius ] []
-                , Svg.line [ Px.x2 nx, Px.y2 ny ] []
-                    |> always viewNone
                 ]
     in
     do
