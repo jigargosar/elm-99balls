@@ -765,8 +765,28 @@ updateBall2 ball acc =
 
         Just ( response, ballCollision ) ->
             let
+                isCollisionElastic =
+                    case ballCollision of
+                        BallEdgeCollision _ ->
+                            True
+
+                        BallTargetCollision target ->
+                            case target.kind of
+                                SolidTarget _ ->
+                                    True
+
+                                ExtraBallTarget ->
+                                    False
+
+                                StarTarget ->
+                                    False
+
                 newBall =
-                    setBallPositionAndVelocity response.position response.velocity ball
+                    if isCollisionElastic then
+                        setBallPositionAndVelocity response.position response.velocity ball
+
+                    else
+                        setBallPosition response.position ball
             in
             case ballCollision of
                 BallEdgeCollision e ->
