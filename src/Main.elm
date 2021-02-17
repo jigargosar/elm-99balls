@@ -446,7 +446,7 @@ updateOnTick model =
                 model
 
             else
-                case validInputAngleV2 model startPointer of
+                case validInputAngle model startPointer of
                     Nothing ->
                         { model | state = WaitingForInput }
 
@@ -482,6 +482,36 @@ firstFloorBallPosition model =
     firstFloorBall model |> Maybe.map .position
 
 
+type InputVersion
+    = InputV1
+    | InputV2
+
+
+validInputAngle : Model -> Vec -> Maybe Float
+validInputAngle =
+    case InputV1 of
+        InputV1 ->
+            validInputAngleV1
+
+        InputV2 ->
+            validInputAngleV2
+
+
+validInputAngleV1 : Model -> Vec -> Maybe Float
+validInputAngleV1 model start =
+    let
+        current =
+            model.pointer
+    in
+    if start.y < current.y then
+        vecAngleFromTo current start
+            |> clampInputAngle
+            |> Just
+
+    else
+        Nothing
+
+
 validInputAngleV2 : Model -> Vec -> Maybe Float
 validInputAngleV2 model start =
     firstFloorBallPosition model
@@ -509,21 +539,6 @@ validInputAngleV2 model start =
 
 clampInputAngle =
     clampMO (turns -0.25) (turns 0.24)
-
-
-validInputAngleV1 : Model -> Vec -> Maybe Float
-validInputAngleV1 model start =
-    let
-        current =
-            model.pointer
-    in
-    if start.y < current.y then
-        vecAngleFromTo current start
-            |> clampInputAngle
-            |> Just
-
-    else
-        Nothing
 
 
 incFrame : Model -> Model
@@ -824,7 +839,7 @@ view model =
                         viewNone
                 , case model.state of
                     DraggingPointer startPointer ->
-                        case validInputAngleV2 model startPointer of
+                        case validInputAngle model startPointer of
                             Nothing ->
                                 viewNone
 
