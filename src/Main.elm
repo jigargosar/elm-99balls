@@ -853,7 +853,7 @@ view model =
 
                     _ ->
                         viewNone
-                , viewDebugPointer model.pointer
+                , viewDebugPointer model.pointer |> always viewNone
                 ]
             ]
         ]
