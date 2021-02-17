@@ -25,7 +25,7 @@ import Util exposing (..)
 # Todo
 
   - Bug: angle always showing at center
-    - for v1 on mobile, check other cases.
+      - for v1 on mobile, check other cases.
 
   - Bug: ball outside world, invariant failed during mobile testing InputV1
 
@@ -238,6 +238,16 @@ type alias Ball =
     }
 
 
+initialBall : Ball
+initialBall =
+    { position = vec 0 (gc.ri.y - gc.ballR)
+    , angle = turns -0.25
+    , hue = 0.15
+    , radius = gc.ballR
+    , speed = gc.ballR * 0.9
+    }
+
+
 initBall : Float -> Ball
 initBall angle =
     { position = vec 0 (gc.ri.y - gc.ballR)
@@ -246,11 +256,6 @@ initBall angle =
     , radius = gc.ballR
     , speed = gc.ballR * 0.9
     }
-
-
-randomBall : Generator Ball
-randomBall =
-    rnd1 initBall (rndF (turns 0.6) (turns 0.9))
 
 
 ballVelocity : Ball -> Vec
@@ -343,12 +348,15 @@ init _ =
         initialSeed =
             seedFrom 4
 
-        ( ( floorBalls, targets ), seed ) =
-            rndStep ( randomLevel, initialSeed )
+        ( targets, seed ) =
+            rndStep ( randomTargets, initialSeed )
+
+        initialBallCount =
+            10
     in
     ( { maybeEmitter = Nothing
       , balls = []
-      , floorBalls = floorBalls
+      , floorBalls = List.repeat initialBallCount initialBall
       , targets = targets
       , pointerDown = False
       , pointer = vecZero
@@ -363,13 +371,6 @@ init _ =
         |> addNewTargetRow
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
-
-
-randomLevel : Generator ( List Ball, List Target )
-randomLevel =
-    rndPair
-        (rndList 15 randomBall)
-        randomTargets
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
