@@ -115,8 +115,8 @@ type alias Target =
     }
 
 
-randomTargets : Generator (List Target)
-randomTargets =
+randomTargets1 : Generator (List Target)
+randomTargets1 =
     let
         randomTargetPositions =
             rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
@@ -125,8 +125,8 @@ randomTargets =
         |> rndAndThen (List.map randomSolidTarget >> rndCombine)
 
 
-randomTargets2 : Generator (List Target)
-randomTargets2 =
+randomTargets : Generator (List Target)
+randomTargets =
     List.map randomTarget gc.topRowPS
         |> rndCombine
         |> Random.map (List.filterMap identity)
@@ -136,7 +136,9 @@ randomTarget : ( Int, Int ) -> Generator (Maybe Target)
 randomTarget gp =
     Random.frequency
         ( 20, Random.constant Nothing )
-        [ ( 80, randomSolidTarget gp |> Random.map Just ) ]
+        [ ( 100, randomSolidTarget gp |> Random.map Just )
+        , ( 10, Random.constant (Just (Target (toWorld gp) ExtraBallTarget)) )
+        ]
 
 
 randomSolidTarget : ( Int, Int ) -> Generator Target
@@ -1007,10 +1009,10 @@ viewTargets progress targets =
                     viewSolidTarget position hp
 
                 ExtraBallTarget ->
-                    viewSolidTarget position 0
+                    viewSolidTarget position -1
 
                 StarTarget ->
-                    viewSolidTarget position 0
+                    viewSolidTarget position -1
     in
     group [] (List.map viewTarget targets)
 
