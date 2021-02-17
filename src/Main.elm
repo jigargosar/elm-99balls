@@ -443,9 +443,9 @@ updateOnTick model =
             else
                 model
 
-        DraggingPointer startPointer ->
+        DraggingPointer start ->
             if not model.pointerDown then
-                case validInputAngle model startPointer of
+                case validInputAngle model start of
                     Nothing ->
                         { model | state = WaitingForInput }
 
