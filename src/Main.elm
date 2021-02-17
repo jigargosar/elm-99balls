@@ -28,11 +28,13 @@ import Util exposing (..)
       - for v1 on mobile, check other cases.
 
   - [x] allow multiple input handling mode for quick switch during testing
-    - for now we are using hardcoded constant for switching
+      - for now we are using hardcoded constant for switching
 
   - test input handling on phone/touch device.
-      - Bug: ball outside world, invariant failed during mobile testing InputV1
       - Concern: angle flickering on touch release
+
+
+# Later
 
   - Concern: Input handling is much better, but there is room for improvement.
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
@@ -45,7 +47,8 @@ import Util exposing (..)
     i.e. when objects already intersecting, what is effect on collision response.
 
   - Invalid states, that are representable.
-      - ball outside screen edges / sim never ending.
+      - +1 ball outside screen edges / sim never ending.
+          - Bug: ball outside world, invariant failed during mobile testing InputV1
       - total number of balls before and after simulation are different.
 
 -}
