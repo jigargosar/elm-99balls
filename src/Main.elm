@@ -695,12 +695,6 @@ areBallsCloseEnough a b =
         |> eqByAtLeast 0.1 0
 
 
-type BallUpdate
-    = BallMoved
-    | BallHitTarget Target
-    | BallHitBottomEdge
-
-
 type alias BallUpdateAcc =
     { targets : List Target
     , floored : List Ball
@@ -785,48 +779,6 @@ updateBall ball acc =
 type BallCollision
     = BallEdgeCollision Edge
     | BallTargetCollision Target
-
-
-updateBallHelp : List Target -> Ball -> ( BallUpdate, Ball )
-updateBallHelp targets ball =
-    let
-        velocity =
-            ballVelocity ball
-                |> vecMapY (add 0.01)
-    in
-    case detectBallCollision targets velocity ball of
-        Nothing ->
-            ( BallMoved, setBallVelocityAndUpdatePosition velocity ball )
-
-        Just ( response, ballCollision ) ->
-            case ballCollision of
-                BallEdgeCollision e ->
-                    ( if isBottomEdge e then
-                        BallHitBottomEdge
-
-                      else
-                        BallMoved
-                    , setBallPositionAndVelocity response.position response.velocity ball
-                    )
-
-                BallTargetCollision target ->
-                    ( BallHitTarget target
-                    , if isTargetSolid target then
-                        setBallPositionAndVelocity response.position response.velocity ball
-
-                      else
-                        setBallPosition response.position ball
-                    )
-
-
-isTargetSolid : Target -> Bool
-isTargetSolid { kind } =
-    case kind of
-        SolidTarget _ ->
-            True
-
-        _ ->
-            False
 
 
 type alias CollisionResponse =
@@ -1055,25 +1007,6 @@ ballTravelPathHelp acc ball pathLen path =
 
         _ ->
             path
-
-
-ballTravelPathHelp1 : Model -> Ball -> Float -> List Vec -> List Vec
-ballTravelPathHelp1 model ball pathLen path =
-    let
-        solidTargets =
-            keepWhen isTargetSolid model.targets
-
-        ( bc, newBall ) =
-            updateBallHelp solidTargets ball
-
-        newPathLenSq =
-            vecLenFromTo ball.position newBall.position + pathLen
-    in
-    if newPathLenSq > maxPathLen || bc == BallHitBottomEdge then
-        path
-
-    else
-        ballTravelPathHelp1 model newBall newPathLenSq (newBall.position :: path)
 
 
 viewTargets : Float -> List Target -> Svg msg
