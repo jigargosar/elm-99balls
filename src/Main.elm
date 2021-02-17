@@ -113,13 +113,14 @@ type alias Target =
     }
 
 
-maxHP =
-    20
-
-
-moveTargetDown : Target -> Target
-moveTargetDown target =
-    { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
+randomTargets : Generator (List Target)
+randomTargets =
+    let
+        randomTargetPositions =
+            rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
+    in
+    randomTargetPositions
+        |> rndAndThen (List.map randomSolidTarget >> rndCombine)
 
 
 randomSolidTarget : ( Int, Int ) -> Generator Target
@@ -130,6 +131,15 @@ randomSolidTarget gp =
 initSolidTarget : ( Int, Int ) -> Int -> Target
 initSolidTarget gp hp =
     Target (toWorld gp) (SolidTarget hp)
+
+
+maxHP =
+    20
+
+
+moveTargetDown : Target -> Target
+moveTargetDown target =
+    { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
 
 
 canTargetsSafelyMoveDown : List Target -> Bool
@@ -218,16 +228,6 @@ fromWorld { x, y } =
     in
     ( (x - dx) / (cri.x * 2), (y - dy) / (cri.y * 2) )
         |> round2
-
-
-randomTargets : Generator (List Target)
-randomTargets =
-    let
-        randomTargetPositions =
-            rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
-    in
-    randomTargetPositions
-        |> rndAndThen (List.map randomSolidTarget >> rndCombine)
 
 
 type alias Ball =
