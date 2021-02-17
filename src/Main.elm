@@ -4,8 +4,8 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import Html exposing (Html, div, node, text)
-import Html.Attributes exposing (href, rel, src, style)
+import Html exposing (Html, div, node)
+import Html.Attributes as A exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
@@ -861,8 +861,7 @@ view model =
         , style "justify-content" "center"
         , style "height" "100%"
         ]
-        [ node "style" [] [ text "html,body{height:100%;}" ]
-        , node "link" [ href "styles.css", rel "stylesheet" ] []
+        [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , Svg.svg
             [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
             , Px.width sceneWidth
