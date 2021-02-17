@@ -634,8 +634,7 @@ moveBallsAndHandleCollision model =
                     { targets = model.targets
                     , floored = model.floorBalls
                     , updated = []
-                    , extraBallsCollected =
-                        0
+                    , extraBallsCollected = 0
                     }
     in
     { model
@@ -1063,15 +1062,45 @@ ballTravelPathAtAngle angle model =
                 ball =
                     initBall ballPosition angle
             in
-            ballTravelPathHelp model ball 0 [ ball.position ]
+            ballTravelPathHelp
+                { targets = model.targets
+                , floored = []
+                , updated = []
+                , extraBallsCollected = 0
+                }
+                ball
+                0
+                [ ball.position ]
 
 
 maxPathLen =
     gc.ri.y * 2.2
 
 
-ballTravelPathHelp : Model -> Ball -> Float -> List Vec -> List Vec
-ballTravelPathHelp model ball pathLen path =
+ballTravelPathHelp : BallUpdateAcc -> Ball -> Float -> List Vec -> List Vec
+ballTravelPathHelp acc ball pathLen path =
+    let
+        nAcc =
+            updateBall ball acc
+    in
+    case nAcc.updated of
+        newBall :: _ ->
+            let
+                newPathLen =
+                    vecLenFromTo ball.position newBall.position + pathLen
+            in
+            if newPathLen > maxPathLen then
+                path
+
+            else
+                ballTravelPathHelp { nAcc | updated = [] } newBall newPathLen (newBall.position :: path)
+
+        _ ->
+            path
+
+
+ballTravelPathHelp1 : Model -> Ball -> Float -> List Vec -> List Vec
+ballTravelPathHelp1 model ball pathLen path =
     let
         solidTargets =
             keepWhen isTargetSolid model.targets
@@ -1086,7 +1115,7 @@ ballTravelPathHelp model ball pathLen path =
         path
 
     else
-        ballTravelPathHelp model newBall newPathLenSq (newBall.position :: path)
+        ballTravelPathHelp1 model newBall newPathLenSq (newBall.position :: path)
 
 
 viewTargets : Float -> List Target -> Svg msg
