@@ -752,6 +752,59 @@ updateBall ball acc =
                     }
 
 
+updateBall2 : Ball -> BallUpdateAcc -> BallUpdateAcc
+updateBall2 ball acc =
+    let
+        velocity =
+            ballVelocity ball
+                |> vecMapY (add 0.01)
+    in
+    case detectBallCollision acc.targets velocity ball of
+        Nothing ->
+            { acc | updated = setBallVelocityAndUpdatePosition velocity ball :: acc.updated }
+
+        Just ( response, ballCollision ) ->
+            let
+                newBall =
+                    setBallPositionAndVelocity response.position response.velocity ball
+            in
+            case ballCollision of
+                BallEdgeCollision e ->
+                    if isBottomEdge e then
+                        { acc | floored = newBall :: acc.floored }
+
+                    else
+                        { acc | updated = newBall :: acc.updated }
+
+                BallTargetCollision target ->
+                    case target.kind of
+                        SolidTarget hp ->
+                            if hp <= 1 then
+                                { acc
+                                    | targets = reject (eq target) acc.targets
+                                    , updated = newBall :: acc.updated
+                                }
+
+                            else
+                                { acc
+                                    | targets = List.setIf (eq target) { target | kind = SolidTarget (hp - 1) } acc.targets
+                                    , updated = newBall :: acc.updated
+                                }
+
+                        ExtraBallTarget ->
+                            { acc
+                                | targets = reject (eq target) acc.targets
+                                , updated = newBall :: acc.updated
+                                , extraBallsCollected = acc.extraBallsCollected + 1
+                            }
+
+                        StarTarget ->
+                            { acc
+                                | targets = reject (eq target) acc.targets
+                                , updated = newBall :: acc.updated
+                            }
+
+
 type BallCollision
     = BallEdgeCollision Edge
     | BallTargetCollision Target
