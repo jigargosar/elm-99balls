@@ -115,14 +115,15 @@ type alias Target =
     }
 
 
-randomTargets1 : Generator (List Target)
-randomTargets1 =
-    let
-        randomTargetPositions =
-            rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
-    in
-    randomTargetPositions
-        |> rndAndThen (List.map randomSolidTarget >> rndCombine)
+
+--randomTargets1 : Generator (List Target)
+--randomTargets1 =
+--    let
+--        randomTargetPositions =
+--            rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
+--    in
+--    randomTargetPositions
+--        |> rndAndThen (List.map randomSolidTarget >> rndCombine)
 
 
 randomTargets : Generator (List Target)
