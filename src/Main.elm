@@ -110,19 +110,7 @@ type TargetKind
 type alias Target =
     { position : Vec
     , kind : TargetKind
-    , radius : Float
-    , hp : Int
     }
-
-
-decHP : Target -> Target
-decHP target =
-    { target | hp = target.hp - 1 }
-
-
-hasHP : Target -> Bool
-hasHP target =
-    target.hp > 0
 
 
 maxHP =
@@ -141,7 +129,7 @@ randomTarget gp =
 
 initSolidTarget : ( Int, Int ) -> Int -> Target
 initSolidTarget gp hp =
-    Target (toWorld gp) (SolidTarget hp) gc.targetR hp
+    Target (toWorld gp) (SolidTarget hp)
 
 
 canTargetsSafelyMoveDown : List Target -> Bool
@@ -702,8 +690,26 @@ updateBall ball ( targets, floored, acc ) =
             let
                 newTargets =
                     targets
-                        |> mapWhenEq target decHP
-                        |> keepWhen hasHP
+                        |> List.filterMap
+                            (\t ->
+                                if t == target then
+                                    case t.kind of
+                                        SolidTarget hp ->
+                                            if hp <= 1 then
+                                                Nothing
+
+                                            else
+                                                Just { t | kind = SolidTarget (hp - 1) }
+
+                                        ExtraBallTarget ->
+                                            Nothing
+
+                                        StarTarget ->
+                                            Nothing
+
+                                else
+                                    Just t
+                            )
             in
             ( newTargets, floored, newBall :: acc )
 
@@ -725,18 +731,34 @@ updateBallHelp targets ball =
             ( BallMoved, setBallVelocityAndUpdatePosition velocity ball )
 
         Just ( response, ballCollision ) ->
-            ( case ballCollision of
+            case ballCollision of
                 BallEdgeCollision e ->
-                    if isBottomEdge e then
+                    ( if isBottomEdge e then
                         BallHitBottomEdge
 
-                    else
+                      else
                         BallMoved
+                    , setBallPositionAndVelocity response.position response.velocity ball
+                    )
 
                 BallTargetCollision target ->
-                    BallHitTarget target
-            , setBallPositionAndVelocity response.position response.velocity ball
-            )
+                    ( BallHitTarget target
+                    , if isTargetSolid target then
+                        setBallPositionAndVelocity response.position response.velocity ball
+
+                      else
+                        setBallPosition response.position ball
+                    )
+
+
+isTargetSolid : Target -> Bool
+isTargetSolid { kind } =
+    case kind of
+        SolidTarget _ ->
+            True
+
+        _ ->
+            False
 
 
 type alias CollisionResponse =
@@ -760,15 +782,29 @@ detectBallCollision targets velocity ball =
         c2 =
             targets
                 |> List.filterMap
-                    (\o ->
-                        detectMovingCircleAndCircleCollision mc ( o.position, o.radius )
-                            |> Maybe.map (pairTo (BallTargetCollision o))
+                    (\target ->
+                        detectMovingCircleAndCircleCollision mc (targetToCircle target)
+                            |> Maybe.map (pairTo (BallTargetCollision target))
                     )
     in
     c1
         ++ c2
         |> minimumBy (fst >> .t)
         |> Maybe.map (mapFst (movingCircleCollisionResponse mc))
+
+
+targetToCircle t =
+    ( t.position
+    , case t.kind of
+        SolidTarget _ ->
+            gc.targetR
+
+        ExtraBallTarget ->
+            gc.ballR
+
+        StarTarget ->
+            gc.ballR
+    )
 
 
 movingCircleCollisionResponse : MovingCircle -> Collision -> CollisionResponse
@@ -942,30 +978,50 @@ ballTravelPathHelp model ball pathLen path =
 viewTargets : Float -> List Target -> Svg msg
 viewTargets progress targets =
     let
-        targetHue target =
-            toFloat target.hp / maxHP
-
         dy =
             (1 - progress) * -(gc.cri.y * 2)
 
         viewTarget target =
-            group [ transform [ translate (target.position |> vecMapY (add dy)) ] ]
-                [ Svg.circle
-                    [ Px.r target.radius
-                    , fillH (targetHue target)
-                    ]
-                    []
-                , words
-                    (String.fromInt target.hp)
-                    [ fillP black
-                    , T.fontFamily [ "monospace" ]
-                    , Px.fontSize (target.radius * 1.5)
+            let
+                position =
+                    target.position |> vecMapY (add dy)
+            in
+            case target.kind of
+                SolidTarget hp ->
+                    viewSolidTarget position hp
 
-                    --, T.fontWeight FontWeightBold
-                    ]
-                ]
+                ExtraBallTarget ->
+                    viewSolidTarget position 0
+
+                StarTarget ->
+                    viewSolidTarget position 0
     in
     group [] (List.map viewTarget targets)
+
+
+viewSolidTarget position hp =
+    let
+        radius =
+            gc.targetR
+
+        targetHue =
+            toFloat hp / maxHP
+    in
+    group [ transform [ translate position ] ]
+        [ Svg.circle
+            [ Px.r radius
+            , fillH targetHue
+            ]
+            []
+        , words
+            (String.fromInt hp)
+            [ fillP black
+            , T.fontFamily [ "monospace" ]
+            , Px.fontSize (radius * 1.5)
+
+            --, T.fontWeight FontWeightBold
+            ]
+        ]
 
 
 viewEdges : Svg Msg
