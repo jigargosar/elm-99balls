@@ -984,8 +984,11 @@ maxPathLen =
 ballTravelPathHelp : Model -> Ball -> Float -> List Vec -> List Vec
 ballTravelPathHelp model ball pathLen path =
     let
+        solidTargets =
+            keepWhen isTargetSolid model.targets
+
         ( bc, newBall ) =
-            updateBallHelp model.targets ball
+            updateBallHelp solidTargets ball
 
         newPathLenSq =
             vecLenFromTo ball.position newBall.position + pathLen
