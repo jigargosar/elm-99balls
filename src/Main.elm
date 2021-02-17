@@ -238,19 +238,18 @@ type alias Ball =
     }
 
 
-initialBall : Ball
-initialBall =
-    { position = vec 0 (gc.ri.y - gc.ballR)
-    , angle = turns -0.25
-    , hue = 0.15
-    , radius = gc.ballR
-    , speed = gc.ballR * 0.9
-    }
+initialBallPosition =
+    vec 0 (gc.ri.y - gc.ballR)
 
 
-initBall : Float -> Ball
-initBall angle =
-    { position = vec 0 (gc.ri.y - gc.ballR)
+initBallAtBottomCenter : Ball
+initBallAtBottomCenter =
+    initBall initialBallPosition (turns -0.25)
+
+
+initBall : Vec -> Float -> Ball
+initBall position angle =
+    { position = position
     , angle = angle
     , hue = 0.15
     , radius = gc.ballR
@@ -356,7 +355,7 @@ init _ =
     in
     ( { maybeEmitter = Nothing
       , balls = []
-      , floorBalls = List.repeat initialBallCount initialBall
+      , floorBalls = List.repeat initialBallCount initBallAtBottomCenter
       , targets = targets
       , pointerDown = False
       , pointer = vecZero
@@ -638,8 +637,12 @@ addNewTargetRow model =
 startSimAtAngle : Float -> Model -> Model
 startSimAtAngle angle model =
     let
+        ballPosition =
+            firstFloorBallPosition model
+                |> Maybe.withDefault initialBallPosition
+
         ball =
-            initBall angle
+            initBall ballPosition angle
     in
     { model
         | floorBalls = []
@@ -898,8 +901,12 @@ viewTravelPath frame pts =
 ballTravelPathAtAngle : Float -> Model -> List Vec
 ballTravelPathAtAngle angle model =
     let
+        ballPosition =
+            firstFloorBallPosition model
+                |> Maybe.withDefault initialBallPosition
+
         ball =
-            initBall angle
+            initBall ballPosition angle
     in
     ballTravelPathHelp model ball 0 [ ball.position ]
 
