@@ -9,6 +9,8 @@ import Html.Attributes as A exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
+import Random
+import Random.Extra as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task
@@ -121,6 +123,20 @@ randomTargets =
     in
     randomTargetPositions
         |> rndAndThen (List.map randomSolidTarget >> rndCombine)
+
+
+randomTargets2 : Generator (List Target)
+randomTargets2 =
+    List.map randomTarget gc.topRowPS
+        |> rndCombine
+        |> Random.map (List.filterMap identity)
+
+
+randomTarget : ( Int, Int ) -> Generator (Maybe Target)
+randomTarget gp =
+    Random.frequency
+        ( 20, Random.constant Nothing )
+        [ ( 80, randomSolidTarget gp |> Random.map Just ) ]
 
 
 randomSolidTarget : ( Int, Int ) -> Generator Target
