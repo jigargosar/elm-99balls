@@ -446,7 +446,7 @@ updateOnTick model =
                 model
 
             else
-                case validInputAngle model startPointer of
+                case validInputAngleV2 model startPointer of
                     Nothing ->
                         { model | state = WaitingForInput }
 
@@ -482,8 +482,8 @@ firstFloorBallPosition model =
     firstFloorBall model |> Maybe.map .position
 
 
-validInputAngle : Model -> Vec -> Maybe Float
-validInputAngle model start =
+validInputAngleV2 : Model -> Vec -> Maybe Float
+validInputAngleV2 model start =
     firstFloorBallPosition model
         |> Maybe.andThen
             (\ballCenter ->
@@ -511,30 +511,19 @@ clampInputAngle =
     clampMO (turns -0.25) (turns 0.24)
 
 
+validInputAngleV1 : Model -> Vec -> Maybe Float
+validInputAngleV1 model start =
+    let
+        current =
+            model.pointer
+    in
+    if start.y < current.y then
+        vecAngleFromTo current start
+            |> clampInputAngle
+            |> Just
 
---validInputAngle1 : Vec -> Vec -> Maybe Float
---validInputAngle1 =
---    let
---        do start current =
---            if isInputValid start current then
---                Just (inputAngle start current)
---
---            else
---                Nothing
---
---        isInputValid : Vec -> Vec -> Bool
---        isInputValid start current =
---            start.y < current.y
---
---        inputAngle : Vec -> Vec -> Float
---        inputAngle start current =
---            vecAngleFromTo current start
---                |> clampInputAngle
---
---        clampInputAngle =
---            clampMO (turns -0.25) (turns 0.24)
---    in
---    do
+    else
+        Nothing
 
 
 incFrame : Model -> Model
@@ -835,7 +824,7 @@ view model =
                         viewNone
                 , case model.state of
                     DraggingPointer startPointer ->
-                        case validInputAngle model startPointer of
+                        case validInputAngleV2 model startPointer of
                             Nothing ->
                                 viewNone
 
