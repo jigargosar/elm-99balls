@@ -24,6 +24,11 @@ import Util exposing (..)
 
 # Todo
 
+  - Bug: angle always showing at center
+    - for v1 on mobile, check other cases.
+
+  - Bug: ball outside world, invariant failed during mobile testing InputV1
+
   - allow multiple input handling mode for quick switch during testing
 
   - test input handling on phone/touch device.
