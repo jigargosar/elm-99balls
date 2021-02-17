@@ -712,48 +712,6 @@ type alias BallUpdateAcc =
 updateBall : Ball -> BallUpdateAcc -> BallUpdateAcc
 updateBall ball acc =
     let
-        ( ballUpdate, newBall ) =
-            updateBallHelp acc.targets ball
-    in
-    case ballUpdate of
-        BallMoved ->
-            { acc | updated = newBall :: acc.updated }
-
-        BallHitBottomEdge ->
-            { acc | floored = newBall :: acc.floored }
-
-        BallHitTarget target ->
-            case target.kind of
-                SolidTarget hp ->
-                    if hp <= 1 then
-                        { acc
-                            | targets = reject (eq target) acc.targets
-                            , updated = newBall :: acc.updated
-                        }
-
-                    else
-                        { acc
-                            | targets = List.setIf (eq target) { target | kind = SolidTarget (hp - 1) } acc.targets
-                            , updated = newBall :: acc.updated
-                        }
-
-                ExtraBallTarget ->
-                    { acc
-                        | targets = reject (eq target) acc.targets
-                        , updated = newBall :: acc.updated
-                        , extraBallsCollected = acc.extraBallsCollected + 1
-                    }
-
-                StarTarget ->
-                    { acc
-                        | targets = reject (eq target) acc.targets
-                        , updated = newBall :: acc.updated
-                    }
-
-
-updateBall2 : Ball -> BallUpdateAcc -> BallUpdateAcc
-updateBall2 ball acc =
-    let
         velocity =
             ballVelocity ball
                 |> vecMapY (add 0.01)
