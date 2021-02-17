@@ -444,10 +444,7 @@ updateOnTick model =
                 model
 
         DraggingPointer startPointer ->
-            if model.pointerDown then
-                model
-
-            else
+            if not model.pointerDown then
                 case validInputAngle model startPointer of
                     Nothing ->
                         { model | state = WaitingForInput }
@@ -455,6 +452,9 @@ updateOnTick model =
                     Just angle ->
                         { model | state = Sim }
                             |> startSimAtAngle angle
+
+            else
+                model
 
         Sim ->
             -- check for turn over
