@@ -628,14 +628,20 @@ convergeBallTowards to ball =
 moveBallsAndHandleCollision : Model -> Model
 moveBallsAndHandleCollision model =
     let
-        ( targets, floorBalls, balls ) =
+        { targets, floored, updated, extraBallsCollected } =
             model.balls
-                |> List.foldl updateBall ( model.targets, model.floorBalls, [] )
+                |> List.foldl updateBall
+                    { targets = model.targets
+                    , floored = model.floorBalls
+                    , updated = []
+                    , extraBallsCollected =
+                        0
+                    }
     in
     { model
         | targets = targets
-        , floorBalls = floorBalls
-        , balls = balls
+        , floorBalls = floored
+        , balls = updated
     }
 
 
@@ -704,23 +710,23 @@ type alias BallUpdateAcc =
     }
 
 
-updateBall : Ball -> ( List Target, List Ball, List Ball ) -> ( List Target, List Ball, List Ball )
-updateBall ball ( targets, floored, acc ) =
+updateBall : Ball -> BallUpdateAcc -> BallUpdateAcc
+updateBall ball acc =
     let
         ( ballUpdate, newBall ) =
-            updateBallHelp targets ball
+            updateBallHelp acc.targets ball
     in
     case ballUpdate of
         BallMoved ->
-            ( targets, floored, newBall :: acc )
+            { acc | updated = newBall :: acc.updated }
 
         BallHitBottomEdge ->
-            ( targets, newBall :: floored, acc )
+            { acc | floored = newBall :: acc.floored }
 
         BallHitTarget target ->
             let
                 newTargets =
-                    targets
+                    acc.targets
                         |> List.filterMap
                             (\t ->
                                 if t == target then
@@ -742,7 +748,7 @@ updateBall ball ( targets, floored, acc ) =
                                     Just t
                             )
             in
-            ( newTargets, floored, newBall :: acc )
+            { acc | targets = newTargets, updated = newBall :: acc.updated }
 
 
 type BallCollision
