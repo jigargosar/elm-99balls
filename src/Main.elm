@@ -431,10 +431,7 @@ updateOnTick model =
                 (model.frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model
-                    | state =
-                        WaitingForInput
-                }
+                { model | state = WaitingForInput }
 
             else
                 model
