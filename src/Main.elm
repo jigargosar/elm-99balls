@@ -943,7 +943,6 @@ view model =
             ]
             [ group []
                 [ rect gc.ri [ fillP black ]
-                , viewEdges
                 , viewFloorBalls model.floorBalls
                 , case model.state of
                     TargetsEntering start ->
@@ -977,6 +976,7 @@ view model =
                     SimWithoutEmitter { balls } ->
                         viewBalls balls
                 , viewDebugPointer model.pointer |> always viewNone
+                , viewEdges
                 ]
             ]
         ]
