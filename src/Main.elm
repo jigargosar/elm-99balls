@@ -971,7 +971,10 @@ view model =
                                     , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
                                     ]
 
-                    _ ->
+                    TargetsEntering _ ->
+                        viewNone
+
+                    WaitingForInput ->
                         viewNone
                 , viewDebugPointer model.pointer |> always viewNone
                 ]
