@@ -93,7 +93,6 @@ type State
     | DraggingPointer Vec
     | SimWithEmitter { emitter : Emitter, balls : List Ball }
     | SimWithoutEmitter { balls : List Ball }
-    | Sim { maybeEmitter : Maybe Emitter, balls : List Ball }
 
 
 type alias Emitter =
@@ -485,7 +484,12 @@ updateOnTick frame model =
                                                 (List.repeat (List.length model.floorBalls - 1) ball)
                                             )
                         in
-                        { model | state = Sim { maybeEmitter = maybeEmitter, balls = [] }, floorBalls = [] }
+                        case maybeEmitter of
+                            Nothing ->
+                                model
+
+                            Just emitter ->
+                                { model | state = SimWithEmitter { emitter = emitter, balls = [] }, floorBalls = [] }
 
             else
                 model
@@ -521,36 +525,6 @@ updateOnTick frame model =
             else
                 moveBallsAndHandleCollision sim.balls model
                     |> (\( balls, m ) -> { m | state = SimWithoutEmitter { balls = balls } })
-
-        Sim sim ->
-            -- check for turn over
-            if (sim.maybeEmitter == Nothing) && (sim.balls == []) then
-                -- check for game over
-                if canTargetsSafelyMoveDown model.targets then
-                    { model | state = TargetsEntering frame }
-                        |> addNewTargetRow
-
-                else
-                    -- game over : for now re-simulate current turn.
-                    { model | state = TargetsEntering frame }
-
-            else
-                let
-                    maybeBallNewEmitter =
-                        sim.maybeEmitter
-                            |> Maybe.andThen (emitBalls frame)
-                in
-                moveBallsAndHandleCollision sim.balls model
-                    |> Tuple.mapFirst
-                        (\balls ->
-                            case maybeBallNewEmitter of
-                                Nothing ->
-                                    { sim | balls = balls }
-
-                                Just ( ball, maybeEmitter ) ->
-                                    { maybeEmitter = maybeEmitter, balls = ball :: balls }
-                        )
-                    |> (\( s, m ) -> { m | state = Sim s })
 
 
 firstFloorBall : Model -> Maybe Ball
@@ -983,17 +957,6 @@ view model =
 
                     SimWithoutEmitter { balls } ->
                         viewBalls balls
-
-                    Sim { balls, maybeEmitter } ->
-                        group []
-                            [ viewBalls balls
-                            , case maybeEmitter of
-                                Just emitter ->
-                                    viewBalls [ emitter.next ]
-
-                                Nothing ->
-                                    viewNone
-                            ]
 
                     DraggingPointer startPointer ->
                         case validInputAngle model startPointer of
