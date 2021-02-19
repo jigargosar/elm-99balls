@@ -70,8 +70,7 @@ type alias Flags =
 
 
 type alias Model =
-    { maybeEmitter : Maybe Emitter
-    , floorBalls : List Ball
+    { floorBalls : List Ball
     , targets : List Target
     , state : State
     , pointerDown : Bool
@@ -92,7 +91,7 @@ type State
     = TargetsEntering Float
     | WaitingForInput
     | DraggingPointer Vec
-    | Sim { balls : List Ball }
+    | Sim { maybeEmitter : Maybe Emitter, balls : List Ball }
 
 
 type alias Emitter =
@@ -372,8 +371,7 @@ init _ =
         initialBallCount =
             10
     in
-    ( { maybeEmitter = Nothing
-      , floorBalls = List.repeat initialBallCount initBallAtBottomCenter
+    ( { floorBalls = List.repeat initialBallCount initBallAtBottomCenter
       , targets = targets
       , pointerDown = False
       , pointer = vecZero
@@ -468,15 +466,31 @@ updateOnTick frame model =
                         { model | state = WaitingForInput }
 
                     Just angle ->
-                        { model | state = Sim { balls = [] } }
-                            |> startSimAtAngle angle
+                        let
+                            maybeEmitter =
+                                case firstFloorBallPosition model of
+                                    Nothing ->
+                                        Nothing
+
+                                    Just ballPosition ->
+                                        let
+                                            ball =
+                                                initBall ballPosition angle
+                                        in
+                                        Just
+                                            (Emitter model.frame
+                                                ball
+                                                (List.repeat (List.length model.floorBalls - 1) ball)
+                                            )
+                        in
+                        { model | state = Sim { maybeEmitter = maybeEmitter, balls = [] }, floorBalls = [] }
 
             else
                 model
 
         Sim sim ->
             -- check for turn over
-            if (model.maybeEmitter == Nothing) && (sim.balls == []) then
+            if (sim.maybeEmitter == Nothing) && (sim.balls == []) then
                 -- check for game over
                 if canTargetsSafelyMoveDown model.targets then
                     { model | state = TargetsEntering frame }
@@ -489,12 +503,12 @@ updateOnTick frame model =
             else
                 moveBallsAndHandleCollision sim.balls model
                     |> (\( balls, nm ) ->
-                            case model.maybeEmitter |> Maybe.andThen (emitBalls frame) of
+                            case sim.maybeEmitter |> Maybe.andThen (emitBalls frame) of
                                 Nothing ->
-                                    { nm | state = Sim { balls = balls } }
+                                    { nm | state = Sim { balls = balls, maybeEmitter = Nothing } }
 
                                 Just ( ball, maybeEmitter ) ->
-                                    { nm | state = Sim { balls = ball :: balls }, maybeEmitter = maybeEmitter }
+                                    { nm | state = Sim { maybeEmitter = maybeEmitter, balls = ball :: balls } }
                        )
 
 
@@ -684,28 +698,6 @@ addNewTargetRow model =
         | targets = targets ++ List.map moveTargetDown model.targets
         , seed = seed
     }
-
-
-startSimAtAngle : Float -> Model -> Model
-startSimAtAngle angle model =
-    case firstFloorBallPosition model of
-        Nothing ->
-            model
-
-        Just ballPosition ->
-            let
-                ball =
-                    initBall ballPosition angle
-            in
-            { model
-                | floorBalls = []
-                , maybeEmitter =
-                    Just
-                        (Emitter model.frame
-                            ball
-                            (List.repeat (List.length model.floorBalls - 1) ball)
-                        )
-            }
 
 
 areFloorBallsSettled : Model -> Bool
@@ -944,15 +936,17 @@ view model =
                     _ ->
                         viewTargets 1 model.targets
                 , viewEdges
-                , case model.maybeEmitter of
-                    Just emitter ->
-                        viewBalls [ emitter.next ]
-
-                    Nothing ->
-                        viewNone
                 , case model.state of
-                    Sim { balls } ->
-                        viewBalls balls
+                    Sim { balls, maybeEmitter } ->
+                        group []
+                            [ viewBalls balls
+                            , case maybeEmitter of
+                                Just emitter ->
+                                    viewBalls [ emitter.next ]
+
+                                Nothing ->
+                                    viewNone
+                            ]
 
                     DraggingPointer startPointer ->
                         case validInputAngle model startPointer of
