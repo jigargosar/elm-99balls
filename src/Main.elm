@@ -501,15 +501,22 @@ updateOnTick frame model =
                     { model | state = TargetsEntering frame }
 
             else
+                let
+                    maybeBallNewEmitter =
+                        sim.maybeEmitter
+                            |> Maybe.andThen (emitBalls frame)
+                in
                 moveBallsAndHandleCollision sim.balls model
-                    |> (\( balls, nm ) ->
-                            case sim.maybeEmitter |> Maybe.andThen (emitBalls frame) of
+                    |> Tuple.mapFirst
+                        (\balls ->
+                            case maybeBallNewEmitter of
                                 Nothing ->
-                                    { nm | state = Sim { balls = balls, maybeEmitter = Nothing } }
+                                    { sim | balls = balls }
 
                                 Just ( ball, maybeEmitter ) ->
-                                    { nm | state = Sim { maybeEmitter = maybeEmitter, balls = ball :: balls } }
-                       )
+                                    { maybeEmitter = maybeEmitter, balls = ball :: balls }
+                        )
+                    |> (\( s, m ) -> { m | state = Sim s })
 
 
 firstFloorBall : Model -> Maybe Ball
