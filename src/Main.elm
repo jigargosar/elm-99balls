@@ -660,7 +660,10 @@ convergeBallTowards to ball =
     setBallPosition p ball
 
 
-moveBallsAndHandleCollision : List Ball -> Model -> ( List Ball, Model )
+moveBallsAndHandleCollision :
+    List Ball
+    -> Model
+    -> { balls : List Ball, extraBallsCollected : Int, targets : List Target, floorBalls : List Ball }
 moveBallsAndHandleCollision balls model =
     let
         ( { targets, extraBallsCollected }, ballUpdates ) =
@@ -673,12 +676,11 @@ moveBallsAndHandleCollision balls model =
         { floored, updated } =
             splitBallUpdates ballUpdates
     in
-    ( updated
-    , { model
-        | targets = targets
-        , floorBalls = floored ++ model.floorBalls
-      }
-    )
+    { balls = updated
+    , extraBallsCollected = extraBallsCollected
+    , targets = targets
+    , floorBalls = floored ++ model.floorBalls
+    }
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
