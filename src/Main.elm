@@ -1024,12 +1024,8 @@ maxPathLen =
 
 ballTravelPathHelp : BallUpdateAcc -> Ball -> Float -> List Vec -> List Vec
 ballTravelPathHelp acc ball pathLen path =
-    let
-        ( nAcc, bu ) =
-            updateBall ball acc
-    in
-    case bu of
-        BallMoved newBall ->
+    case updateBall ball acc of
+        ( nAcc, BallMoved newBall ) ->
             let
                 newPathLen =
                     vecLenFromTo ball.position newBall.position + pathLen
