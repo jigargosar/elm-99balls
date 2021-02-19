@@ -491,7 +491,20 @@ updateOnTick frame model =
                 model
 
         SimWithEmitter sim ->
-            model
+            moveBallsAndHandleCollision sim.balls model
+                |> Tuple.mapFirst
+                    (\balls ->
+                        case emitBalls frame sim.emitter of
+                            Nothing ->
+                                SimWithEmitter { sim | balls = balls }
+
+                            Just ( ball, Just emitter ) ->
+                                SimWithEmitter { emitter = emitter, balls = ball :: balls }
+
+                            Just ( ball, Nothing ) ->
+                                SimWithoutEmitter { balls = ball :: balls }
+                    )
+                |> (\( s, m ) -> { m | state = s })
 
         SimWithoutEmitter sim ->
             model
