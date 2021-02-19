@@ -91,6 +91,8 @@ type State
     = TargetsEntering Float
     | WaitingForInput
     | DraggingPointer Vec
+    | SimWithEmitter { emitter : Emitter, balls : List Ball }
+    | SimWithoutEmitter { balls : List Ball }
     | Sim { maybeEmitter : Maybe Emitter, balls : List Ball }
 
 
@@ -487,6 +489,12 @@ updateOnTick frame model =
 
             else
                 model
+
+        SimWithEmitter sim ->
+            model
+
+        SimWithoutEmitter sim ->
+            model
 
         Sim sim ->
             -- check for turn over
