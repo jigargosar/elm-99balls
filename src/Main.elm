@@ -400,7 +400,7 @@ update message model =
             ( { model | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
 
         OnTick _ ->
-            ( updateOnTick model
+            ( updateOnTick model.frame model
                 |> convergeFloorBalls
                 |> incFrame
                 |> cachePointer
@@ -441,12 +441,12 @@ cachePointer model =
     { model | prevPointer = model.pointer }
 
 
-updateOnTick : Model -> Model
-updateOnTick model =
+updateOnTick : Float -> Model -> Model
+updateOnTick frame model =
     case model.state of
         TargetsEntering start ->
             if
-                (model.frame - start > animDur)
+                (frame - start > animDur)
                     && areFloorBallsSettled model
             then
                 { model | state = WaitingForInput }
@@ -479,17 +479,17 @@ updateOnTick model =
             if (model.maybeEmitter == Nothing) && (sim.balls == []) then
                 -- check for game over
                 if canTargetsSafelyMoveDown model.targets then
-                    { model | state = TargetsEntering model.frame }
+                    { model | state = TargetsEntering frame }
                         |> addNewTargetRow
 
                 else
                     -- game over : for now re-simulate current turn.
-                    { model | state = TargetsEntering model.frame }
+                    { model | state = TargetsEntering frame }
 
             else
                 moveBallsAndHandleCollision sim.balls model
                     |> (\( balls, nm ) ->
-                            case model.maybeEmitter |> Maybe.andThen (emitBalls nm) of
+                            case model.maybeEmitter |> Maybe.andThen (emitBalls frame) of
                                 Nothing ->
                                     { nm | state = Sim { balls = balls } }
 
@@ -572,9 +572,9 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
-emitBalls : Model -> Emitter -> Maybe ( Ball, Maybe Emitter )
-emitBalls model emitter =
-    if model.frame - emitter.start > 10 then
+emitBalls : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
+emitBalls frame emitter =
+    if frame - emitter.start > 10 then
         Just
             ( emitter.next
             , case emitter.rest of
@@ -582,7 +582,7 @@ emitBalls model emitter =
                     Nothing
 
                 n :: r ->
-                    Just (Emitter model.frame n r)
+                    Just (Emitter frame n r)
             )
 
     else
