@@ -92,7 +92,7 @@ type State
     | WaitingForInput
     | DraggingPointer Vec
     | SimWithEmitter { emitter : Emitter, balls : List Ball, extraBallsCollected : Int }
-    | SimWithoutEmitter { balls : List Ball }
+    | SimWithoutEmitter { balls : List Ball, extraBallsCollected : Int }
 
 
 type alias Emitter =
@@ -516,7 +516,10 @@ updateOnTick frame model =
                             SimWithEmitter { sim | emitter = emitter, balls = ball :: balls }
 
                         Just ( ball, Nothing ) ->
-                            SimWithoutEmitter { balls = ball :: balls }
+                            SimWithoutEmitter
+                                { balls = ball :: balls
+                                , extraBallsCollected = extraBallsCollected + sim.extraBallsCollected
+                                }
             in
             { model | state = state, targets = targets, floorBalls = floorBalls }
 
@@ -538,7 +541,11 @@ updateOnTick frame model =
                         moveBallsAndHandleCollision sim.balls model
                 in
                 { model
-                    | state = SimWithoutEmitter { balls = balls }
+                    | state =
+                        SimWithoutEmitter
+                            { balls = balls
+                            , extraBallsCollected = extraBallsCollected + sim.extraBallsCollected
+                            }
                     , targets = targets
                     , floorBalls = floorBalls
                 }
