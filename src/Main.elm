@@ -813,8 +813,7 @@ detectBallCollision targets velocity ball =
                             |> Maybe.map (pairTo (BallTargetCollision target))
                     )
     in
-    c1
-        ++ c2
+    (c1 ++ c2)
         |> minimumBy (fst >> .t)
 
 
