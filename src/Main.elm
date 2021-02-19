@@ -507,7 +507,20 @@ updateOnTick frame model =
                 |> (\( s, m ) -> { m | state = s })
 
         SimWithoutEmitter sim ->
-            model
+            -- check for turn over
+            if sim.balls == [] then
+                -- check for game over
+                if canTargetsSafelyMoveDown model.targets then
+                    { model | state = TargetsEntering frame }
+                        |> addNewTargetRow
+
+                else
+                    -- game over : for now re-simulate current turn.
+                    { model | state = TargetsEntering frame }
+
+            else
+                moveBallsAndHandleCollision sim.balls model
+                    |> (\( balls, m ) -> { m | state = SimWithoutEmitter { balls = balls } })
 
         Sim sim ->
             -- check for turn over
