@@ -978,6 +978,12 @@ view model =
                         viewTargets 1 model.targets
                 , viewEdges
                 , case model.state of
+                    SimWithEmitter { emitter, balls } ->
+                        viewBalls (emitter.next :: balls)
+
+                    SimWithoutEmitter { balls } ->
+                        viewBalls balls
+
                     Sim { balls, maybeEmitter } ->
                         group []
                             [ viewBalls balls
