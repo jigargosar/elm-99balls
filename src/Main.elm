@@ -628,22 +628,43 @@ convergeBallTowards to ball =
 moveBallsAndHandleCollision : Model -> Model
 moveBallsAndHandleCollision model =
     let
-        { targets, floored, updated, extraBallsCollected } =
+        ( { targets, extraBallsCollected }, ballUpdates ) =
             model.balls
-                |> List.foldl
-                    (\ball acc ->
+                |> List.mapAccuml
+                    (\acc ball ->
                         updateBall ball acc
-                            |> fst
                     )
                     { targets = model.targets
-                    , floored = model.floorBalls
-                    , updated = []
                     , extraBallsCollected = 0
                     }
+
+        floored =
+            List.filterMap
+                (\bu ->
+                    case bu of
+                        BallFloored b ->
+                            Just b
+
+                        _ ->
+                            Nothing
+                )
+                ballUpdates
+
+        updated =
+            List.filterMap
+                (\bu ->
+                    case bu of
+                        BallMoved b ->
+                            Just b
+
+                        _ ->
+                            Nothing
+                )
+                ballUpdates
     in
     { model
         | targets = targets
-        , floorBalls = floored
+        , floorBalls = floored ++ model.floorBalls
         , balls = updated
     }
 
@@ -701,8 +722,6 @@ areBallsCloseEnough a b =
 
 type alias BallUpdateAcc =
     { targets : List Target
-    , floored : List Ball
-    , updated : List Ball
     , extraBallsCollected : Int
     }
 
@@ -721,7 +740,7 @@ updateBall ball acc =
     in
     case detectBallCollision acc.targets velocity ball of
         Nothing ->
-            ( { acc | updated = setBallVelocityAndUpdatePosition velocity ball :: acc.updated }
+            ( acc
             , BallMoved (setBallVelocityAndUpdatePosition velocity ball)
             )
 
@@ -733,12 +752,12 @@ updateBall ball acc =
             case ballCollision of
                 BallEdgeCollision e ->
                     if isBottomEdge e then
-                        ( { acc | floored = newBall :: acc.floored }
+                        ( acc
                         , BallFloored newBall
                         )
 
                     else
-                        ( { acc | updated = newBall :: acc.updated }
+                        ( acc
                         , BallMoved newBall
                         )
 
@@ -748,7 +767,6 @@ updateBall ball acc =
                             if hp <= 1 then
                                 ( { acc
                                     | targets = reject (eq target) acc.targets
-                                    , updated = newBall :: acc.updated
                                   }
                                 , BallMoved newBall
                                 )
@@ -756,7 +774,6 @@ updateBall ball acc =
                             else
                                 ( { acc
                                     | targets = List.setIf (eq target) { target | kind = SolidTarget (hp - 1) } acc.targets
-                                    , updated = newBall :: acc.updated
                                   }
                                 , BallMoved newBall
                                 )
@@ -764,7 +781,6 @@ updateBall ball acc =
                         ExtraBallTarget ->
                             ( { acc
                                 | targets = reject (eq target) acc.targets
-                                , updated = newBall :: acc.updated
                                 , extraBallsCollected = acc.extraBallsCollected + 1
                               }
                             , BallMoved newBall
@@ -773,7 +789,6 @@ updateBall ball acc =
                         StarTarget ->
                             ( { acc
                                 | targets = reject (eq target) acc.targets
-                                , updated = newBall :: acc.updated
                               }
                             , BallMoved newBall
                             )
@@ -996,8 +1011,6 @@ ballTravelPathAtAngle angle model =
             in
             ballTravelPathHelp
                 { targets = model.targets
-                , floored = []
-                , updated = []
                 , extraBallsCollected = 0
                 }
                 ball
@@ -1012,11 +1025,11 @@ maxPathLen =
 ballTravelPathHelp : BallUpdateAcc -> Ball -> Float -> List Vec -> List Vec
 ballTravelPathHelp acc ball pathLen path =
     let
-        ( nAcc, _ ) =
+        ( nAcc, bu ) =
             updateBall ball acc
     in
-    case nAcc.updated of
-        newBall :: _ ->
+    case bu of
+        BallMoved newBall ->
             let
                 newPathLen =
                     vecLenFromTo ball.position newBall.position + pathLen
@@ -1025,7 +1038,7 @@ ballTravelPathHelp acc ball pathLen path =
                 path
 
             else
-                ballTravelPathHelp { nAcc | updated = [] } newBall newPathLen (newBall.position :: path)
+                ballTravelPathHelp nAcc newBall newPathLen (newBall.position :: path)
 
         _ ->
             path
