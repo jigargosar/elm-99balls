@@ -943,6 +943,7 @@ view model =
             ]
             [ group []
                 [ rect gc.ri [ fillP black ]
+                , viewEdges
                 , viewFloorBalls model.floorBalls
                 , case model.state of
                     TargetsEntering start ->
@@ -950,7 +951,6 @@ view model =
 
                     _ ->
                         viewTargets 1 model.targets
-                , viewEdges
                 , case model.state of
                     TargetsEntering _ ->
                         viewNone
