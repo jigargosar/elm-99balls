@@ -630,7 +630,10 @@ moveBallsAndHandleCollision model =
     let
         { targets, floored, updated, extraBallsCollected } =
             model.balls
-                |> List.foldl updateBall
+                |> List.foldl
+                    (\ball acc ->
+                        updateBall ball acc
+                    )
                     { targets = model.targets
                     , floored = model.floorBalls
                     , updated = []
@@ -701,6 +704,11 @@ type alias BallUpdateAcc =
     , updated : List Ball
     , extraBallsCollected : Int
     }
+
+
+type BallUpdate
+    = BallFloored Ball
+    | BallMoved Ball
 
 
 updateBall : Ball -> BallUpdateAcc -> BallUpdateAcc
