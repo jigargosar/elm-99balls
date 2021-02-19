@@ -952,11 +952,11 @@ view model =
                         viewTargets 1 model.targets
                 , viewEdges
                 , case model.state of
-                    SimWithEmitter { emitter, balls } ->
-                        viewBalls (emitter.next :: balls)
+                    TargetsEntering _ ->
+                        viewNone
 
-                    SimWithoutEmitter { balls } ->
-                        viewBalls balls
+                    WaitingForInput ->
+                        viewNone
 
                     DraggingPointer startPointer ->
                         case validInputAngle model startPointer of
@@ -971,11 +971,11 @@ view model =
                                     , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
                                     ]
 
-                    TargetsEntering _ ->
-                        viewNone
+                    SimWithEmitter { emitter, balls } ->
+                        viewBalls (emitter.next :: balls)
 
-                    WaitingForInput ->
-                        viewNone
+                    SimWithoutEmitter { balls } ->
+                        viewBalls balls
                 , viewDebugPointer model.pointer |> always viewNone
                 ]
             ]
