@@ -633,6 +633,7 @@ moveBallsAndHandleCollision model =
                 |> List.foldl
                     (\ball acc ->
                         updateBall ball acc
+                            |> fst
                     )
                     { targets = model.targets
                     , floored = model.floorBalls
@@ -711,7 +712,7 @@ type BallUpdate
     | BallMoved Ball
 
 
-updateBall : Ball -> BallUpdateAcc -> BallUpdateAcc
+updateBall : Ball -> BallUpdateAcc -> ( BallUpdateAcc, BallUpdate )
 updateBall ball acc =
     let
         velocity =
@@ -720,7 +721,9 @@ updateBall ball acc =
     in
     case detectBallCollision acc.targets velocity ball of
         Nothing ->
-            { acc | updated = setBallVelocityAndUpdatePosition velocity ball :: acc.updated }
+            ( { acc | updated = setBallVelocityAndUpdatePosition velocity ball :: acc.updated }
+            , BallMoved (setBallVelocityAndUpdatePosition velocity ball)
+            )
 
         Just ( collision, ballCollision ) ->
             let
@@ -730,38 +733,50 @@ updateBall ball acc =
             case ballCollision of
                 BallEdgeCollision e ->
                     if isBottomEdge e then
-                        { acc | floored = newBall :: acc.floored }
+                        ( { acc | floored = newBall :: acc.floored }
+                        , BallFloored newBall
+                        )
 
                     else
-                        { acc | updated = newBall :: acc.updated }
+                        ( { acc | updated = newBall :: acc.updated }
+                        , BallMoved newBall
+                        )
 
                 BallTargetCollision target ->
                     case target.kind of
                         SolidTarget hp ->
                             if hp <= 1 then
-                                { acc
+                                ( { acc
                                     | targets = reject (eq target) acc.targets
                                     , updated = newBall :: acc.updated
-                                }
+                                  }
+                                , BallMoved newBall
+                                )
 
                             else
-                                { acc
+                                ( { acc
                                     | targets = List.setIf (eq target) { target | kind = SolidTarget (hp - 1) } acc.targets
                                     , updated = newBall :: acc.updated
-                                }
+                                  }
+                                , BallMoved newBall
+                                )
 
                         ExtraBallTarget ->
-                            { acc
+                            ( { acc
                                 | targets = reject (eq target) acc.targets
                                 , updated = newBall :: acc.updated
                                 , extraBallsCollected = acc.extraBallsCollected + 1
-                            }
+                              }
+                            , BallMoved newBall
+                            )
 
                         StarTarget ->
-                            { acc
+                            ( { acc
                                 | targets = reject (eq target) acc.targets
                                 , updated = newBall :: acc.updated
-                            }
+                              }
+                            , BallMoved newBall
+                            )
 
 
 resolveBallCollision collision ballCollision velocity ball =
@@ -997,7 +1012,7 @@ maxPathLen =
 ballTravelPathHelp : BallUpdateAcc -> Ball -> Float -> List Vec -> List Vec
 ballTravelPathHelp acc ball pathLen path =
     let
-        nAcc =
+        ( nAcc, _ ) =
             updateBall ball acc
     in
     case nAcc.updated of
