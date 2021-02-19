@@ -716,34 +716,8 @@ updateBall ball acc =
 
         Just ( collision, ballCollision ) ->
             let
-                isSolidCollision =
-                    case ballCollision of
-                        BallEdgeCollision _ ->
-                            True
-
-                        BallTargetCollision target ->
-                            case target.kind of
-                                SolidTarget _ ->
-                                    True
-
-                                ExtraBallTarget ->
-                                    False
-
-                                StarTarget ->
-                                    False
-
-                newPosition =
-                    vecAdd ball.position (velocity |> vecScale collision.t)
-
-                newVelocity =
-                    if isSolidCollision then
-                        fullyElasticCollisionResponseVelocity collision velocity
-
-                    else
-                        velocity
-
                 newBall =
-                    setBallPositionAndVelocity newPosition newVelocity ball
+                    resolveBallCollision collision ballCollision velocity ball
             in
             case ballCollision of
                 BallEdgeCollision e ->
@@ -782,8 +756,35 @@ updateBall ball acc =
                             }
 
 
-fullyElasticCollisionResponseVelocity collision velocity =
-    vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
+resolveBallCollision collision ballCollision velocity ball =
+    let
+        isSolidCollision =
+            case ballCollision of
+                BallEdgeCollision _ ->
+                    True
+
+                BallTargetCollision target ->
+                    case target.kind of
+                        SolidTarget _ ->
+                            True
+
+                        ExtraBallTarget ->
+                            False
+
+                        StarTarget ->
+                            False
+
+        newPosition =
+            vecAdd ball.position (velocity |> vecScale collision.t)
+
+        newVelocity =
+            if isSolidCollision then
+                fullyElasticCollisionResponseVelocity collision velocity
+
+            else
+                velocity
+    in
+    setBallPositionAndVelocity newPosition newVelocity ball
 
 
 type BallCollision

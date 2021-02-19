@@ -522,6 +522,10 @@ intersectRaySphere ( p, d ) ( sc, sr ) =
                 |> Just
 
 
+fullyElasticCollisionResponseVelocity collision velocity =
+    vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
+
+
 type alias CollisionResponse =
     { position : Vec, velocity : Vec }
 
