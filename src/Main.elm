@@ -716,7 +716,7 @@ updateBall ball acc =
 
         Just ( collision, ballCollision ) ->
             let
-                isCollisionWithSolidObject =
+                isSolidCollision =
                     case ballCollision of
                         BallEdgeCollision _ ->
                             True
@@ -736,9 +736,8 @@ updateBall ball acc =
                     vecAdd ball.position (velocity |> vecScale collision.t)
 
                 newVelocity =
-                    if isCollisionWithSolidObject then
-                        -- compute fully elastic response velocity
-                        vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
+                    if isSolidCollision then
+                        fullyElasticCollisionResponseVelocity collision velocity
 
                     else
                         velocity
@@ -781,6 +780,10 @@ updateBall ball acc =
                                 | targets = reject (eq target) acc.targets
                                 , updated = newBall :: acc.updated
                             }
+
+
+fullyElasticCollisionResponseVelocity collision velocity =
+    vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
 
 
 type BallCollision
