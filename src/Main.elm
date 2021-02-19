@@ -91,7 +91,7 @@ type State
     = TargetsEntering Float
     | WaitingForInput
     | DraggingPointer Vec
-    | SimWithEmitter { emitter : Emitter, balls : List Ball, extraBalls : Int }
+    | SimWithEmitter { emitter : Emitter, balls : List Ball, extraBallsCollected : Int }
     | SimWithoutEmitter { balls : List Ball }
 
 
@@ -494,7 +494,7 @@ updateOnTick frame model =
                                         SimWithEmitter
                                             { emitter = emitter
                                             , balls = []
-                                            , extraBalls = 0
+                                            , extraBallsCollected = 0
                                             }
                                     , floorBalls = []
                                 }
@@ -503,20 +503,22 @@ updateOnTick frame model =
                 model
 
         SimWithEmitter sim ->
-            moveBallsAndHandleCollision sim.balls model
-                |> Tuple.mapFirst
-                    (\balls ->
-                        case emitBalls frame sim.emitter of
-                            Nothing ->
-                                SimWithEmitter { sim | balls = balls }
+            let
+                { balls, targets, extraBallsCollected, floorBalls } =
+                    moveBallsAndHandleCollision sim.balls model
 
-                            Just ( ball, Just emitter ) ->
-                                SimWithEmitter { sim | emitter = emitter, balls = ball :: balls }
+                state =
+                    case emitBalls frame sim.emitter of
+                        Nothing ->
+                            SimWithEmitter { sim | balls = balls }
 
-                            Just ( ball, Nothing ) ->
-                                SimWithoutEmitter { balls = ball :: balls }
-                    )
-                |> (\( s, m ) -> { m | state = s })
+                        Just ( ball, Just emitter ) ->
+                            SimWithEmitter { sim | emitter = emitter, balls = ball :: balls }
+
+                        Just ( ball, Nothing ) ->
+                            SimWithoutEmitter { balls = ball :: balls }
+            in
+            { model | state = state, targets = targets, floorBalls = floorBalls }
 
         SimWithoutEmitter sim ->
             -- check for turn over
@@ -531,8 +533,15 @@ updateOnTick frame model =
                     { model | state = TargetsEntering frame }
 
             else
-                moveBallsAndHandleCollision sim.balls model
-                    |> (\( balls, m ) -> { m | state = SimWithoutEmitter { balls = balls } })
+                let
+                    { balls, targets, extraBallsCollected, floorBalls } =
+                        moveBallsAndHandleCollision sim.balls model
+                in
+                { model
+                    | state = SimWithoutEmitter { balls = balls }
+                    , targets = targets
+                    , floorBalls = floorBalls
+                }
 
 
 firstFloorBall : Model -> Maybe Ball
