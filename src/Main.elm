@@ -91,7 +91,7 @@ type State
     = TargetsEntering Float
     | WaitingForInput
     | DraggingPointer Vec
-    | SimWithEmitter { emitter : Emitter, balls : List Ball }
+    | SimWithEmitter { emitter : Emitter, balls : List Ball, extraBalls : Int }
     | SimWithoutEmitter { balls : List Ball }
 
 
@@ -489,7 +489,15 @@ updateOnTick frame model =
                                 model
 
                             Just emitter ->
-                                { model | state = SimWithEmitter { emitter = emitter, balls = [] }, floorBalls = [] }
+                                { model
+                                    | state =
+                                        SimWithEmitter
+                                            { emitter = emitter
+                                            , balls = []
+                                            , extraBalls = 0
+                                            }
+                                    , floorBalls = []
+                                }
 
             else
                 model
@@ -503,7 +511,7 @@ updateOnTick frame model =
                                 SimWithEmitter { sim | balls = balls }
 
                             Just ( ball, Just emitter ) ->
-                                SimWithEmitter { emitter = emitter, balls = ball :: balls }
+                                SimWithEmitter { sim | emitter = emitter, balls = ball :: balls }
 
                             Just ( ball, Nothing ) ->
                                 SimWithoutEmitter { balls = ball :: balls }
