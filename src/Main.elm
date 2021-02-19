@@ -630,14 +630,24 @@ moveBallsAndHandleCollision model =
     let
         ( { targets, extraBallsCollected }, ballUpdates ) =
             model.balls
-                |> List.mapAccuml
-                    (\acc ball ->
-                        updateBall ball acc
-                    )
+                |> List.mapAccuml updateBall
                     { targets = model.targets
                     , extraBallsCollected = 0
                     }
 
+        { floored, updated } =
+            splitBallUpdates ballUpdates
+    in
+    { model
+        | targets = targets
+        , floorBalls = floored ++ model.floorBalls
+        , balls = updated
+    }
+
+
+splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
+splitBallUpdates ballUpdates =
+    let
         floored =
             List.filterMap
                 (\bu ->
@@ -662,11 +672,7 @@ moveBallsAndHandleCollision model =
                 )
                 ballUpdates
     in
-    { model
-        | targets = targets
-        , floorBalls = floored ++ model.floorBalls
-        , balls = updated
-    }
+    { floored = floored, updated = updated }
 
 
 addNewTargetRow : Model -> Model
@@ -731,8 +737,8 @@ type BallUpdate
     | BallMoved Ball
 
 
-updateBall : Ball -> BallUpdateAcc -> ( BallUpdateAcc, BallUpdate )
-updateBall ball acc =
+updateBall : BallUpdateAcc -> Ball -> ( BallUpdateAcc, BallUpdate )
+updateBall acc ball =
     let
         velocity =
             ballVelocity ball
@@ -1024,7 +1030,7 @@ maxPathLen =
 
 ballTravelPathHelp : BallUpdateAcc -> Ball -> Float -> List Vec -> List Vec
 ballTravelPathHelp acc ball pathLen path =
-    case updateBall ball acc of
+    case updateBall acc ball of
         ( nAcc, BallMoved newBall ) ->
             let
                 newPathLen =
