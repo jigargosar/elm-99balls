@@ -71,7 +71,6 @@ type alias Flags =
 
 type alias Model =
     { maybeEmitter : Maybe Emitter
-    , balls : List Ball
     , floorBalls : List Ball
     , targets : List Target
     , state : State
@@ -93,7 +92,7 @@ type State
     = TargetsEntering Float
     | WaitingForInput
     | DraggingPointer Vec
-    | Sim
+    | Sim { balls : List Ball }
 
 
 type alias Emitter =
@@ -374,7 +373,6 @@ init _ =
             10
     in
     ( { maybeEmitter = Nothing
-      , balls = []
       , floorBalls = List.repeat initialBallCount initBallAtBottomCenter
       , targets = targets
       , pointerDown = False
@@ -470,15 +468,15 @@ updateOnTick model =
                         { model | state = WaitingForInput }
 
                     Just angle ->
-                        { model | state = Sim }
+                        { model | state = Sim { balls = [] } }
                             |> startSimAtAngle angle
 
             else
                 model
 
-        Sim ->
+        Sim sim ->
             -- check for turn over
-            if (model.maybeEmitter == Nothing) && (model.balls == []) then
+            if (model.maybeEmitter == Nothing) && (sim.balls == []) then
                 -- check for game over
                 if canTargetsSafelyMoveDown model.targets then
                     { model | state = TargetsEntering model.frame }
@@ -489,9 +487,15 @@ updateOnTick model =
                     { model | state = TargetsEntering model.frame }
 
             else
-                model
-                    |> moveBallsAndHandleCollision
-                    |> emitBalls
+                moveBallsAndHandleCollision sim.balls model
+                    |> (\( balls, nm ) ->
+                            case model.maybeEmitter |> Maybe.andThen (emitBalls nm) of
+                                Nothing ->
+                                    { nm | state = Sim { balls = balls } }
+
+                                Just ( ball, maybeEmitter ) ->
+                                    { nm | state = Sim { balls = ball :: balls }, maybeEmitter = maybeEmitter }
+                       )
 
 
 firstFloorBall : Model -> Maybe Ball
@@ -568,27 +572,21 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
-emitBalls : Model -> Model
-emitBalls model =
-    case model.maybeEmitter of
-        Nothing ->
-            model
+emitBalls : Model -> Emitter -> Maybe ( Ball, Maybe Emitter )
+emitBalls model emitter =
+    if model.frame - emitter.start > 10 then
+        Just
+            ( emitter.next
+            , case emitter.rest of
+                [] ->
+                    Nothing
 
-        Just emitter ->
-            if model.frame - emitter.start > 10 then
-                { model
-                    | balls = emitter.next :: model.balls
-                    , maybeEmitter =
-                        case emitter.rest of
-                            [] ->
-                                Nothing
+                n :: r ->
+                    Just (Emitter model.frame n r)
+            )
 
-                            n :: r ->
-                                Just (Emitter model.frame n r)
-                }
-
-            else
-                model
+    else
+        Nothing
 
 
 mapFloorBalls : (Ball -> List Ball -> ( Ball, List Ball )) -> Model -> Maybe Model
@@ -625,11 +623,11 @@ convergeBallTowards to ball =
     setBallPosition p ball
 
 
-moveBallsAndHandleCollision : Model -> Model
-moveBallsAndHandleCollision model =
+moveBallsAndHandleCollision : List Ball -> Model -> ( List Ball, Model )
+moveBallsAndHandleCollision balls model =
     let
         ( { targets, extraBallsCollected }, ballUpdates ) =
-            model.balls
+            balls
                 |> List.mapAccuml updateBall
                     { targets = model.targets
                     , extraBallsCollected = 0
@@ -638,11 +636,12 @@ moveBallsAndHandleCollision model =
         { floored, updated } =
             splitBallUpdates ballUpdates
     in
-    { model
+    ( updated
+    , { model
         | targets = targets
         , floorBalls = floored ++ model.floorBalls
-        , balls = updated
-    }
+      }
+    )
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
@@ -944,7 +943,6 @@ view model =
 
                     _ ->
                         viewTargets 1 model.targets
-                , viewBalls model.balls
                 , viewEdges
                 , case model.maybeEmitter of
                     Just emitter ->
@@ -953,6 +951,9 @@ view model =
                     Nothing ->
                         viewNone
                 , case model.state of
+                    Sim { balls } ->
+                        viewBalls balls
+
                     DraggingPointer startPointer ->
                         case validInputAngle model startPointer of
                             Nothing ->
