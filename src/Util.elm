@@ -673,6 +673,14 @@ atLeast =
     Basics.Extra.atLeast
 
 
+applyN n fn x =
+    if n <= 0 then
+        x
+
+    else
+        applyN (n - 1) fn (fn x)
+
+
 
 -- List
 

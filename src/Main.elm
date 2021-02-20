@@ -383,13 +383,8 @@ initGame model =
         , state = TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
         , seed = seed
     }
-        |> addNewTargetRow
-        |> addNewTargetRow
-        |> addNewTargetRow
-        |> addNewTargetRow
-        |> addNewTargetRow
-        |> addNewTargetRow
-        |> addNewTargetRow
+        --|> applyN 7 addNewTargetRow
+        |> identity
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
