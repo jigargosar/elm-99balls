@@ -364,7 +364,7 @@ initGame model =
             rndStep ( randomTargets, model.seed )
 
         initialBallCount =
-            10
+            1
     in
     { model
         | ballCount = initialBallCount
