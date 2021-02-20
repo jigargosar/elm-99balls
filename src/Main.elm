@@ -519,12 +519,12 @@ updateOnTick frame model =
             if sim.me == Nothing && sim.bs == [] then
                 -- check for game over
                 if canTargetsSafelyMoveDown model.targets then
-                    { model | state = TargetsEntering frame }
+                    { model | state = TargetsEntering frame, ballCount = model.ballCount + sim.ebc }
                         |> addNewTargetRow
 
                 else
                     -- game over : for now re-simulate current turn.
-                    { model | state = TargetsEntering frame }
+                    { model | state = TargetsEntering frame, ballCount = model.ballCount + sim.ebc }
 
             else
                 let
