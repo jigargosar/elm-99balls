@@ -153,6 +153,11 @@ vecMapY fn =
     vecMapBoth identity fn
 
 
+vecMapX : (Float -> Float) -> Vec -> Vec
+vecMapX fn =
+    vecMapBoth fn identity
+
+
 vecApply : (Float -> Float -> a) -> Vec -> a
 vecApply fn { x, y } =
     fn x y
@@ -652,6 +657,14 @@ propEmpty fn =
 
 propEq fn v x =
     fn x == v
+
+
+atMost =
+    Basics.Extra.atMost
+
+
+atLeast =
+    Basics.Extra.atLeast
 
 
 
