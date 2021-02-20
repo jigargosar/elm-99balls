@@ -958,7 +958,6 @@ view model =
                         in
                         group [] [ viewBalls balls, viewFloorBalls sim.fbs ]
                 , viewDebugPointer model.pointer |> always viewNone
-                , viewEdges
                 ]
             ]
         ]
@@ -1091,17 +1090,6 @@ viewSolidTarget position hp =
             --, T.fontWeight FontWeightBold
             ]
         ]
-
-
-viewEdges : Svg Msg
-viewEdges =
-    let
-        viewEdge : Seg -> Svg Msg
-        viewEdge edge =
-            polySeg edge
-                [ strokeP red, Px.strokeWidth 1 ]
-    in
-    group [] (List.map viewEdge edges)
 
 
 viewBalls : List Ball -> Svg Msg
