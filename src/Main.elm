@@ -137,7 +137,7 @@ randomTarget gp =
     Random.frequency
         ( 25, Random.constant Nothing )
         [ ( 70, randomSolidTarget gp |> Random.map Just )
-        , ( 5, Random.constant (Just (Target (toWorld gp) ExtraBallTarget)) )
+        , ( 5, Random.constant (Just (Target (gpToWorld gp) ExtraBallTarget)) )
         ]
 
 
@@ -148,7 +148,7 @@ randomSolidTarget gp =
 
 initSolidTarget : ( Int, Int ) -> Int -> Target
 initSolidTarget gp hp =
-    Target (toWorld gp) (SolidTarget hp)
+    Target (gpToWorld gp) (SolidTarget hp)
 
 
 maxHP =
@@ -165,7 +165,7 @@ canTargetsSafelyMoveDown targets =
     let
         maxGY =
             maximumBy (.position >> .y) targets
-                |> Maybe.map (.position >> fromWorld >> snd)
+                |> Maybe.map (.position >> gpFromWorld >> snd)
                 |> Maybe.withDefault -1
     in
     maxGY < (gc.h - 2)
@@ -229,8 +229,8 @@ gc =
     }
 
 
-toWorld : ( Int, Int ) -> Vec
-toWorld ( x, y ) =
+gpToWorld : ( Int, Int ) -> Vec
+gpToWorld ( x, y ) =
     let
         { cri, dy, dx } =
             gc
@@ -238,8 +238,8 @@ toWorld ( x, y ) =
     vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
 
 
-fromWorld : Vec -> ( Int, Int )
-fromWorld { x, y } =
+gpFromWorld : Vec -> ( Int, Int )
+gpFromWorld { x, y } =
     let
         { cri, dy, dx } =
             gc
