@@ -87,9 +87,19 @@ type alias Model =
     }
 
 
-animDur : Float
-animDur =
+transitionDuration : Float
+transitionDuration =
     60 / 4
+
+
+transitionProgress : Float -> Float -> Float
+transitionProgress start now =
+    (now - start) / transitionDuration |> clamp 0 1
+
+
+transitionDone : Float -> Float -> Bool
+transitionDone start now =
+    transitionProgress start now >= 1
 
 
 type State
@@ -449,7 +459,7 @@ updateOnTick : Float -> Model -> Model
 updateOnTick frame model =
     case model.state of
         TargetsEntering { start, ballPosition } ->
-            if frame - start > animDur then
+            if transitionDone start frame then
                 { model | state = WaitingForInput { ballPosition = ballPosition } }
 
             else
@@ -906,25 +916,26 @@ view model =
             , style "touch-action" "none"
             , style "user-select" "none"
             ]
-            [ group []
-                [ rect gc.ri [ fillP black ]
-                , words (String.fromInt model.ballCount)
+            [ rect gc.ri [ fillP black ]
+            , group
+                [ case model.state of
+                    Lost _ ->
+                        fade 0.1
+
+                    _ ->
+                        fade 1
+                ]
+                [ words (String.fromInt model.ballCount)
                     [ fillH 0.15
                     , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
                     ]
-                , let
-                    progress =
-                        targetAnimProgress model.frame model.state
-                  in
-                  group
-                    [ case model.state of
-                        Lost _ ->
-                            S.opacity "0.5"
-
-                        _ ->
-                            S.opacity "1"
-                    ]
-                    [ viewAnimTargets progress model.targets
+                , group
+                    []
+                    [ let
+                        progress =
+                            targetTransitionProgress model.state model.frame
+                      in
+                      viewAnimTargets progress model.targets
                     ]
                 , case model.state of
                     TargetsEntering { ballPosition } ->
@@ -968,8 +979,21 @@ view model =
                         group [] [ viewBalls balls, viewFloorBalls sim.fbs ]
                 , viewDebugPointer model.pointer |> always viewNone
                 ]
+            , viewLostState model.state
             ]
         ]
+
+
+viewLostState state =
+    case state of
+        Lost _ ->
+            words "Game Over. Tap to Continue"
+                [ fillH 0.15
+                , transform [ scale 3 ]
+                ]
+
+        _ ->
+            viewNone
 
 
 viewFloorBalls floorBalls =
@@ -1039,14 +1063,14 @@ ballTravelPathHelp acc ball pathLen path =
             path
 
 
-targetAnimProgress : Float -> State -> Float
-targetAnimProgress now state =
+targetTransitionProgress : State -> Float -> Float
+targetTransitionProgress state now =
     case state of
         TargetsEntering { start } ->
-            (now - start) / animDur |> clamp 0 1
+            transitionProgress start now
 
         Lost start ->
-            (now - start) / animDur |> clamp 0 1
+            transitionProgress start now
 
         _ ->
             1
@@ -1201,3 +1225,7 @@ group =
 
 viewNone =
     Svg.text ""
+
+
+fade o =
+    T.opacity (Opacity o)
