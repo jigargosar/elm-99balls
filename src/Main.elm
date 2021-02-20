@@ -516,7 +516,33 @@ updateOnTick frame model =
                     { model | state = TargetsEntering frame }
 
             else
-                model
+                let
+                    _ =
+                        sim.me
+                            |> Maybe.andThen (emitBalls frame)
+
+                    { balls, targets, extraBallsCollected, floorBalls } =
+                        moveBallsAndHandleCollision sim.bs model
+
+                    ( newBs, newMe ) =
+                        case
+                            sim.me
+                                |> Maybe.andThen (emitBalls frame)
+                        of
+                            Nothing ->
+                                ( balls, sim.me )
+
+                            Just ( eb, me_ ) ->
+                                ( eb :: balls, me_ )
+
+                    newEbc =
+                        extraBallsCollected + sim.ebc
+                in
+                { model
+                    | state = Sim { bs = newBs, me = newMe, ebc = newEbc }
+                    , targets = targets
+                    , floorBalls = floorBalls
+                }
 
         SimWithEmitter sim ->
             let
