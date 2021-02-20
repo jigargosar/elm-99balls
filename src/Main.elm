@@ -97,6 +97,7 @@ type State
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
     | Sim SimR
+    | Lost
 
 
 type alias SimR =
@@ -337,29 +338,43 @@ init _ =
     let
         initialSeed =
             seedFrom 4
-
-        ( targets, seed ) =
-            rndStep ( randomTargets, initialSeed )
-
-        initialBallCount =
-            10
     in
-    ( { ballCount = initialBallCount
-      , targets = targets
+    ( { ballCount = 0
+      , targets = []
+      , state = Lost
+
+      -- mock game state above ^
       , pointerDown = False
       , prevPointerDown = False
       , pointer = vecZero
       , prevPointer = vecZero
-      , state = TargetsEntering { start = 0, ballPosition = initialBallPosition }
       , frame = 0
       , vri = gc.ri
-      , seed = seed
+      , seed = initialSeed
       }
-        |> addNewTargetRow
-        |> addNewTargetRow
-        |> addNewTargetRow
+        |> initGame
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
+
+
+initGame : Model -> Model
+initGame model =
+    let
+        ( targets, seed ) =
+            rndStep ( randomTargets, model.seed )
+
+        initialBallCount =
+            10
+    in
+    { model
+        | ballCount = initialBallCount
+        , targets = targets
+        , state = TargetsEntering { start = 0, ballPosition = initialBallPosition }
+        , seed = seed
+    }
+        |> addNewTargetRow
+        |> addNewTargetRow
+        |> addNewTargetRow
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -466,6 +481,13 @@ updateOnTick frame model =
                                     (List.repeat (model.ballCount - 1) emitterBall)
                         in
                         { model | state = Sim { me = Just emitter, bs = [], ebc = 0, fbs = [] } }
+
+            else
+                model
+
+        Lost ->
+            if model.pointerDown && not model.prevPointerDown then
+                initGame model
 
             else
                 model
