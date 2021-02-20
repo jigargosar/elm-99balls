@@ -410,21 +410,21 @@ update message model =
         PointerDown isDown pointer ->
             ( { model
                 | pointerDown = isDown
-                , pointer = pointer |> svgToWorld model
+                , pointer = pointer |> pageToWorld model
               }
             , Cmd.none
             )
 
         PointerMoved pointer ->
             ( { model
-                | pointer = pointer |> svgToWorld model
+                | pointer = pointer |> pageToWorld model
               }
             , Cmd.none
             )
 
 
-svgToWorld : Model -> Vec -> Vec
-svgToWorld model svgCord =
+pageToWorld : Model -> Vec -> Vec
+pageToWorld model pageCord =
     let
         svgRI =
             computeSvgRI model
@@ -432,8 +432,22 @@ svgToWorld model svgCord =
         svgScale =
             gc.ri.x / svgRI.x
     in
-    vecSub svgCord svgRI
+    vecSub pageCord model.vri
         |> vecScale svgScale
+
+
+
+--svgToWorld : Model -> Vec -> Vec
+--svgToWorld model svgCord =
+--    let
+--        svgRI =
+--            computeSvgRI model
+--
+--        svgScale =
+--            gc.ri.x / svgRI.x
+--    in
+--    vecSub svgCord svgRI
+--        |> vecScale svgScale
 
 
 cachePointer : Model -> Model
