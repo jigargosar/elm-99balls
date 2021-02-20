@@ -518,7 +518,8 @@ updateOnTick frame model =
 
                         else
                             -- game over : for now re-simulate current turn.
-                            newModel
+                            -- newModel
+                            { model | state = Lost }
 
             else
                 let
