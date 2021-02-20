@@ -918,7 +918,7 @@ view model =
             ]
             [ rect gc.ri [ fillP black ]
             , let
-                { state, targets } =
+                { state, targets, ballCount } =
                     model
 
                 now =
@@ -932,10 +932,7 @@ view model =
                     _ ->
                         fade 1
                 ]
-                [ words (String.fromInt model.ballCount)
-                    [ fillH 0.15
-                    , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
-                    ]
+                [ viewBallCount ballCount
                 , viewTargets state now targets
                 , case state of
                     TargetsEntering { ballPosition } ->
@@ -976,6 +973,13 @@ view model =
                 ]
             , viewLostState model.state
             ]
+        ]
+
+
+viewBallCount ballCount =
+    words (String.fromInt ballCount)
+        [ fillH 0.15
+        , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
         ]
 
 
