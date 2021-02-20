@@ -74,7 +74,8 @@ type alias Flags =
 
 
 type alias Model =
-    { ballCount : Int
+    { turn : Int
+    , ballCount : Int
     , targets : List Target
     , state : State
     , pointerDown : Bool
@@ -345,7 +346,8 @@ init _ =
         initialSeed =
             seedFrom 4
     in
-    ( { ballCount = 0
+    ( { turn = 1
+      , ballCount = 0
       , targets = []
       , state = Lost 0
 
@@ -374,7 +376,7 @@ initGame model =
         , targets = []
         , state = TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
     }
-        |> applyN 1 addNewTargetRow
+        |> applyN 1 addNewTargetRowAndIncTurn
         |> identity
 
 
@@ -518,13 +520,13 @@ updateOnTick frame model =
                         in
                         if canTargetsSafelyMoveDown model.targets then
                             newModel
-                                |> addNewTargetRow
+                                |> addNewTargetRowAndIncTurn
 
                         else
                             -- game over : for now re-simulate current turn.
                             -- newModel
                             { model | state = Lost model.frame }
-                                |> addNewTargetRow
+                                |> addNewTargetRowAndIncTurn
 
             else
                 let
@@ -666,14 +668,15 @@ splitBallUpdates ballUpdates =
     { floored = floored, updated = updated }
 
 
-addNewTargetRow : Model -> Model
-addNewTargetRow model =
+addNewTargetRowAndIncTurn : Model -> Model
+addNewTargetRowAndIncTurn model =
     let
         ( targets, seed ) =
-            rndStep ( randomTargets 1, model.seed )
+            rndStep ( randomTargets model.turn, model.seed )
     in
     { model
         | targets = targets ++ List.map moveTargetDown model.targets
+        , turn = inc model.turn
         , seed = seed
     }
 
