@@ -910,17 +910,9 @@ view model =
                     ]
                 , let
                     progress =
-                        case model.state of
-                            TargetsEntering { start } ->
-                                (model.frame - start) / animDur |> clamp 0 1
-
-                            Lost start ->
-                                (model.frame - start) / animDur |> clamp 0 1
-
-                            _ ->
-                                1
+                        targetAnimProgress model.frame model.state
                   in
-                  viewTargets progress model.targets
+                  viewAnimTargets progress model.targets
                 , case model.state of
                     TargetsEntering { ballPosition } ->
                         viewBallAt ballPosition
@@ -1035,8 +1027,21 @@ ballTravelPathHelp acc ball pathLen path =
             path
 
 
-viewTargets : Float -> List Target -> Svg msg
-viewTargets progress targets =
+targetAnimProgress : Float -> State -> Float
+targetAnimProgress now state =
+    case state of
+        TargetsEntering { start } ->
+            (now - start) / animDur |> clamp 0 1
+
+        Lost start ->
+            (now - start) / animDur |> clamp 0 1
+
+        _ ->
+            1
+
+
+viewAnimTargets : Float -> List Target -> Svg msg
+viewAnimTargets progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
