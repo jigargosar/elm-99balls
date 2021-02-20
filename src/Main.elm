@@ -122,17 +122,6 @@ type alias Target =
     }
 
 
-
---randomTargets1 : Generator (List Target)
---randomTargets1 =
---    let
---        randomTargetPositions =
---            rnd2 List.drop (rndInt 1 3) (rndShuffle gc.topRowPS)
---    in
---    randomTargetPositions
---        |> rndAndThen (List.map randomSolidTarget >> rndCombine)
-
-
 randomTargets : Generator (List Target)
 randomTargets =
     List.map randomTarget gc.topRowPS
@@ -1085,39 +1074,12 @@ viewSolidTarget position hp =
 viewEdges : Svg Msg
 viewEdges =
     let
-        do =
-            group []
-                [ group [] (List.map viewEdge edges)
-                , group [] (List.map viewEdgeNormal edges)
-                    |> always viewNone
-                ]
-
         viewEdge : Edge -> Svg Msg
         viewEdge edge =
             polySeg (edgeToSeg edge)
                 [ strokeP red, Px.strokeWidth 1 ]
-
-        viewEdgeNormal : Edge -> Svg Msg
-        viewEdgeNormal edge =
-            polySeg (edgeDebugNormal edge)
-                [ strokeP blue, Px.strokeWidth 5 ]
-
-        edgeDebugNormal : Edge -> Seg
-        edgeDebugNormal { from, to } =
-            let
-                start =
-                    vecMidpoint from to
-
-                velocity =
-                    vecUnitNormalFromTo from to
-                        |> vecScale (gc.ri.x * 0.1)
-
-                end =
-                    vecAdd start velocity
-            in
-            ( start, end )
     in
-    do
+    group [] (List.map viewEdge edges)
 
 
 viewBalls : List Ball -> Svg Msg
