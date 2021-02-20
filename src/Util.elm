@@ -804,3 +804,8 @@ alwaysPreventDefaultOn eventName decoder =
 offsetDecoder : Decoder Vec
 offsetDecoder =
     JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
+
+
+pageXYDecoder : Decoder Vec
+pageXYDecoder =
+    JD.map2 vec (JD.field "pageX" JD.float) (JD.field "pageY" JD.float)
