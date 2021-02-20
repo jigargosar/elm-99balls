@@ -90,9 +90,9 @@ animDur =
 
 
 type State
-    = TargetsEntering Float
-    | WaitingForInput
-    | DraggingPointer Vec
+    = TargetsEntering { start : Float, ballPosition : Vec }
+    | WaitingForInput { ballPosition : Vec }
+    | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
     | Sim { me : Maybe Emitter, bs : List Ball, ebc : Int }
 
 
@@ -258,9 +258,13 @@ type alias Ball =
     }
 
 
+initialBallPosition =
+    vec 0 (gc.ri.y - gc.ballR)
+
+
 initBallAtBottomCenter : Ball
 initBallAtBottomCenter =
-    initBall (vec 0 (gc.ri.y - gc.ballR)) (turns -0.25)
+    initBall initialBallPosition (turns -0.25)
 
 
 ballHue =
@@ -374,13 +378,13 @@ init _ =
             10
     in
     ( { ballCount = initialBallCount
-      , floorBalls = List.repeat initialBallCount initBallAtBottomCenter
+      , floorBalls = []
       , targets = targets
       , pointerDown = False
       , prevPointerDown = False
       , pointer = vecZero
       , prevPointer = vecZero
-      , state = TargetsEntering 0
+      , state = TargetsEntering { start = 0, ballPosition = initialBallPosition }
       , frame = 0
       , vri = gc.ri
       , seed = seed
@@ -460,56 +464,49 @@ cachePointer model =
 updateOnTick : Float -> Model -> Model
 updateOnTick frame model =
     case model.state of
-        TargetsEntering start ->
+        TargetsEntering { start, ballPosition } ->
             if
                 (frame - start > animDur)
                     && areFloorBallsSettled model
             then
-                { model | state = WaitingForInput }
+                { model | state = WaitingForInput { ballPosition = ballPosition } }
 
             else
                 model
 
-        WaitingForInput ->
+        WaitingForInput { ballPosition } ->
             if model.pointerDown && not model.prevPointerDown then
-                { model | state = DraggingPointer (model.pointer |> vecMapY (atMost 0)) }
+                { model
+                    | state =
+                        DraggingPointer
+                            { dragStartAt = model.pointer |> vecMapY (atMost 0)
+                            , ballPosition = ballPosition
+                            }
+                }
 
             else
                 model
 
-        DraggingPointer start ->
+        DraggingPointer { dragStartAt, ballPosition } ->
             if not model.pointerDown then
-                case validInputAngle model start of
+                case validInputAngle model dragStartAt of
                     Nothing ->
-                        { model | state = WaitingForInput }
+                        { model | state = WaitingForInput { ballPosition = ballPosition } }
 
                     Just angle ->
                         let
-                            maybeEmitter =
-                                case firstFloorBallPosition model of
-                                    Nothing ->
-                                        Nothing
+                            emitterBall =
+                                initBall ballPosition angle
 
-                                    Just ballPosition ->
-                                        let
-                                            ball =
-                                                initBall ballPosition angle
-                                        in
-                                        Just
-                                            (Emitter model.frame
-                                                ball
-                                                (List.repeat (model.ballCount - 1) ball)
-                                            )
+                            emitter =
+                                Emitter model.frame
+                                    emitterBall
+                                    (List.repeat (model.ballCount - 1) emitterBall)
                         in
-                        case maybeEmitter of
-                            Nothing ->
-                                model
-
-                            Just emitter ->
-                                { model
-                                    | state = Sim { me = Just emitter, bs = [], ebc = 0 }
-                                    , floorBalls = []
-                                }
+                        { model
+                            | state = Sim { me = Just emitter, bs = [], ebc = 0 }
+                            , floorBalls = []
+                        }
 
             else
                 model
@@ -517,14 +514,30 @@ updateOnTick frame model =
         Sim sim ->
             -- check for turn over
             if sim.me == Nothing && sim.bs == [] then
-                -- check for game over
-                if canTargetsSafelyMoveDown model.targets then
-                    { model | state = TargetsEntering frame, ballCount = model.ballCount + sim.ebc }
-                        |> addNewTargetRow
+                case firstFloorBallPosition model of
+                    Nothing ->
+                        model
 
-                else
-                    -- game over : for now re-simulate current turn.
-                    { model | state = TargetsEntering frame, ballCount = model.ballCount + sim.ebc }
+                    Just ballPosition ->
+                        -- check for game over
+                        let
+                            newModel =
+                                { model
+                                    | state =
+                                        TargetsEntering
+                                            { start = frame
+                                            , ballPosition = ballPosition
+                                            }
+                                    , ballCount = model.ballCount + sim.ebc
+                                }
+                        in
+                        if canTargetsSafelyMoveDown model.targets then
+                            newModel
+                                |> addNewTargetRow
+
+                        else
+                            -- game over : for now re-simulate current turn.
+                            newModel
 
             else
                 let
