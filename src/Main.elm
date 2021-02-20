@@ -457,7 +457,7 @@ updateOnTick frame model =
                 model
 
         WaitingForInput ->
-            if model.pointerDown then
+            if model.pointerDown && not model.prevPointerDown then
                 { model | state = DraggingPointer (model.pointer |> vecMapY (atMost 0)) }
 
             else
