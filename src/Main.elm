@@ -935,6 +935,12 @@ view model =
                                         ]
                             ]
 
+                    Lost ->
+                        words "Game Over. Tap to Continue"
+                            [ fillH 0.15
+                            , transform [ scale 3 ]
+                            ]
+
                     Sim sim ->
                         let
                             balls =
