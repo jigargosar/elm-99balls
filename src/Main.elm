@@ -5,7 +5,7 @@ import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
 import Float.Extra
-import Html exposing (Attribute, Html, div, node)
+import Html exposing (Attribute, Html, div, node, text)
 import Html.Attributes as A exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -899,7 +899,10 @@ view model =
         , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
-        , viewSvg model
+        , div [ style "position" "relative" ]
+            [ viewLostStateOverlayHtml model.state
+            , viewSvg model
+            ]
         ]
 
 
@@ -915,7 +918,7 @@ viewSvg { vri, state, ballCount, targets, pointer, frame } =
             , viewStateContent frame pointer targets state
             , viewDebugPointer pointer |> always noView
             ]
-        , viewLostStateOverlay state
+        , viewLostStateOverlaySvg state
         ]
 
 
@@ -982,13 +985,34 @@ viewBallCount ballCount =
         ]
 
 
-viewLostStateOverlay state =
+viewLostStateOverlaySvg state =
     case state of
         Lost _ ->
             words "Game Over. Tap to Continue"
                 [ fillH 0.15
                 , transform [ scale 3 ]
                 ]
+
+        _ ->
+            noView
+
+
+viewLostStateOverlayHtml state =
+    case state of
+        Lost _ ->
+            div
+                [ style "position" "absolute"
+                , style "width" "100%"
+                , style "height" "100%"
+                , style "display" "flex"
+                , style "align-items" "center"
+                , style "justify-content" "center"
+                , style "color" "red"
+
+                --, style "touch-action" "none"
+                , style "user-select" "none"
+                ]
+                [ text "Game Over. Tap to Continue" ]
 
         _ ->
             noView
