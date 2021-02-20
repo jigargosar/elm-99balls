@@ -947,6 +947,7 @@ view model =
         , style "align-items" "center"
         , style "justify-content" "center"
         , style "height" "100%"
+        , E.on "pointerup" (pageXYDecoder |> JD.map (PointerDown False))
         , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
@@ -957,7 +958,6 @@ view model =
             , S.fill "none"
             , S.stroke "none"
             , E.on "pointerdown" (pageXYDecoder |> JD.map (PointerDown True))
-            , E.on "pointerup" (pageXYDecoder |> JD.map (PointerDown False))
             , style "touch-action" "none"
             , style "user-select" "none"
             ]
