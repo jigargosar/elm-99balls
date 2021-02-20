@@ -133,25 +133,20 @@ type alias Target =
     }
 
 
-randomTargets : Generator (List Target)
-randomTargets =
-    List.map randomTarget gc.topRowPS
+randomTargets : Int -> Generator (List Target)
+randomTargets turns =
+    List.map (randomTarget turns) gc.topRowPS
         |> rndCombine
         |> Random.map (List.filterMap identity)
 
 
-randomTarget : ( Int, Int ) -> Generator (Maybe Target)
-randomTarget gp =
+randomTarget : Int -> ( Int, Int ) -> Generator (Maybe Target)
+randomTarget turns gp =
     Random.frequency
         ( 25, Random.constant Nothing )
-        [ ( 70, randomSolidTarget gp |> Random.map Just )
+        [ ( 70, rnd1 (initSolidTarget gp) (rndInt 1 (maxHP |> atMost (turns + 3))) |> Random.map Just )
         , ( 5, Random.constant (Just (Target (gpToWorld gp) ExtraBallTarget)) )
         ]
-
-
-randomSolidTarget : ( Int, Int ) -> Generator Target
-randomSolidTarget gp =
-    rnd1 (initSolidTarget gp) (rndInt 1 maxHP)
 
 
 initSolidTarget : ( Int, Int ) -> Int -> Target
@@ -371,19 +366,15 @@ init _ =
 initGame : Model -> Model
 initGame model =
     let
-        ( targets, seed ) =
-            rndStep ( randomTargets, model.seed )
-
         initialBallCount =
             1
     in
     { model
         | ballCount = initialBallCount
-        , targets = targets
+        , targets = []
         , state = TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
-        , seed = seed
     }
-        --|> applyN 7 addNewTargetRow
+        |> applyN 1 addNewTargetRow
         |> identity
 
 
@@ -679,7 +670,7 @@ addNewTargetRow : Model -> Model
 addNewTargetRow model =
     let
         ( targets, seed ) =
-            rndStep ( randomTargets, model.seed )
+            rndStep ( randomTargets 1, model.seed )
     in
     { model
         | targets = targets ++ List.map moveTargetDown model.targets
