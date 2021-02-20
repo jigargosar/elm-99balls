@@ -4,7 +4,6 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import Float.Extra
 import Html exposing (Attribute, Html, div, node, text)
 import Html.Attributes as A exposing (style)
 import Html.Events as E
