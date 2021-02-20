@@ -925,17 +925,20 @@ view model =
                         viewBallAt ballPosition
 
                     DraggingPointer { dragStartAt, ballPosition } ->
-                        case validInputAngle model dragStartAt of
-                            Nothing ->
-                                viewNone
+                        group []
+                            [ viewBallAt ballPosition
+                            , case validInputAngle model dragStartAt of
+                                Nothing ->
+                                    viewNone
 
-                            Just angle ->
-                                group []
-                                    [ viewTravelPath model.frame
-                                        (ballTravelPath model.targets ballPosition angle)
-                                    , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
-                                    , circle 10 [ fillH 0.4, transform [ translate dragStartAt ] ]
-                                    ]
+                                Just angle ->
+                                    group []
+                                        [ viewTravelPath model.frame
+                                            (ballTravelPath model.targets ballPosition angle)
+                                        , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
+                                        , circle 10 [ fillH 0.4, transform [ translate dragStartAt ] ]
+                                        ]
+                            ]
 
                     Sim sim ->
                         let
