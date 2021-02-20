@@ -262,11 +262,6 @@ initialBallPosition =
     vec 0 (gc.ri.y - gc.ballR)
 
 
-initBallAtBottomCenter : Ball
-initBallAtBottomCenter =
-    initBall initialBallPosition (turns -0.25)
-
-
 ballHue =
     0.15
 
@@ -983,20 +978,20 @@ view model =
                 [ rect gc.ri [ fillP black ]
                 , viewFloorBalls model.floorBalls
                 , case model.state of
-                    TargetsEntering start ->
+                    TargetsEntering { start } ->
                         viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
 
                     _ ->
                         viewTargets 1 model.targets
                 , case model.state of
-                    TargetsEntering _ ->
-                        viewNone
+                    TargetsEntering { ballPosition } ->
+                        viewBallAt ballPosition
 
-                    WaitingForInput ->
-                        viewNone
+                    WaitingForInput { ballPosition } ->
+                        viewBallAt ballPosition
 
-                    DraggingPointer startPointer ->
-                        case validInputAngle model startPointer of
+                    DraggingPointer { dragStartAt } ->
+                        case validInputAngle model dragStartAt of
                             Nothing ->
                                 viewNone
 
@@ -1005,7 +1000,7 @@ view model =
                                     [ viewTravelPath model.frame
                                         (ballTravelPathAtAngle angle model)
                                     , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
-                                    , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
+                                    , circle 10 [ fillH 0.4, transform [ translate dragStartAt ] ]
                                     ]
 
                     Sim sim ->
