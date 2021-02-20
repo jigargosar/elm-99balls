@@ -1029,8 +1029,17 @@ view model =
                                     , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
                                     ]
 
-                    Sim _ ->
-                        words "impl sim view" [ fillH 0, transform [ scale 4 ] ]
+                    Sim sim ->
+                        let
+                            balls =
+                                case sim.me of
+                                    Nothing ->
+                                        sim.bs
+
+                                    Just em ->
+                                        em.next :: sim.bs
+                        in
+                        viewBalls balls
 
                     SimWithEmitter { emitter, balls } ->
                         viewBalls (emitter.next :: balls)
