@@ -375,6 +375,10 @@ initGame model =
         |> addNewTargetRow
         |> addNewTargetRow
         |> addNewTargetRow
+        |> addNewTargetRow
+        |> addNewTargetRow
+        |> addNewTargetRow
+        |> addNewTargetRow
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
