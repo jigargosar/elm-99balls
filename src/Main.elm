@@ -509,7 +509,7 @@ updateOnTick frame model =
         Sim sim ->
             -- check for turn over
             if sim.me == Nothing && sim.bs == [] then
-                case firstFloorBallPosition model of
+                case model.floorBalls |> List.head |> Maybe.map .position of
                     Nothing ->
                         model
 
@@ -560,33 +560,8 @@ updateOnTick frame model =
                 }
 
 
-firstFloorBall : Model -> Maybe Ball
-firstFloorBall model =
-    model.floorBalls |> List.head
-
-
-firstFloorBallPosition : Model -> Maybe Vec
-firstFloorBallPosition model =
-    firstFloorBall model |> Maybe.map .position
-
-
-type InputVersion
-    = InputV1
-    | InputV2
-
-
 validInputAngle : Model -> Vec -> Maybe Float
-validInputAngle =
-    case InputV1 of
-        InputV1 ->
-            validInputAngleV1
-
-        InputV2 ->
-            validInputAngleV2
-
-
-validInputAngleV1 : Model -> Vec -> Maybe Float
-validInputAngleV1 model start =
+validInputAngle model start =
     let
         current =
             model.pointer
@@ -598,31 +573,6 @@ validInputAngleV1 model start =
 
     else
         Nothing
-
-
-validInputAngleV2 : Model -> Vec -> Maybe Float
-validInputAngleV2 model start =
-    firstFloorBallPosition model
-        |> Maybe.andThen
-            (\ballCenter ->
-                let
-                    current =
-                        model.pointer
-
-                    angleOffset =
-                        angleABC current start ballCenter
-                            |> mul 0.1
-                in
-                if start.y < current.y then
-                    Just
-                        (vecAngleFromTo ballCenter start
-                            |> add angleOffset
-                            |> clampInputAngle
-                        )
-
-                else
-                    Nothing
-            )
 
 
 clampInputAngle =
@@ -990,7 +940,7 @@ view model =
                     WaitingForInput { ballPosition } ->
                         viewBallAt ballPosition
 
-                    DraggingPointer { dragStartAt } ->
+                    DraggingPointer { dragStartAt, ballPosition } ->
                         case validInputAngle model dragStartAt of
                             Nothing ->
                                 viewNone
@@ -998,7 +948,7 @@ view model =
                             Just angle ->
                                 group []
                                     [ viewTravelPath model.frame
-                                        (ballTravelPathAtAngle angle model)
+                                        (ballTravelPath model.targets ballPosition angle)
                                     , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
                                     , circle 10 [ fillH 0.4, transform [ translate dragStartAt ] ]
                                     ]
@@ -1051,24 +1001,19 @@ viewTravelPath frame pts =
         ]
 
 
-ballTravelPathAtAngle : Float -> Model -> List Vec
-ballTravelPathAtAngle angle model =
-    case firstFloorBallPosition model of
-        Nothing ->
-            []
-
-        Just ballPosition ->
-            let
-                ball =
-                    initBall ballPosition angle
-            in
-            ballTravelPathHelp
-                { targets = model.targets
-                , ebc = 0
-                }
-                ball
-                0
-                [ ball.position ]
+ballTravelPath : List Target -> Vec -> Float -> List Vec
+ballTravelPath targets ballPosition angle =
+    let
+        ball =
+            initBall ballPosition angle
+    in
+    ballTravelPathHelp
+        { targets = targets
+        , ebc = 0
+        }
+        ball
+        0
+        [ ball.position ]
 
 
 maxPathLen =
