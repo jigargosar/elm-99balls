@@ -93,8 +93,6 @@ type State
     | WaitingForInput
     | DraggingPointer Vec
     | Sim { me : Maybe Emitter, bs : List Ball, ebc : Int }
-    | SimWithEmitter { emitter : Emitter, balls : List Ball, extraBallsCollected : Int }
-    | SimWithoutEmitter { balls : List Ball, extraBallsCollected : Int }
 
 
 type alias Emitter =
@@ -533,54 +531,6 @@ updateOnTick frame model =
                 in
                 { model
                     | state = Sim { bs = newBs, me = newMe, ebc = newEbc }
-                    , targets = targets
-                    , floorBalls = floorBalls
-                }
-
-        SimWithEmitter sim ->
-            let
-                { balls, targets, extraBallsCollected, floorBalls } =
-                    moveBallsAndHandleCollision sim.balls model
-
-                state =
-                    case emitBalls frame sim.emitter of
-                        Nothing ->
-                            SimWithEmitter { sim | balls = balls }
-
-                        Just ( ball, Just emitter ) ->
-                            SimWithEmitter { sim | emitter = emitter, balls = ball :: balls }
-
-                        Just ( ball, Nothing ) ->
-                            SimWithoutEmitter
-                                { balls = ball :: balls
-                                , extraBallsCollected = extraBallsCollected + sim.extraBallsCollected
-                                }
-            in
-            { model | state = state, targets = targets, floorBalls = floorBalls }
-
-        SimWithoutEmitter sim ->
-            -- check for turn over
-            if sim.balls == [] then
-                -- check for game over
-                if canTargetsSafelyMoveDown model.targets then
-                    { model | state = TargetsEntering frame }
-                        |> addNewTargetRow
-
-                else
-                    -- game over : for now re-simulate current turn.
-                    { model | state = TargetsEntering frame }
-
-            else
-                let
-                    { balls, targets, extraBallsCollected, floorBalls } =
-                        moveBallsAndHandleCollision sim.balls model
-                in
-                { model
-                    | state =
-                        SimWithoutEmitter
-                            { balls = balls
-                            , extraBallsCollected = extraBallsCollected + sim.extraBallsCollected
-                            }
                     , targets = targets
                     , floorBalls = floorBalls
                 }
@@ -1036,12 +986,6 @@ view model =
                                     Just em ->
                                         em.next :: sim.bs
                         in
-                        viewBalls balls
-
-                    SimWithEmitter { emitter, balls } ->
-                        viewBalls (emitter.next :: balls)
-
-                    SimWithoutEmitter { balls } ->
                         viewBalls balls
                 , viewDebugPointer model.pointer |> always viewNone
                 , viewEdges
