@@ -480,7 +480,7 @@ updateOnTick frame model =
 
         DraggingPointer { dragStartAt, ballPosition } ->
             if not model.pointerDown then
-                case validInputAngle model dragStartAt of
+                case validInputAngleFromTo dragStartAt model.pointer of
                     Nothing ->
                         { model | state = WaitingForInput { ballPosition = ballPosition } }
 
@@ -564,12 +564,8 @@ updateOnTick frame model =
                 }
 
 
-validInputAngle : Model -> Vec -> Maybe Float
-validInputAngle model start =
-    let
-        current =
-            model.pointer
-    in
+validInputAngleFromTo : Vec -> Vec -> Maybe Float
+validInputAngleFromTo start current =
     if start.y < current.y then
         vecAngleFromTo current start
             |> clampInputAngle
@@ -893,13 +889,6 @@ computeSvgRI vri_ =
 
 view : Model -> Html Msg
 view model =
-    let
-        { state, targets, ballCount, vri } =
-            model
-
-        now =
-            model.frame
-    in
     div
         [ style "display" "flex"
         , style "align-items" "center"
@@ -909,57 +898,62 @@ view model =
         , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
-        , Svg.svg (svgAttrs vri)
-            [ rect gc.ri [ fillP black ]
-            , group
-                [ case model.state of
-                    Lost _ ->
-                        fade 0.1
+        , viewSvg model
+        ]
 
-                    _ ->
-                        fade 1
-                ]
-                [ viewBallCount ballCount
-                , viewTargets state now targets
-                , case state of
-                    TargetsEntering { ballPosition } ->
-                        viewBallAt ballPosition
 
-                    WaitingForInput { ballPosition } ->
-                        viewBallAt ballPosition
+viewSvg : Model -> Html Msg
+viewSvg { vri, state, ballCount, targets, pointer, frame } =
+    Svg.svg (svgAttrs vri)
+        [ rect gc.ri [ fillP black ]
+        , group
+            [ case state of
+                Lost _ ->
+                    fade 0.1
 
-                    DraggingPointer { dragStartAt, ballPosition } ->
-                        group []
-                            [ viewBallAt ballPosition
-                            , case validInputAngle model dragStartAt of
-                                Nothing ->
-                                    viewNone
-
-                                Just angle ->
-                                    group []
-                                        [ viewTravelPath now (ballTravelPath model.targets ballPosition angle)
-                                        , viewDebugPoints [ model.pointer, dragStartAt ]
-                                        ]
-                            ]
-
-                    Lost _ ->
-                        viewNone
-
-                    Sim sim ->
-                        let
-                            balls =
-                                case sim.me of
-                                    Nothing ->
-                                        sim.bs
-
-                                    Just em ->
-                                        em.next :: sim.bs
-                        in
-                        group [] [ viewBalls balls, viewFloorBalls sim.fbs ]
-                , viewDebugPointer model.pointer |> always viewNone
-                ]
-            , viewLostState model.state
+                _ ->
+                    fade 1
             ]
+            [ viewBallCount ballCount
+            , viewTargets state frame targets
+            , case state of
+                TargetsEntering { ballPosition } ->
+                    viewBallAt ballPosition
+
+                WaitingForInput { ballPosition } ->
+                    viewBallAt ballPosition
+
+                DraggingPointer { dragStartAt, ballPosition } ->
+                    group []
+                        [ viewBallAt ballPosition
+                        , case validInputAngleFromTo dragStartAt pointer of
+                            Nothing ->
+                                viewNone
+
+                            Just angle ->
+                                group []
+                                    [ viewTravelPath frame (ballTravelPath targets ballPosition angle)
+                                    , viewDebugPoints [ pointer, dragStartAt ]
+                                    ]
+                        ]
+
+                Lost _ ->
+                    viewNone
+
+                Sim sim ->
+                    let
+                        balls =
+                            case sim.me of
+                                Nothing ->
+                                    sim.bs
+
+                                Just em ->
+                                    em.next :: sim.bs
+                    in
+                    group [] [ viewBalls balls, viewFloorBalls sim.fbs ]
+            , viewDebugPointer pointer |> always viewNone
+            ]
+        , viewLostState state
         ]
 
 
