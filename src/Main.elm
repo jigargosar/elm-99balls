@@ -369,7 +369,7 @@ initGame model =
     { model
         | ballCount = initialBallCount
         , targets = targets
-        , state = TargetsEntering { start = 0, ballPosition = initialBallPosition }
+        , state = TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
         , seed = seed
     }
         |> addNewTargetRow
