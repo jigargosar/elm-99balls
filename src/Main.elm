@@ -917,7 +917,14 @@ view model =
             , style "user-select" "none"
             ]
             [ rect gc.ri [ fillP black ]
-            , group
+            , let
+                { state, targets } =
+                    model
+
+                now =
+                    model.frame
+              in
+              group
                 [ case model.state of
                     Lost _ ->
                         fade 0.1
@@ -929,15 +936,8 @@ view model =
                     [ fillH 0.15
                     , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
                     ]
-                , group
-                    []
-                    [ let
-                        progress =
-                            targetTransitionProgress model.state model.frame
-                      in
-                      viewAnimTargets progress model.targets
-                    ]
-                , case model.state of
+                , viewTargets state now targets
+                , case state of
                     TargetsEntering { ballPosition } ->
                         viewBallAt ballPosition
 
@@ -953,10 +953,8 @@ view model =
 
                                 Just angle ->
                                     group []
-                                        [ viewTravelPath model.frame
-                                            (ballTravelPath model.targets ballPosition angle)
-                                        , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
-                                        , circle 10 [ fillH 0.4, transform [ translate dragStartAt ] ]
+                                        [ viewTravelPath now (ballTravelPath model.targets ballPosition angle)
+                                        , viewDebugPoints [ model.pointer, dragStartAt ]
                                         ]
                             ]
 
@@ -1010,6 +1008,16 @@ viewDebugPointer pointer =
         [ circle (gc.ballR * 0.5) [ fillH 0.4, transform [ translate pointer ] ]
         , polySeg ( vecZero, pointer ) [ strokeH 0.6 ]
         ]
+
+
+viewDebugPoints : List Vec -> Svg msg
+viewDebugPoints pts =
+    group [] (List.map viewDebugPointAt pts)
+
+
+viewDebugPointAt : Vec -> Svg msg
+viewDebugPointAt pt =
+    circle (gc.ballR * 0.5) [ fillH 0.4, transform [ translate pt ] ]
 
 
 viewTravelPath : Float -> List Vec -> Svg msg
@@ -1076,8 +1084,16 @@ targetTransitionProgress state now =
             1
 
 
-viewAnimTargets : Float -> List Target -> Svg msg
-viewAnimTargets progress targets =
+viewTargets state now targets =
+    let
+        progress =
+            targetTransitionProgress state now
+    in
+    viewTransitioningTargets progress targets
+
+
+viewTransitioningTargets : Float -> List Target -> Svg msg
+viewTransitioningTargets progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
