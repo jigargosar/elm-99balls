@@ -842,3 +842,7 @@ noAttr =
 
 noView =
     text ""
+
+
+hideView =
+    always noView

@@ -919,9 +919,9 @@ viewSvg { vri, state, ballCount, targets, pointer, frame } =
             [ viewBallCount ballCount
             , viewTargets state frame targets
             , viewStateContent frame pointer targets state
-            , viewDebugPointer pointer |> always noView
+            , viewDebugPointer pointer |> hideView
             ]
-        , viewLostStateOverlaySvg state |> always noView
+        , viewLostStateOverlaySvg state |> hideView
         ]
 
 
