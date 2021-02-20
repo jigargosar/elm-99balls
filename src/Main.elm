@@ -302,48 +302,24 @@ setBallVelocityAndUpdatePosition rawVelocity ball =
     }
 
 
-type alias Edge =
-    { from : Vec
-    , to : Vec
-    }
-
-
-edgeFromSeg : Seg -> Edge
-edgeFromSeg ( a, b ) =
-    edgeFromTo a b
-
-
-edgeFromTo : Vec -> Vec -> Edge
-edgeFromTo from to =
-    { from = from
-    , to = to
-    }
-
-
-edgeToSeg : Edge -> Seg
-edgeToSeg { from, to } =
-    ( from, to )
-
-
-screenSeg =
+screenSegments =
     boundingSegFromRadii gc.ri
 
 
-edges : List Edge
+edges : List Seg
 edges =
     let
         { top, right, bottom, left } =
-            screenSeg
+            screenSegments
     in
     [ top, right, bottom, left ]
-        |> List.map edgeFromSeg
 
 
 bottomEdge =
-    edgeFromSeg screenSeg.bottom
+    screenSegments.bottom
 
 
-isBottomEdge : Edge -> Bool
+isBottomEdge : Seg -> Bool
 isBottomEdge edge =
     edge == bottomEdge
 
@@ -804,7 +780,7 @@ resolveBallCollision collision ballCollision velocity ball =
 
 
 type BallCollision
-    = BallEdgeCollision Edge
+    = BallEdgeCollision Seg
     | BallTargetCollision Target
 
 
@@ -818,7 +794,7 @@ detectBallCollision targets velocity ball =
             edges
                 |> List.filterMap
                     (\e ->
-                        detectMovingCircleAndSegCollision mc (edgeToSeg e)
+                        detectMovingCircleAndSegCollision mc e
                             |> Maybe.map (pairTo (BallEdgeCollision e))
                     )
 
@@ -1074,9 +1050,9 @@ viewSolidTarget position hp =
 viewEdges : Svg Msg
 viewEdges =
     let
-        viewEdge : Edge -> Svg Msg
+        viewEdge : Seg -> Svg Msg
         viewEdge edge =
-            polySeg (edgeToSeg edge)
+            polySeg edge
                 [ strokeP red, Px.strokeWidth 1 ]
     in
     group [] (List.map viewEdge edges)
