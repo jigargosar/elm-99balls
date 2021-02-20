@@ -91,6 +91,7 @@ type State
     = TargetsEntering Float
     | WaitingForInput
     | DraggingPointer Vec
+    | Sim { me : Maybe Emitter, bs : List Ball, ebc : Int }
     | SimWithEmitter { emitter : Emitter, balls : List Ball, extraBallsCollected : Int }
     | SimWithoutEmitter { balls : List Ball, extraBallsCollected : Int }
 
@@ -498,6 +499,21 @@ updateOnTick frame model =
                                             }
                                     , floorBalls = []
                                 }
+
+            else
+                model
+
+        Sim sim ->
+            -- check for turn over
+            if sim.me == Nothing && sim.bs == [] then
+                -- check for game over
+                if canTargetsSafelyMoveDown model.targets then
+                    { model | state = TargetsEntering frame }
+                        |> addNewTargetRow
+
+                else
+                    -- game over : for now re-simulate current turn.
+                    { model | state = TargetsEntering frame }
 
             else
                 model
@@ -995,6 +1011,9 @@ view model =
                                     , circle 10 [ fillH 0.4, transform [ translate model.pointer ] ]
                                     , circle 10 [ fillH 0.4, transform [ translate startPointer ] ]
                                     ]
+
+                    Sim _ ->
+                        words "impl sim view" [ fillH 0, transform [ scale 4 ] ]
 
                     SimWithEmitter { emitter, balls } ->
                         viewBalls (emitter.next :: balls)
