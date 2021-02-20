@@ -526,7 +526,7 @@ updateOnTick frame model =
 
             else
                 let
-                    { balls, targets, extraBallsCollected, floorBalls } =
+                    { balls, targets, ebc, floorBalls } =
                         moveBallsAndHandleCollision sim.bs model
 
                     ( newBs, newMe ) =
@@ -541,7 +541,7 @@ updateOnTick frame model =
                                 ( eb :: balls, me_ )
 
                     newEbc =
-                        extraBallsCollected + sim.ebc
+                        ebc + sim.ebc
                 in
                 { model
                     | state = Sim { bs = newBs, me = newMe, ebc = newEbc }
@@ -678,21 +678,21 @@ convergeBallTowards to ball =
 moveBallsAndHandleCollision :
     List Ball
     -> Model
-    -> { balls : List Ball, extraBallsCollected : Int, targets : List Target, floorBalls : List Ball }
+    -> { balls : List Ball, ebc : Int, targets : List Target, floorBalls : List Ball }
 moveBallsAndHandleCollision balls model =
     let
-        ( { targets, extraBallsCollected }, ballUpdates ) =
+        ( { targets, ebc }, ballUpdates ) =
             balls
                 |> List.mapAccuml updateBall
                     { targets = model.targets
-                    , extraBallsCollected = 0
+                    , ebc = 0
                     }
 
         { floored, updated } =
             splitBallUpdates ballUpdates
     in
     { balls = updated
-    , extraBallsCollected = extraBallsCollected
+    , ebc = ebc
     , targets = targets
     , floorBalls = floored ++ model.floorBalls
     }
@@ -759,7 +759,7 @@ areBallsCloseEnough a b =
 
 type alias BallUpdateAcc =
     { targets : List Target
-    , extraBallsCollected : Int
+    , ebc : Int
     }
 
 
@@ -810,7 +810,10 @@ updateBall acc ball =
 
                             else
                                 ( { acc
-                                    | targets = List.setIf (eq target) { target | kind = SolidTarget (hp - 1) } acc.targets
+                                    | targets =
+                                        List.setIf (eq target)
+                                            { target | kind = SolidTarget (hp - 1) }
+                                            acc.targets
                                   }
                                 , BallMoved newBall
                                 )
@@ -818,7 +821,7 @@ updateBall acc ball =
                         ExtraBallTarget ->
                             ( { acc
                                 | targets = reject (eq target) acc.targets
-                                , extraBallsCollected = acc.extraBallsCollected + 1
+                                , ebc = acc.ebc + 1
                               }
                             , BallMoved newBall
                             )
@@ -1051,7 +1054,7 @@ ballTravelPathAtAngle angle model =
             in
             ballTravelPathHelp
                 { targets = model.targets
-                , extraBallsCollected = 0
+                , ebc = 0
                 }
                 ball
                 0
