@@ -911,6 +911,10 @@ view model =
             ]
             [ group []
                 [ rect gc.ri [ fillP black ]
+                , words (String.fromInt model.ballCount)
+                    [ fillH 0.15
+                    , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
+                    ]
                 , case model.state of
                     TargetsEntering { start } ->
                         viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
