@@ -959,10 +959,7 @@ view model =
                             ]
 
                     Lost _ ->
-                        words "Game Over. Tap to Continue"
-                            [ fillH 0.15
-                            , transform [ scale 3 ]
-                            ]
+                        viewNone
 
                     Sim sim ->
                         let
