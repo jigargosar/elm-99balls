@@ -34,7 +34,7 @@ import Util exposing (..)
 
   - [x] goodies: extra ball
 
-  - game over
+  - [x] game over
 
   - turn relative ball count. don't spend too much time. also check the 99balls game.
 
