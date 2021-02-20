@@ -363,7 +363,7 @@ init _ =
       , vri = gc.ri
       , seed = initialSeed
       }
-      --|> initGame
+        |> initGame
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
