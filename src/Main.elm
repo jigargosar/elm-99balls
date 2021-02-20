@@ -916,7 +916,16 @@ view model =
                     progress =
                         targetAnimProgress model.frame model.state
                   in
-                  viewAnimTargets progress model.targets
+                  group
+                    [ case model.state of
+                        Lost _ ->
+                            S.opacity "0.5"
+
+                        _ ->
+                            S.opacity "1"
+                    ]
+                    [ viewAnimTargets progress model.targets
+                    ]
                 , case model.state of
                     TargetsEntering { ballPosition } ->
                         viewBallAt ballPosition
