@@ -71,7 +71,6 @@ type alias Flags =
 
 type alias Model =
     { ballCount : Int
-    , floorBalls : List Ball
     , targets : List Target
     , state : State
     , pointerDown : Bool
@@ -93,7 +92,11 @@ type State
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
-    | Sim { me : Maybe Emitter, bs : List Ball, ebc : Int }
+    | Sim SimR
+
+
+type alias SimR =
+    { me : Maybe Emitter, bs : List Ball, ebc : Int, fbs : List Ball }
 
 
 type alias Emitter =
@@ -373,7 +376,6 @@ init _ =
             10
     in
     ( { ballCount = initialBallCount
-      , floorBalls = []
       , targets = targets
       , pointerDown = False
       , prevPointerDown = False
@@ -402,7 +404,6 @@ update message model =
 
         OnTick _ ->
             ( updateOnTick model.frame model
-                |> convergeFloorBalls
                 |> incFrame
                 |> cachePointer
             , Cmd.none
@@ -460,10 +461,7 @@ updateOnTick : Float -> Model -> Model
 updateOnTick frame model =
     case model.state of
         TargetsEntering { start, ballPosition } ->
-            if
-                (frame - start > animDur)
-                    && areFloorBallsSettled model
-            then
+            if frame - start > animDur then
                 { model | state = WaitingForInput { ballPosition = ballPosition } }
 
             else
@@ -498,18 +496,15 @@ updateOnTick frame model =
                                     emitterBall
                                     (List.repeat (model.ballCount - 1) emitterBall)
                         in
-                        { model
-                            | state = Sim { me = Just emitter, bs = [], ebc = 0 }
-                            , floorBalls = []
-                        }
+                        { model | state = Sim { me = Just emitter, bs = [], ebc = 0, fbs = [] } }
 
             else
                 model
 
         Sim sim ->
             -- check for turn over
-            if sim.me == Nothing && sim.bs == [] then
-                case model.floorBalls |> List.head |> Maybe.map .position of
+            if sim.me == Nothing && sim.bs == [] && areFloorBallsSettled sim.fbs then
+                case sim.fbs |> List.last |> Maybe.map .position of
                     Nothing ->
                         model
 
@@ -552,11 +547,13 @@ updateOnTick frame model =
 
                     newEbc =
                         ebc + sim.ebc
+
+                    newFbs =
+                        floorBalls ++ convergeFloorBalls sim.fbs
                 in
                 { model
-                    | state = Sim { bs = newBs, me = newMe, ebc = newEbc }
+                    | state = Sim { bs = newBs, me = newMe, ebc = newEbc, fbs = newFbs }
                     , targets = targets
-                    , floorBalls = floorBalls
                 }
 
 
@@ -601,27 +598,15 @@ emitBalls frame emitter =
         Nothing
 
 
-mapFloorBalls : (Ball -> List Ball -> ( Ball, List Ball )) -> Model -> Maybe Model
-mapFloorBalls fn model =
-    List.unconsLast model.floorBalls
+convergeFloorBalls : List Ball -> List Ball
+convergeFloorBalls fbs =
+    fbs
+        |> List.unconsLast
         |> Maybe.map
-            (\( last, rest ) ->
-                let
-                    ( nLast, nRest ) =
-                        fn last rest
-                in
-                { model | floorBalls = nRest ++ [ nLast ] }
+            (\( last, others ) ->
+                List.map (convergeBallTowards last.position) others ++ [ last ]
             )
-
-
-convergeFloorBalls : Model -> Model
-convergeFloorBalls model =
-    model
-        |> mapFloorBalls
-            (\last others ->
-                ( last, List.map (convergeBallTowards last.position) others )
-            )
-        |> Maybe.withDefault model
+        |> Maybe.withDefault fbs
 
 
 convergeBallTowards : Vec -> Ball -> Ball
@@ -654,7 +639,7 @@ moveBallsAndHandleCollision balls model =
     { balls = updated
     , ebc = ebc
     , targets = targets
-    , floorBalls = floored ++ model.floorBalls
+    , floorBalls = floored
     }
 
 
@@ -700,9 +685,9 @@ addNewTargetRow model =
     }
 
 
-areFloorBallsSettled : Model -> Bool
-areFloorBallsSettled model =
-    model.floorBalls
+areFloorBallsSettled : List Ball -> Bool
+areFloorBallsSettled floorBalls =
+    floorBalls
         |> List.unconsLast
         |> Maybe.map
             (\( first, rest ) ->
@@ -926,7 +911,6 @@ view model =
             ]
             [ group []
                 [ rect gc.ri [ fillP black ]
-                , viewFloorBalls model.floorBalls
                 , case model.state of
                     TargetsEntering { start } ->
                         viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
@@ -963,7 +947,7 @@ view model =
                                     Just em ->
                                         em.next :: sim.bs
                         in
-                        viewBalls balls
+                        group [] [ viewBalls balls, viewFloorBalls sim.fbs ]
                 , viewDebugPointer model.pointer |> always viewNone
                 , viewEdges
                 ]
