@@ -799,3 +799,8 @@ translate =
 alwaysPreventDefaultOn : String -> Decoder a -> Html.Attribute a
 alwaysPreventDefaultOn eventName decoder =
     E.preventDefaultOn eventName (JD.map (pairTo True) decoder)
+
+
+offsetDecoder : Decoder Vec
+offsetDecoder =
+    JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)

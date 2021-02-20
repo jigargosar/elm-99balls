@@ -952,11 +952,6 @@ subscriptions _ =
         ]
 
 
-offsetDecoder : Decoder Vec
-offsetDecoder =
-    JD.map2 vec (JD.field "offsetX" JD.float) (JD.field "offsetY" JD.float)
-
-
 computeSvgRI : Model -> Vec
 computeSvgRI model =
     let
