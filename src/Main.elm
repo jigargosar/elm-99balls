@@ -32,16 +32,17 @@ import Util exposing (..)
   - [x] allow multiple input handling mode for quick switch during testing
       - for now we are using hardcoded constant for switching
 
-  - goodies: extra ball
+  - [x] goodies: extra ball
+
+  - game over
+
+  - turn relative ball count. don't spend too much time. also check the 99balls game.
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
 
 # Later
-
-  - Concern: Input handling is much better, but there is room for improvement.
-      - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
 
   - add nice `ting` sound on target ball collision
 
@@ -54,6 +55,9 @@ import Util exposing (..)
       - +1 ball outside screen edges / sim never ending.
           - Bug: ball outside world, invariant failed during mobile testing InputV1
       - total number of balls before and after simulation are different.
+
+  - -1 Concern: Input handling is much better, but there is room for improvement.
+      - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
 
 -}
 main =
