@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import Html exposing (Html, div, node)
+import Html exposing (Attribute, Html, div, node)
 import Html.Attributes as A exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -427,7 +427,7 @@ pageToWorld : Model -> Vec -> Vec
 pageToWorld model pageCord =
     let
         svgRI =
-            computeSvgRI model
+            computeSvgRI model.vri
 
         svgScale =
             gc.ri.x / svgRI.x
@@ -871,14 +871,14 @@ subscriptions _ =
         ]
 
 
-computeSvgRI : Model -> Vec
-computeSvgRI model =
+computeSvgRI : Vec -> Vec
+computeSvgRI vri_ =
     let
         ar =
             gc.aspectRatio
 
         vri =
-            model.vri
+            vri_
                 |> vecScale 0.95
 
         viewportAR =
@@ -894,8 +894,11 @@ computeSvgRI model =
 view : Model -> Html Msg
 view model =
     let
-        svgRi =
-            computeSvgRI model
+        { state, targets, ballCount, vri } =
+            model
+
+        now =
+            model.frame
     in
     div
         [ style "display" "flex"
@@ -906,25 +909,9 @@ view model =
         , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
-        , Svg.svg
-            [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
-            , Px.width (svgRi.x * 2)
-            , Px.height (svgRi.y * 2)
-            , S.fill "none"
-            , S.stroke "none"
-            , E.on "pointerdown" (pageXYDecoder |> JD.map (PointerDown True))
-            , style "touch-action" "none"
-            , style "user-select" "none"
-            ]
+        , Svg.svg (svgAttrs vri)
             [ rect gc.ri [ fillP black ]
-            , let
-                { state, targets, ballCount } =
-                    model
-
-                now =
-                    model.frame
-              in
-              group
+            , group
                 [ case model.state of
                     Lost _ ->
                         fade 0.1
@@ -974,6 +961,23 @@ view model =
             , viewLostState model.state
             ]
         ]
+
+
+svgAttrs : Vec -> List (Attribute Msg)
+svgAttrs vri =
+    let
+        svgRi =
+            computeSvgRI vri
+    in
+    [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
+    , Px.width (svgRi.x * 2)
+    , Px.height (svgRi.y * 2)
+    , S.fill "none"
+    , S.stroke "none"
+    , E.on "pointerdown" (pageXYDecoder |> JD.map (PointerDown True))
+    , style "touch-action" "none"
+    , style "user-select" "none"
+    ]
 
 
 viewBallCount ballCount =
