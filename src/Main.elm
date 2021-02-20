@@ -996,6 +996,7 @@ viewLostStateOverlaySvg state =
             noView
 
 
+viewLostStateOverlayHtml : State -> Html Msg
 viewLostStateOverlayHtml state =
     case state of
         Lost _ ->
