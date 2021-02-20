@@ -498,7 +498,7 @@ updateOnTick frame model =
                                         Just
                                             (Emitter model.frame
                                                 ball
-                                                (List.repeat (List.length model.floorBalls - 1) ball)
+                                                (List.repeat (model.ballCount - 1) ball)
                                             )
                         in
                         case maybeEmitter of
