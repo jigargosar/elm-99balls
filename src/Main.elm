@@ -70,7 +70,8 @@ type alias Flags =
 
 
 type alias Model =
-    { floorBalls : List Ball
+    { ballCount : Int
+    , floorBalls : List Ball
     , targets : List Target
     , state : State
     , pointerDown : Bool
@@ -372,7 +373,8 @@ init _ =
         initialBallCount =
             10
     in
-    ( { floorBalls = List.repeat initialBallCount initBallAtBottomCenter
+    ( { ballCount = initialBallCount
+      , floorBalls = List.repeat initialBallCount initBallAtBottomCenter
       , targets = targets
       , pointerDown = False
       , prevPointerDown = False
