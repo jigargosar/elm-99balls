@@ -74,6 +74,7 @@ type alias Model =
     , targets : List Target
     , state : State
     , pointerDown : Bool
+    , prevPointerDown : Bool
     , pointer : Vec
     , prevPointer : Vec
     , frame : Float
@@ -376,6 +377,7 @@ init _ =
     ( { floorBalls = List.repeat initialBallCount initBallAtBottomCenter
       , targets = targets
       , pointerDown = False
+      , prevPointerDown = False
       , pointer = vecZero
       , prevPointer = vecZero
       , state = TargetsEntering 0
@@ -438,7 +440,7 @@ svgToWorld model svgCord =
 
 cachePointer : Model -> Model
 cachePointer model =
-    { model | prevPointer = model.pointer }
+    { model | prevPointer = model.pointer, prevPointerDown = model.pointerDown }
 
 
 updateOnTick : Float -> Model -> Model
