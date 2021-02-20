@@ -919,7 +919,7 @@ viewSvg { vri, state, ballCount, targets, pointer, frame } =
             , viewStateContent frame pointer targets state
             , viewDebugPointer pointer |> always viewNone
             ]
-        , viewLostState state
+        , viewLostStateOverlay state
         ]
 
 
@@ -986,7 +986,7 @@ viewBallCount ballCount =
         ]
 
 
-viewLostState state =
+viewLostStateOverlay state =
     case state of
         Lost _ ->
             words "Game Over. Tap to Continue"
