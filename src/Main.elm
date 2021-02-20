@@ -6,7 +6,7 @@ import Browser.Events
 import Color exposing (..)
 import Html exposing (Attribute, Html, div, node, text)
 import Html.Attributes as A exposing (style)
-import Html.Events as E
+import Html.Events as E exposing (onClick)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Random
@@ -341,6 +341,7 @@ type Msg
     | OnTick Float
     | PointerDown Bool Vec
     | PointerMoved Vec
+    | RestartGameClicked
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -362,7 +363,7 @@ init _ =
       , vri = gc.ri
       , seed = initialSeed
       }
-        |> initGame
+      --|> initGame
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
@@ -421,6 +422,9 @@ update message model =
               }
             , Cmd.none
             )
+
+        RestartGameClicked ->
+            ( initGame model, Cmd.none )
 
 
 pageToWorld : Model -> Vec -> Vec
@@ -917,7 +921,7 @@ viewSvg { vri, state, ballCount, targets, pointer, frame } =
             , viewStateContent frame pointer targets state
             , viewDebugPointer pointer |> always noView
             ]
-        , viewLostStateOverlaySvg state
+        , viewLostStateOverlaySvg state |> always noView
         ]
 
 
@@ -1005,14 +1009,17 @@ viewLostStateOverlayHtml state =
                 , style "width" "100%"
                 , style "height" "100%"
                 , style "display" "flex"
+                , style "flex-direction" "column"
                 , style "align-items" "center"
                 , style "justify-content" "center"
-                , style "color" "red"
-
-                --, style "touch-action" "none"
+                , style "color" (fromHue 0.15 |> Color.toCssString)
+                , style "font-size" "2rem"
                 , style "user-select" "none"
+                , onClick RestartGameClicked
                 ]
-                [ text "Game Over. Tap to Continue" ]
+                [ div [ style "font-size" "3rem" ] [ text "Game Over" ]
+                , div [] [ text "Tap to Continue" ]
+                ]
 
         _ ->
             noView
