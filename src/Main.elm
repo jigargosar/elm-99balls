@@ -97,7 +97,7 @@ type State
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
     | Sim SimR
-    | Lost
+    | Lost Float
 
 
 type alias SimR =
@@ -341,7 +341,7 @@ init _ =
     in
     ( { ballCount = 0
       , targets = []
-      , state = Lost
+      , state = Lost 0
 
       -- mock game state above ^
       , pointerDown = False
@@ -485,7 +485,7 @@ updateOnTick frame model =
             else
                 model
 
-        Lost ->
+        Lost _ ->
             if model.pointerDown && not model.prevPointerDown then
                 initGame model
 
@@ -519,7 +519,8 @@ updateOnTick frame model =
                         else
                             -- game over : for now re-simulate current turn.
                             -- newModel
-                            { model | state = Lost }
+                            { model | state = Lost model.frame }
+                                |> addNewTargetRow
 
             else
                 let
@@ -907,12 +908,19 @@ view model =
                     [ fillH 0.15
                     , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
                     ]
-                , case model.state of
-                    TargetsEntering { start } ->
-                        viewTargets ((model.frame - start) / animDur |> clamp 0 1) model.targets
+                , let
+                    progress =
+                        case model.state of
+                            TargetsEntering { start } ->
+                                (model.frame - start) / animDur |> clamp 0 1
 
-                    _ ->
-                        viewTargets 1 model.targets
+                            Lost start ->
+                                (model.frame - start) / animDur |> clamp 0 1
+
+                            _ ->
+                                1
+                  in
+                  viewTargets progress model.targets
                 , case model.state of
                     TargetsEntering { ballPosition } ->
                         viewBallAt ballPosition
@@ -936,7 +944,7 @@ view model =
                                         ]
                             ]
 
-                    Lost ->
+                    Lost start ->
                         words "Game Over. Tap to Continue"
                             [ fillH 0.15
                             , transform [ scale 3 ]
