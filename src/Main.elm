@@ -491,12 +491,7 @@ updateOnTick frame model =
 
                             Just emitter ->
                                 { model
-                                    | state =
-                                        SimWithEmitter
-                                            { emitter = emitter
-                                            , balls = []
-                                            , extraBallsCollected = 0
-                                            }
+                                    | state = Sim { me = Just emitter, bs = [], ebc = 0 }
                                     , floorBalls = []
                                 }
 
@@ -517,10 +512,6 @@ updateOnTick frame model =
 
             else
                 let
-                    _ =
-                        sim.me
-                            |> Maybe.andThen (emitBalls frame)
-
                     { balls, targets, extraBallsCollected, floorBalls } =
                         moveBallsAndHandleCollision sim.bs model
 
