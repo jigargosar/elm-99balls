@@ -4,6 +4,7 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
+import Float.Extra
 import Html exposing (Attribute, Html, div, node)
 import Html.Attributes as A exposing (style)
 import Html.Events as E
@@ -907,17 +908,12 @@ viewSvg { vri, state, ballCount, targets, pointer, frame } =
     Svg.svg (svgAttrs vri)
         [ rect gc.ri [ fillP black ]
         , group
-            [ case state of
-                Lost _ ->
-                    fade 0.1
-
-                _ ->
-                    fade 1
+            [ maybeAttr (lerp 1 0.1 >> fade) (lostStateTransitionProgress state frame)
             ]
             [ viewBallCount ballCount
             , viewTargets state frame targets
             , viewStateContent frame pointer targets state
-            , viewDebugPointer pointer |> always viewNone
+            , viewDebugPointer pointer |> always noView
             ]
         , viewLostStateOverlay state
         ]
@@ -937,7 +933,7 @@ viewStateContent frame pointer targets state =
                 [ viewBallAt ballPosition
                 , case validInputAngleFromTo dragStartAt pointer of
                     Nothing ->
-                        viewNone
+                        noView
 
                     Just angle ->
                         group []
@@ -947,7 +943,7 @@ viewStateContent frame pointer targets state =
                 ]
 
         Lost _ ->
-            viewNone
+            noView
 
         Sim sim ->
             let
@@ -995,13 +991,13 @@ viewLostStateOverlay state =
                 ]
 
         _ ->
-            viewNone
+            noView
 
 
 viewFloorBalls floorBalls =
     case floorBalls of
         [] ->
-            viewNone
+            noView
 
         h :: t ->
             viewBalls (h :: (t |> reject (areBallsCloseEnough h)))
@@ -1086,6 +1082,17 @@ targetTransitionProgress state now =
 
         _ ->
             1
+
+
+lostStateTransitionProgress : State -> Float -> Maybe Float
+lostStateTransitionProgress state now =
+    case state of
+        Lost start ->
+            transitionProgress start now
+                |> Just
+
+        _ ->
+            Nothing
 
 
 viewTargets state now targets =
@@ -1241,10 +1248,6 @@ fillH =
 
 group =
     Svg.g
-
-
-viewNone =
-    Svg.text ""
 
 
 fade o =

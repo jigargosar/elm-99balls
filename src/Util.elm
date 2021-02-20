@@ -1,7 +1,9 @@
 module Util exposing (..)
 
 import Basics.Extra exposing (atLeast)
-import Html
+import Float.Extra
+import Html exposing (text)
+import Html.Attributes exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
@@ -643,6 +645,10 @@ eqByAtLeast tol a b =
     abs (a - b) < tol
 
 
+lerp =
+    Float.Extra.interpolateFrom
+
+
 when pred fn x =
     if pred x then
         fn x
@@ -813,3 +819,26 @@ offsetDecoder =
 pageXYDecoder : Decoder Vec
 pageXYDecoder =
     JD.map2 vec (JD.field "pageX" JD.float) (JD.field "pageY" JD.float)
+
+
+
+-- HTML
+
+
+maybeAttr : (a -> Html.Attribute msg) -> Maybe a -> Html.Attribute msg
+maybeAttr attrFn mb =
+    case mb of
+        Nothing ->
+            noAttr
+
+        Just v ->
+            attrFn v
+
+
+noAttr : Html.Attribute msg
+noAttr =
+    style "" ""
+
+
+noView =
+    text ""
