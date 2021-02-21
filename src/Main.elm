@@ -642,6 +642,17 @@ stepSimEmitter frame sim =
 
 convergeFloorBalls : List Ball -> List Ball
 convergeFloorBalls fbs =
+    let
+        convergeBallTowards : Vec -> Ball -> Ball
+        convergeBallTowards to ball =
+            let
+                p =
+                    vecFromTo ball.position to
+                        |> vecScale 0.1
+                        |> vecAdd ball.position
+            in
+            setBallPosition p ball
+    in
     fbs
         |> List.unconsLast
         |> Maybe.map
@@ -651,15 +662,21 @@ convergeFloorBalls fbs =
         |> Maybe.withDefault fbs
 
 
-convergeBallTowards : Vec -> Ball -> Ball
-convergeBallTowards to ball =
-    let
-        p =
-            vecFromTo ball.position to
-                |> vecScale 0.1
-                |> vecAdd ball.position
-    in
-    setBallPosition p ball
+areFloorBallsSettled : List Ball -> Bool
+areFloorBallsSettled floorBalls =
+    floorBalls
+        |> List.unconsLast
+        |> Maybe.map
+            (\( first, rest ) ->
+                List.all (areBallsCloseEnough first) rest
+            )
+        |> Maybe.withDefault False
+
+
+areBallsCloseEnough : Ball -> Ball -> Bool
+areBallsCloseEnough a b =
+    vecLenSqFromTo a.position b.position
+        |> eqByAtLeast 0.1 0
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
@@ -703,23 +720,6 @@ addNewTargetRowAndIncTurn game =
         , turn = inc game.turn
         , seed = seed
     }
-
-
-areFloorBallsSettled : List Ball -> Bool
-areFloorBallsSettled floorBalls =
-    floorBalls
-        |> List.unconsLast
-        |> Maybe.map
-            (\( first, rest ) ->
-                List.all (areBallsCloseEnough first) rest
-            )
-        |> Maybe.withDefault False
-
-
-areBallsCloseEnough : Ball -> Ball -> Bool
-areBallsCloseEnough a b =
-    vecLenSqFromTo a.position b.position
-        |> eqByAtLeast 0.1 0
 
 
 type alias BallUpdateAcc =
