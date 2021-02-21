@@ -141,20 +141,18 @@ type alias Sim =
 
 type alias Emitter =
     { start : Float
-    , next : Ball
-    , rest : List Ball
+    , proto : Ball
+    , remaining : Int
     }
 
 
 initEmitter : Float -> Vec -> Float -> Int -> Emitter
 initEmitter frame ballPosition angle ballCount =
     let
-        emitterBall =
+        proto =
             initBall ballPosition angle
     in
-    Emitter frame
-        emitterBall
-        (List.repeat (ballCount - 1) emitterBall)
+    Emitter frame proto (ballCount - 1)
 
 
 type TargetKind
@@ -623,16 +621,15 @@ stepSimEmitter frame sim =
     sim.mbEmitter
         |> Maybe.filter (\{ start } -> frame - start > 10)
         |> Maybe.map
-            (\emitter ->
+            (\{ proto, remaining } ->
                 { sim
-                    | balls = emitter.next :: sim.balls
+                    | balls = proto :: sim.balls
                     , mbEmitter =
-                        case emitter.rest of
-                            [] ->
-                                Nothing
+                        if remaining <= 0 then
+                            Nothing
 
-                            n :: r ->
-                                Just (Emitter frame n r)
+                        else
+                            Just (Emitter frame proto (remaining - 1))
                 }
             )
         |> Maybe.withDefault sim
@@ -982,7 +979,7 @@ viewRunningStateContent frame pointer targets rs =
                             sim.balls
 
                         Just em ->
-                            em.next :: sim.balls
+                            em.proto :: sim.balls
             in
             group [] [ viewBalls balls, viewFloorBalls sim.floored ]
 
