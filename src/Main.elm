@@ -888,7 +888,7 @@ view model =
 viewStateContent : Model -> List (Html Msg)
 viewStateContent m =
     let
-        viewSvg contentView =
+        svgSkeleton contentView =
             Svg.svg (svgAttrs m.vri)
                 [ rect gc.ri [ fillP black ]
                 , group []
@@ -905,11 +905,11 @@ viewStateContent m =
                     transitionProgress start m.frame
             in
             [ viewLostStateOverlayTransition progress
-            , viewSvg (viewTransitioningTargets progress m.targets)
+            , svgSkeleton (viewTransitioningTargets progress m.targets)
             ]
 
         Running rs ->
-            [ viewSvg
+            [ svgSkeleton
                 (group []
                     [ viewRunStateTargets m.frame rs m.targets
                     , viewRunningStateContent m.frame m.pointer m.targets rs
