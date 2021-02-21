@@ -37,7 +37,7 @@ import Util exposing (..)
 
   - [x] game over
 
-  - turn relative ball count. don't spend too much time. also check the 99balls game.
+  - [x] turn relative ball count. don't spend too much time. also check the 99balls game.
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
