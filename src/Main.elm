@@ -532,40 +532,46 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 game
 
         Sim_ sim ->
-            -- check for turn over
-            if
-                (sim.mbEmitter == Nothing)
-                    && (sim.balls == [])
-                    && areFloorBallsSettled sim.floored
-            then
-                case sim.floored |> List.last |> Maybe.map .position of
-                    Nothing ->
-                        game
+            case ballPositionOnTurnEnd sim of
+                Just ballPosition ->
+                    { game
+                        | state =
+                            if canTargetsSafelyMoveDown game.targets then
+                                TargetsEntering
+                                    { start = frame
+                                    , ballPosition = ballPosition
+                                    }
 
-                    Just ballPosition ->
-                        { game
-                            | state =
-                                if canTargetsSafelyMoveDown game.targets then
-                                    TargetsEntering
-                                        { start = frame
-                                        , ballPosition = ballPosition
-                                        }
+                            else
+                                GameLost frame
+                    }
+                        |> addNewTargetRowAndIncTurn
 
-                                else
-                                    GameLost frame
-                        }
-                            |> addNewTargetRowAndIncTurn
+                Nothing ->
+                    let
+                        ( { ebc, targets }, newSim ) =
+                            stepSim frame game.targets sim
+                    in
+                    { game
+                        | state = Sim_ newSim
+                        , targets = targets
+                        , ballCount = game.ballCount + ebc
+                    }
 
-            else
-                let
-                    ( { ebc, targets }, newSim ) =
-                        stepSim frame game.targets sim
-                in
-                { game
-                    | state = Sim_ newSim
-                    , targets = targets
-                    , ballCount = game.ballCount + ebc
-                }
+
+ballPositionOnTurnEnd : Sim -> Maybe Vec
+ballPositionOnTurnEnd sim =
+    let
+        turnEnded =
+            (sim.mbEmitter == Nothing)
+                && (sim.balls == [])
+                && areFloorBallsSettled sim.floored
+    in
+    if turnEnded then
+        sim.floored |> List.last |> Maybe.map .position
+
+    else
+        Nothing
 
 
 stepSim : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
