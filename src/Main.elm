@@ -888,23 +888,38 @@ view model =
 viewStateContent : Model -> List (Html Msg)
 viewStateContent model =
     let
-        { vri, ballCount, targets, pointer, frame } =
-            model
+        frame =
+            model.frame
+
+        targets =
+            model.targets
+
+        pointer =
+            model.pointer
+
+        state =
+            model.state
     in
-    case model.state of
+    case state of
         GameLost start ->
             let
                 progress =
                     transitionProgress start frame
             in
-            [ viewLostStateOverlay start frame
+            [ viewLostStateOverlayTransition progress
             , viewSvg (viewTransitioningTargets progress targets)
                 model
             ]
 
         Running rs ->
-            [ viewSvg (viewRunningState frame pointer targets rs)
-                model
+            let
+                cv =
+                    group []
+                        [ viewRunStateTargets frame rs targets
+                        , viewRunningStateContent frame pointer targets rs
+                        ]
+            in
+            [ viewSvg cv model
             ]
 
 
@@ -916,14 +931,6 @@ viewSvg contentView { vri, ballCount, pointer } =
             , contentView
             , viewDebugPointer pointer |> hideView
             ]
-        ]
-
-
-viewRunningState : Float -> Vec -> List Target -> RunState -> Svg Msg
-viewRunningState frame pointer targets rs =
-    group []
-        [ viewRunStateTargets frame rs targets
-        , viewRunningStateContent frame pointer targets rs
         ]
 
 
@@ -987,12 +994,8 @@ viewBallCount ballCount =
         ]
 
 
-viewLostStateOverlay : Float -> Float -> Html Msg
-viewLostStateOverlay start now =
-    let
-        progress =
-            transitionProgress start now
-    in
+viewLostStateOverlayTransition : Float -> Html Msg
+viewLostStateOverlayTransition progress =
     div
         [ style "position" "absolute"
         , style "width" "100%"
