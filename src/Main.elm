@@ -905,7 +905,7 @@ viewStateContent m =
                     transitionProgress start m.frame
             in
             [ viewLostStateOverlayTransition progress
-            , svgSkeleton (viewTransitioningTargets progress m.targets)
+            , svgSkeleton (viewTargets progress m.targets)
             ]
 
         Running rs ->
@@ -1102,11 +1102,11 @@ viewRunStateTargets now rs targets =
         progress =
             targetTransitionProgress rs now
     in
-    viewTransitioningTargets progress targets
+    viewTargets progress targets
 
 
-viewTransitioningTargets : Float -> List Target -> Svg msg
-viewTransitioningTargets progress targets =
+viewTargets : Float -> List Target -> Svg msg
+viewTargets progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
