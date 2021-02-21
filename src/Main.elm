@@ -555,7 +555,7 @@ updateOnTick frame model =
                         floored ++ convergeFloorBalls sim.fbs
                 in
                 { model
-                    | state = Sim { bs = newBs, me = newMe, fbs = newFbs }
+                    | state = Sim { me = newMe, bs = newBs, fbs = newFbs }
                     , targets = targets
                     , ballCount = model.ballCount + ebc
                 }
