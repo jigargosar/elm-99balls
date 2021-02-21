@@ -493,11 +493,11 @@ updateGameOnTick env game =
             game
 
         Running state ->
-            updateRunStateOnTick env state game
+            updateRunningGameOnTick env state game
 
 
-updateRunStateOnTick : Env -> RunState -> Game -> Game
-updateRunStateOnTick { pointer, pointerDown, prevPointerDown, frame } state game =
+updateRunningGameOnTick : Env -> RunState -> Game -> Game
+updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state game =
     case state of
         TargetsEntering { start, ballPosition } ->
             if transitionDone start frame then
