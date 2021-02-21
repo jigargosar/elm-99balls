@@ -539,23 +539,16 @@ updateOnTick frame model =
 
                     { floored, updated } =
                         splitBallUpdates ballUpdates
-
-                    ( newBs, newMe ) =
-                        case
-                            sim.me
-                                |> Maybe.andThen (emitBalls frame)
-                        of
-                            Nothing ->
-                                ( updated, sim.me )
-
-                            Just ( eb, me_ ) ->
-                                ( eb :: updated, me_ )
-
-                    newFbs =
-                        floored ++ convergeFloorBalls sim.fbs
                 in
                 { model
-                    | state = Sim { me = newMe, bs = newBs, fbs = newFbs }
+                    | state =
+                        Sim
+                            ({ sim
+                                | bs = updated
+                                , fbs = floored ++ convergeFloorBalls sim.fbs
+                             }
+                                |> emitBalls frame
+                            )
                     , targets = targets
                     , ballCount = model.ballCount + ebc
                 }
@@ -581,8 +574,21 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
-emitBalls : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
-emitBalls frame emitter =
+emitBalls : Float -> SimR -> SimR
+emitBalls frame sim =
+    case
+        sim.me
+            |> Maybe.andThen (emitBallsHelp frame)
+    of
+        Nothing ->
+            sim
+
+        Just ( eb, me ) ->
+            { sim | bs = eb :: sim.bs, me = me }
+
+
+emitBallsHelp : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
+emitBallsHelp frame emitter =
     if frame - emitter.start > 10 then
         Just
             ( emitter.next
