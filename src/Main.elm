@@ -113,7 +113,7 @@ type State
 
 
 type alias SimR =
-    { me : Maybe Emitter, bs : List Ball, fbs : List Ball }
+    { mbEmitter : Maybe Emitter, balls : List Ball, floored : List Ball }
 
 
 type alias Emitter =
@@ -488,7 +488,7 @@ updateOnTick frame model =
                                     emitterBall
                                     (List.repeat (model.ballCount - 1) emitterBall)
                         in
-                        { model | state = Sim { me = Just emitter, bs = [], fbs = [] } }
+                        { model | state = Sim { mbEmitter = Just emitter, balls = [], floored = [] } }
 
             else
                 model
@@ -502,8 +502,8 @@ updateOnTick frame model =
 
         Sim sim ->
             -- check for turn over
-            if sim.me == Nothing && sim.bs == [] && areFloorBallsSettled sim.fbs then
-                case sim.fbs |> List.last |> Maybe.map .position of
+            if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
+                case sim.floored |> List.last |> Maybe.map .position of
                     Nothing ->
                         model
 
@@ -543,14 +543,14 @@ updateOnTick frame model =
 
 stepSim : Float -> List Target -> SimR -> ( { ebc : Int, targets : List Target }, SimR )
 stepSim frame targets sim =
-    sim.bs
+    sim.balls
         |> List.mapAccuml updateBall { targets = targets, ebc = 0 }
         |> mapSnd
             (splitBallUpdates
                 >> (\{ floored, updated } ->
                         { sim
-                            | bs = updated
-                            , fbs = floored ++ convergeFloorBalls sim.fbs
+                            | balls = updated
+                            , floored = floored ++ convergeFloorBalls sim.floored
                         }
                             |> stepSimEmitter frame
                    )
@@ -579,13 +579,13 @@ incFrame model =
 
 stepSimEmitter : Float -> SimR -> SimR
 stepSimEmitter frame sim =
-    sim.me
+    sim.mbEmitter
         |> Maybe.filter (\{ start } -> frame - start > 10)
         |> Maybe.map
             (\emitter ->
                 { sim
-                    | bs = emitter.next :: sim.bs
-                    , me =
+                    | balls = emitter.next :: sim.balls
+                    , mbEmitter =
                         case emitter.rest of
                             [] ->
                                 Nothing
@@ -924,14 +924,14 @@ viewStateContent frame pointer targets state =
         Sim sim ->
             let
                 balls =
-                    case sim.me of
+                    case sim.mbEmitter of
                         Nothing ->
-                            sim.bs
+                            sim.balls
 
                         Just em ->
-                            em.next :: sim.bs
+                            em.next :: sim.balls
             in
-            group [] [ viewBalls balls, viewFloorBalls sim.fbs ]
+            group [] [ viewBalls balls, viewFloorBalls sim.floored ]
 
 
 svgAttrs : Vec -> List (Attribute Msg)
