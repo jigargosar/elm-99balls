@@ -843,6 +843,16 @@ maybeAttr attrFn mb =
             attrFn v
 
 
+maybeView : (a -> Html.Html msg) -> Maybe a -> Html.Html msg
+maybeView viewFn mb =
+    case mb of
+        Nothing ->
+            noView
+
+        Just x ->
+            viewFn x
+
+
 noAttr : Html.Attribute msg
 noAttr =
     style "" ""

@@ -898,26 +898,25 @@ viewStateContent model =
                     transitionProgress start frame
             in
             [ viewLostStateOverlay start frame
-            , Svg.svg (svgAttrs vri)
-                [ rect gc.ri [ fillP black ]
-                , group []
-                    [ viewBallCount ballCount
-                    , viewTransitioningTargets progress targets
-                    , viewDebugPointer pointer |> hideView
-                    ]
-                ]
+            , viewSvg (viewTransitioningTargets progress targets)
+                model
             ]
 
         Running rs ->
-            [ Svg.svg (svgAttrs vri)
-                [ rect gc.ri [ fillP black ]
-                , group []
-                    [ viewBallCount ballCount
-                    , viewRunningState frame pointer targets rs
-                    , viewDebugPointer pointer |> hideView
-                    ]
-                ]
+            [ viewSvg (viewRunningState frame pointer targets rs)
+                model
             ]
+
+
+viewSvg contentView { vri, ballCount, pointer } =
+    Svg.svg (svgAttrs vri)
+        [ rect gc.ri [ fillP black ]
+        , group []
+            [ viewBallCount ballCount
+            , contentView
+            , viewDebugPointer pointer |> hideView
+            ]
+        ]
 
 
 viewRunningState : Float -> Vec -> List Target -> RunState -> Svg Msg
