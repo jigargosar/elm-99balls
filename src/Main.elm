@@ -78,7 +78,7 @@ type alias Model =
     { turn : Int
     , ballCount : Int
     , targets : List Target
-    , state : RunState
+    , state : State
     , pointerDown : Bool
     , prevPointerDown : Bool
     , pointer : Vec
@@ -104,12 +104,16 @@ transitionDone start now =
     transitionProgress start now >= 1
 
 
+type State
+    = Running RunState
+    | GameLost Float
+
+
 type RunState
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
     | SimTag Sim
-    | Lost Float
 
 
 type alias Sim =
@@ -350,7 +354,7 @@ init _ =
     ( { turn = -1
       , ballCount = -1
       , targets = []
-      , state = Lost 0
+      , state = GameLost 0
 
       -- mock game state above ^
       , pointerDown = False
@@ -375,7 +379,7 @@ initGame model =
     { model
         | ballCount = initialBallCount
         , targets = []
-        , state = TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
+        , state = Running <| TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
         , turn = 1
     }
         |> applyN 1 addNewTargetRowAndIncTurn
@@ -452,93 +456,97 @@ cachePointer model =
 updateOnTick : Float -> Model -> Model
 updateOnTick frame model =
     case model.state of
-        TargetsEntering { start, ballPosition } ->
-            if transitionDone start frame then
-                { model | state = WaitingForInput { ballPosition = ballPosition } }
-
-            else
-                model
-
-        WaitingForInput { ballPosition } ->
-            if model.pointerDown && not model.prevPointerDown then
-                { model
-                    | state =
-                        DraggingPointer
-                            { dragStartAt = model.pointer |> vecMapY (atMost 0)
-                            , ballPosition = ballPosition
-                            }
-                }
-
-            else
-                model
-
-        DraggingPointer { dragStartAt, ballPosition } ->
-            if not model.pointerDown then
-                case validInputAngleFromTo dragStartAt model.pointer of
-                    Nothing ->
-                        { model | state = WaitingForInput { ballPosition = ballPosition } }
-
-                    Just angle ->
-                        let
-                            emitterBall =
-                                initBall ballPosition angle
-
-                            emitter =
-                                Emitter model.frame
-                                    emitterBall
-                                    (List.repeat (model.ballCount - 1) emitterBall)
-                        in
-                        { model | state = SimTag { mbEmitter = Just emitter, balls = [], floored = [] } }
-
-            else
-                model
-
-        Lost _ ->
+        GameLost _ ->
             if model.pointerDown && not model.prevPointerDown then
                 initGame model
 
             else
                 model
 
-        SimTag sim ->
-            -- check for turn over
-            if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
-                case sim.floored |> List.last |> Maybe.map .position of
-                    Nothing ->
+        Running state ->
+            case state of
+                TargetsEntering { start, ballPosition } ->
+                    if transitionDone start frame then
+                        { model | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+
+                    else
                         model
 
-                    Just ballPosition ->
-                        -- check for game over
+                WaitingForInput { ballPosition } ->
+                    if model.pointerDown && not model.prevPointerDown then
+                        { model
+                            | state =
+                                Running <|
+                                    DraggingPointer
+                                        { dragStartAt = model.pointer |> vecMapY (atMost 0)
+                                        , ballPosition = ballPosition
+                                        }
+                        }
+
+                    else
+                        model
+
+                DraggingPointer { dragStartAt, ballPosition } ->
+                    if not model.pointerDown then
+                        case validInputAngleFromTo dragStartAt model.pointer of
+                            Nothing ->
+                                { model | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+
+                            Just angle ->
+                                let
+                                    emitterBall =
+                                        initBall ballPosition angle
+
+                                    emitter =
+                                        Emitter model.frame
+                                            emitterBall
+                                            (List.repeat (model.ballCount - 1) emitterBall)
+                                in
+                                { model | state = Running <| SimTag { mbEmitter = Just emitter, balls = [], floored = [] } }
+
+                    else
+                        model
+
+                SimTag sim ->
+                    -- check for turn over
+                    if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
+                        case sim.floored |> List.last |> Maybe.map .position of
+                            Nothing ->
+                                model
+
+                            Just ballPosition ->
+                                -- check for game over
+                                let
+                                    newModel =
+                                        { model
+                                            | state =
+                                                Running <|
+                                                    TargetsEntering
+                                                        { start = frame
+                                                        , ballPosition = ballPosition
+                                                        }
+                                        }
+                                in
+                                if canTargetsSafelyMoveDown model.targets then
+                                    newModel
+                                        |> addNewTargetRowAndIncTurn
+
+                                else
+                                    -- game over : for now re-simulate current turn.
+                                    -- newModel
+                                    { model | state = GameLost model.frame }
+                                        |> addNewTargetRowAndIncTurn
+
+                    else
                         let
-                            newModel =
-                                { model
-                                    | state =
-                                        TargetsEntering
-                                            { start = frame
-                                            , ballPosition = ballPosition
-                                            }
-                                }
+                            ( { ebc, targets }, newSim ) =
+                                stepSim frame model.targets sim
                         in
-                        if canTargetsSafelyMoveDown model.targets then
-                            newModel
-                                |> addNewTargetRowAndIncTurn
-
-                        else
-                            -- game over : for now re-simulate current turn.
-                            -- newModel
-                            { model | state = Lost model.frame }
-                                |> addNewTargetRowAndIncTurn
-
-            else
-                let
-                    ( { ebc, targets }, newSim ) =
-                        stepSim frame model.targets sim
-                in
-                { model
-                    | state = SimTag newSim
-                    , targets = targets
-                    , ballCount = model.ballCount + ebc
-                }
+                        { model
+                            | state = Running <| SimTag newSim
+                            , targets = targets
+                            , ballCount = model.ballCount + ebc
+                        }
 
 
 stepSim : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
@@ -873,31 +881,48 @@ view model =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , div [ style "position" "relative" ]
-            [ viewLostStateOverlayHtml model.state
-            , viewSvg model
-            ]
+            (let
+                { vri, ballCount, targets, pointer, frame } =
+                    model
+             in
+             case model.state of
+                GameLost start ->
+                    let
+                        progress =
+                            transitionProgress start frame
+                    in
+                    [ viewLostStateOverlay
+                    , Svg.svg
+                        ((lerp 1 0.1 progress |> fade)
+                            :: svgAttrs vri
+                        )
+                        [ rect gc.ri [ fillP black ]
+                        , group []
+                            [ viewBallCount ballCount
+                            , viewTransitioningTargets progress targets
+                            , viewDebugPointer pointer |> hideView
+                            ]
+                        ]
+                    ]
+
+                Running rs ->
+                    [ Svg.svg (svgAttrs vri)
+                        [ rect gc.ri [ fillP black ]
+                        , group []
+                            [ viewBallCount ballCount
+                            , viewRunStateTargets frame rs targets
+                            , viewRunningState frame pointer targets rs
+                            , viewDebugPointer pointer |> hideView
+                            ]
+                        ]
+                    ]
+            )
         ]
 
 
-viewSvg : Model -> Html Msg
-viewSvg { vri, state, ballCount, targets, pointer, frame } =
-    Svg.svg (svgAttrs vri)
-        [ rect gc.ri [ fillP black ]
-        , group
-            [ maybeAttr (lerp 1 0.1 >> fade) (lostStateTransitionProgress state frame)
-            ]
-            [ viewBallCount ballCount
-            , viewTargets state frame targets
-            , viewStateContent frame pointer targets state
-            , viewDebugPointer pointer |> hideView
-            ]
-        , viewLostStateOverlaySvg state |> hideView
-        ]
-
-
-viewStateContent : Float -> Vec -> List Target -> RunState -> Svg Msg
-viewStateContent frame pointer targets state =
-    case state of
+viewRunningState : Float -> Vec -> List Target -> RunState -> Svg Msg
+viewRunningState frame pointer targets rs =
+    case rs of
         TargetsEntering { ballPosition } ->
             viewBallAt ballPosition
 
@@ -917,9 +942,6 @@ viewStateContent frame pointer targets state =
                             , viewDebugPoints [ pointer, dragStartAt ]
                             ]
                 ]
-
-        Lost _ ->
-            noView
 
         SimTag sim ->
             let
@@ -958,41 +980,24 @@ viewBallCount ballCount =
         ]
 
 
-viewLostStateOverlaySvg state =
-    case state of
-        Lost _ ->
-            words "Game Over. Tap to Continue"
-                [ fillH 0.15
-                , transform [ scale 3 ]
-                ]
-
-        _ ->
-            noView
-
-
-viewLostStateOverlayHtml : RunState -> Html Msg
-viewLostStateOverlayHtml state =
-    case state of
-        Lost _ ->
-            div
-                [ style "position" "absolute"
-                , style "width" "100%"
-                , style "height" "100%"
-                , style "display" "flex"
-                , style "flex-direction" "column"
-                , style "align-items" "center"
-                , style "justify-content" "center"
-                , style "color" (fromHue 0.15 |> Color.toCssString)
-                , style "font-size" "2rem"
-                , style "user-select" "none"
-                , onClick RestartGameClicked
-                ]
-                [ div [ style "font-size" "3rem" ] [ text "Game Over" ]
-                , div [] [ text "Tap to Continue" ]
-                ]
-
-        _ ->
-            noView
+viewLostStateOverlay : Html Msg
+viewLostStateOverlay =
+    div
+        [ style "position" "absolute"
+        , style "width" "100%"
+        , style "height" "100%"
+        , style "display" "flex"
+        , style "flex-direction" "column"
+        , style "align-items" "center"
+        , style "justify-content" "center"
+        , style "color" (fromHue 0.15 |> Color.toCssString)
+        , style "font-size" "2rem"
+        , style "user-select" "none"
+        , onClick RestartGameClicked
+        ]
+        [ div [ style "font-size" "3rem" ] [ text "Game Over" ]
+        , div [] [ text "Tap to Continue" ]
+        ]
 
 
 viewFloorBalls floorBalls =
@@ -1073,33 +1078,20 @@ ballTravelPathHelp acc ball pathLen path =
 
 
 targetTransitionProgress : RunState -> Float -> Float
-targetTransitionProgress state now =
-    case state of
+targetTransitionProgress rs now =
+    case rs of
         TargetsEntering { start } ->
-            transitionProgress start now
-
-        Lost start ->
             transitionProgress start now
 
         _ ->
             1
 
 
-lostStateTransitionProgress : RunState -> Float -> Maybe Float
-lostStateTransitionProgress state now =
-    case state of
-        Lost start ->
-            transitionProgress start now
-                |> Just
-
-        _ ->
-            Nothing
-
-
-viewTargets state now targets =
+viewRunStateTargets : Float -> RunState -> List Target -> Svg msg
+viewRunStateTargets now rs targets =
     let
         progress =
-            targetTransitionProgress state now
+            targetTransitionProgress rs now
     in
     viewTransitioningTargets progress targets
 
