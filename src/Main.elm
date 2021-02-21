@@ -146,6 +146,17 @@ type alias Emitter =
     }
 
 
+initEmitter : Float -> Vec -> Float -> Int -> Emitter
+initEmitter frame ballPosition angle ballCount =
+    let
+        emitterBall =
+            initBall ballPosition angle
+    in
+    Emitter frame
+        emitterBall
+        (List.repeat (ballCount - 1) emitterBall)
+
+
 type TargetKind
     = SolidTarget Int
     | ExtraBallTarget
@@ -506,29 +517,24 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
                 DraggingPointer { dragStartAt, ballPosition } ->
                     if not pointerDown then
-                        case validInputAngleFromTo dragStartAt pointer of
-                            Nothing ->
-                                { game | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+                        let
+                            rs =
+                                case validInputAngleFromTo dragStartAt pointer of
+                                    Nothing ->
+                                        WaitingForInput { ballPosition = ballPosition }
 
-                            Just angle ->
-                                let
-                                    emitterBall =
-                                        initBall ballPosition angle
-
-                                    emitter =
-                                        Emitter frame
-                                            emitterBall
-                                            (List.repeat (game.ballCount - 1) emitterBall)
-                                in
-                                { game
-                                    | state =
-                                        Running <|
-                                            Sim_
-                                                { mbEmitter = Just emitter
-                                                , balls = []
-                                                , floored = []
-                                                }
-                                }
+                                    Just angle ->
+                                        let
+                                            emitter =
+                                                initEmitter frame ballPosition angle game.ballCount
+                                        in
+                                        Sim_
+                                            { mbEmitter = Just emitter
+                                            , balls = []
+                                            , floored = []
+                                            }
+                        in
+                        { game | state = Running rs }
 
                     else
                         game
