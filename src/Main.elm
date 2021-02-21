@@ -538,7 +538,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             if not pointerDown then
                 { game
                     | state =
-                        case validInputAngleFromTo dragStartAt pointer of
+                        case validAimAngleTowards dragStartAt pointer of
                             Nothing ->
                                 initWaitingForInputState ballPosition
 
@@ -610,8 +610,8 @@ stepSimHelp frame targets sim =
             )
 
 
-validInputAngleFromTo : Vec -> Vec -> Maybe Float
-validInputAngleFromTo start current =
+validAimAngleTowards : Vec -> Vec -> Maybe Float
+validAimAngleTowards start current =
     if start.y < current.y then
         vecAngleFromTo current start
             |> clampInputAngle
@@ -952,7 +952,7 @@ viewStateContent frame pointer targets state =
         Aiming { dragStartAt, ballPosition } ->
             group []
                 [ viewBallAt ballPosition
-                , case validInputAngleFromTo dragStartAt pointer of
+                , case validAimAngleTowards dragStartAt pointer of
                     Nothing ->
                         noView
 
