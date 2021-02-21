@@ -9,6 +9,7 @@ import Html.Attributes as A exposing (style)
 import Html.Events as E exposing (onClick)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
+import Maybe.Extra as Maybe
 import Random
 import Random.Extra as Random
 import Svg exposing (Svg)
@@ -580,13 +581,22 @@ emitBalls : Float -> SimR -> SimR
 emitBalls frame sim =
     case
         sim.me
-            |> Maybe.andThen (emitBallsHelp frame)
+            |> Maybe.filter (\{ start } -> frame - start > 10)
     of
         Nothing ->
             sim
 
-        Just ( eb, me ) ->
-            { sim | bs = eb :: sim.bs, me = me }
+        Just emitter ->
+            { sim
+                | bs = emitter.next :: sim.bs
+                , me =
+                    case emitter.rest of
+                        [] ->
+                            Nothing
+
+                        n :: r ->
+                            Just (Emitter frame n r)
+            }
 
 
 emitBallsHelp : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
