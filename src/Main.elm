@@ -891,7 +891,7 @@ view model =
                         progress =
                             transitionProgress start frame
                     in
-                    [ viewLostStateOverlay
+                    [ viewLostStateOverlay start frame
                     , Svg.svg
                         ((lerp 1 0.1 progress |> fade)
                             :: svgAttrs vri
@@ -980,8 +980,12 @@ viewBallCount ballCount =
         ]
 
 
-viewLostStateOverlay : Html Msg
-viewLostStateOverlay =
+viewLostStateOverlay : Float -> Float -> Html Msg
+viewLostStateOverlay start now =
+    let
+        progress =
+            transitionProgress start now
+    in
     div
         [ style "position" "absolute"
         , style "width" "100%"
@@ -994,6 +998,7 @@ viewLostStateOverlay =
         , style "font-size" "2rem"
         , style "user-select" "none"
         , onClick RestartGameClicked
+        , style "opacity" (lerp 0 0.9 progress |> String.fromFloat)
         ]
         [ div [ style "font-size" "3rem" ] [ text "Game Over" ]
         , div [] [ text "Tap to Continue" ]
