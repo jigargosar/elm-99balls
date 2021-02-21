@@ -561,15 +561,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> addNewTargetRowAndIncTurn
 
                 Nothing ->
-                    let
-                        ( { ebc, targets }, newSim ) =
-                            stepSim frame game.targets sim
-                    in
-                    { game
-                        | state = Sim_ newSim
-                        , targets = targets
-                        , ballCount = game.ballCount + ebc
-                    }
+                    stepSim frame game sim
 
 
 ballPositionOnTurnEnd : Sim -> Maybe Vec
@@ -587,8 +579,21 @@ ballPositionOnTurnEnd sim =
         Nothing
 
 
-stepSim : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
-stepSim frame targets sim =
+stepSim : Float -> Game -> Sim -> Game
+stepSim frame game sim =
+    let
+        ( { ebc, targets }, newSim ) =
+            stepSimHelp frame game.targets sim
+    in
+    { game
+        | state = Sim_ newSim
+        , targets = targets
+        , ballCount = game.ballCount + ebc
+    }
+
+
+stepSimHelp : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
+stepSimHelp frame targets sim =
     sim.balls
         |> List.mapAccuml updateBall { targets = targets, ebc = 0 }
         |> mapSnd
