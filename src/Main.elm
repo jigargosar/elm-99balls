@@ -533,27 +533,19 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 game
 
                             Just ballPosition ->
-                                -- check for game over
-                                let
-                                    newModel =
-                                        { game
-                                            | state =
-                                                Running <|
-                                                    TargetsEntering
-                                                        { start = frame
-                                                        , ballPosition = ballPosition
-                                                        }
-                                        }
-                                in
-                                if canTargetsSafelyMoveDown game.targets then
-                                    newModel
-                                        |> addNewTargetRowAndIncTurn
+                                { game
+                                    | state =
+                                        if canTargetsSafelyMoveDown game.targets then
+                                            Running <|
+                                                TargetsEntering
+                                                    { start = frame
+                                                    , ballPosition = ballPosition
+                                                    }
 
-                                else
-                                    -- game over : for now re-simulate current turn.
-                                    -- newModel
-                                    { game | state = GameLost frame }
-                                        |> addNewTargetRowAndIncTurn
+                                        else
+                                            GameLost frame
+                                }
+                                    |> addNewTargetRowAndIncTurn
 
                     else
                         let
