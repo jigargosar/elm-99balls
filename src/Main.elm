@@ -530,28 +530,30 @@ updateOnTick frame model =
 
             else
                 let
-                    ( { targets, ebc }, ballUpdates ) =
-                        sim.bs
-                            |> List.mapAccuml updateBall
-                                { targets = model.targets
-                                , ebc = 0
-                                }
-
-                    { floored, updated } =
-                        splitBallUpdates ballUpdates
+                    ( { ebc, targets }, newSim ) =
+                        stepSim frame model.targets sim
                 in
                 { model
-                    | state =
-                        Sim
-                            ({ sim
-                                | bs = updated
-                                , fbs = floored ++ convergeFloorBalls sim.fbs
-                             }
-                                |> emitBalls frame
-                            )
+                    | state = Sim newSim
                     , targets = targets
                     , ballCount = model.ballCount + ebc
                 }
+
+
+stepSim : Float -> List Target -> SimR -> ( { ebc : Int, targets : List Target }, SimR )
+stepSim frame targets sim =
+    sim.bs
+        |> List.mapAccuml updateBall { targets = targets, ebc = 0 }
+        |> mapSnd
+            (splitBallUpdates
+                >> (\{ floored, updated } ->
+                        { sim
+                            | bs = updated
+                            , fbs = floored ++ convergeFloorBalls sim.fbs
+                        }
+                            |> emitBalls frame
+                   )
+            )
 
 
 validInputAngleFromTo : Vec -> Vec -> Maybe Float
