@@ -493,6 +493,19 @@ pageToWorld env pageCord =
 --        |> vecScale svgScale
 
 
+initWaitingForInputState : Vec -> State
+initWaitingForInputState ballPosition =
+    WaitingForInput { ballPosition = ballPosition }
+
+
+initTargetsEnteringState : Float -> Vec -> State
+initTargetsEnteringState start ballPosition =
+    TargetsEntering
+        { start = start
+        , ballPosition = ballPosition
+        }
+
+
 updateGameOnTick : Env -> Game -> Game
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
@@ -501,7 +514,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
         TargetsEntering { start, ballPosition } ->
             if transitionDone start frame then
-                { game | state = WaitingForInput { ballPosition = ballPosition } }
+                { game | state = initWaitingForInputState ballPosition }
 
             else
                 game
@@ -525,7 +538,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     | state =
                         case validInputAngleFromTo dragStartAt pointer of
                             Nothing ->
-                                WaitingForInput { ballPosition = ballPosition }
+                                initWaitingForInputState ballPosition
 
                             Just angle ->
                                 Sim_ (initSim frame ballPosition angle game.ballCount)
@@ -540,10 +553,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     { game
                         | state =
                             if canTargetsSafelyMoveDown game.targets then
-                                TargetsEntering
-                                    { start = frame
-                                    , ballPosition = ballPosition
-                                    }
+                                initTargetsEnteringState frame ballPosition
 
                             else
                                 GameLost frame
