@@ -546,7 +546,11 @@ updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state g
 
         Sim_ sim ->
             -- check for turn over
-            if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
+            if
+                (sim.mbEmitter == Nothing)
+                    && (sim.balls == [])
+                    && areFloorBallsSettled sim.floored
+            then
                 case sim.floored |> List.last |> Maybe.map .position of
                     Nothing ->
                         game
