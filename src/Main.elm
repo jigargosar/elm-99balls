@@ -78,7 +78,7 @@ type alias Model =
     { turn : Int
     , ballCount : Int
     , targets : List Target
-    , state : State
+    , state : RunState
     , pointerDown : Bool
     , prevPointerDown : Bool
     , pointer : Vec
@@ -104,7 +104,7 @@ transitionDone start now =
     transitionProgress start now >= 1
 
 
-type State
+type RunState
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
@@ -895,7 +895,7 @@ viewSvg { vri, state, ballCount, targets, pointer, frame } =
         ]
 
 
-viewStateContent : Float -> Vec -> List Target -> State -> Svg Msg
+viewStateContent : Float -> Vec -> List Target -> RunState -> Svg Msg
 viewStateContent frame pointer targets state =
     case state of
         TargetsEntering { ballPosition } ->
@@ -970,7 +970,7 @@ viewLostStateOverlaySvg state =
             noView
 
 
-viewLostStateOverlayHtml : State -> Html Msg
+viewLostStateOverlayHtml : RunState -> Html Msg
 viewLostStateOverlayHtml state =
     case state of
         Lost _ ->
@@ -1072,7 +1072,7 @@ ballTravelPathHelp acc ball pathLen path =
             path
 
 
-targetTransitionProgress : State -> Float -> Float
+targetTransitionProgress : RunState -> Float -> Float
 targetTransitionProgress state now =
     case state of
         TargetsEntering { start } ->
@@ -1085,7 +1085,7 @@ targetTransitionProgress state now =
             1
 
 
-lostStateTransitionProgress : State -> Float -> Maybe Float
+lostStateTransitionProgress : RunState -> Float -> Maybe Float
 lostStateTransitionProgress state now =
     case state of
         Lost start ->
