@@ -346,8 +346,8 @@ init _ =
         initialSeed =
             seedFrom 4
     in
-    ( { turn = 1
-      , ballCount = 0
+    ( { turn = -1
+      , ballCount = -1
       , targets = []
       , state = Lost 0
 
@@ -375,6 +375,7 @@ initGame model =
         | ballCount = initialBallCount
         , targets = []
         , state = TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
+        , turn = 1
     }
         |> applyN 1 addNewTargetRowAndIncTurn
         |> identity
@@ -530,8 +531,15 @@ updateOnTick frame model =
 
             else
                 let
-                    { balls, targets, ebc, floorBalls } =
-                        moveBallsAndHandleCollision sim.bs model
+                    ( { targets, ebc }, ballUpdates ) =
+                        sim.bs
+                            |> List.mapAccuml updateBall
+                                { targets = model.targets
+                                , ebc = 0
+                                }
+
+                    { floored, updated } =
+                        splitBallUpdates ballUpdates
 
                     ( newBs, newMe ) =
                         case
@@ -539,16 +547,16 @@ updateOnTick frame model =
                                 |> Maybe.andThen (emitBalls frame)
                         of
                             Nothing ->
-                                ( balls, sim.me )
+                                ( updated, sim.me )
 
                             Just ( eb, me_ ) ->
-                                ( eb :: balls, me_ )
+                                ( eb :: updated, me_ )
 
                     newEbc =
                         ebc + sim.ebc
 
                     newFbs =
-                        floorBalls ++ convergeFloorBalls sim.fbs
+                        floored ++ convergeFloorBalls sim.fbs
                 in
                 { model
                     | state = Sim { bs = newBs, me = newMe, ebc = newEbc, fbs = newFbs }
@@ -613,29 +621,6 @@ convergeBallTowards to ball =
                 |> vecAdd ball.position
     in
     setBallPosition p ball
-
-
-moveBallsAndHandleCollision :
-    List Ball
-    -> Model
-    -> { balls : List Ball, ebc : Int, targets : List Target, floorBalls : List Ball }
-moveBallsAndHandleCollision balls model =
-    let
-        ( { targets, ebc }, ballUpdates ) =
-            balls
-                |> List.mapAccuml updateBall
-                    { targets = model.targets
-                    , ebc = 0
-                    }
-
-        { floored, updated } =
-            splitBallUpdates ballUpdates
-    in
-    { balls = updated
-    , ebc = ebc
-    , targets = targets
-    , floorBalls = floored
-    }
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
