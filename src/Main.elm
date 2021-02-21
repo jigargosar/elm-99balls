@@ -74,14 +74,28 @@ type alias Flags =
     ()
 
 
-type alias Model =
-    { game : Game
-    , pointerDown : Bool
+type Model
+    = Model Env Game
+
+
+type alias Env =
+    { pointerDown : Bool
     , prevPointerDown : Bool
     , pointer : Vec
     , prevPointer : Vec
     , frame : Float
     , vri : Vec
+    }
+
+
+initialEnvironment : Env
+initialEnvironment =
+    { pointerDown = False
+    , prevPointerDown = False
+    , pointer = vecZero
+    , prevPointer = vecZero
+    , frame = 0
+    , vri = gc.ri
     }
 
 
@@ -356,17 +370,10 @@ init _ =
         initialSeed =
             seedFrom 4
 
-        initialFrame =
-            0
+        env =
+            initialEnvironment
     in
-    ( { game = initGame initialFrame initialSeed
-      , pointerDown = False
-      , prevPointerDown = False
-      , pointer = vecZero
-      , prevPointer = vecZero
-      , frame = initialFrame
-      , vri = gc.ri
-      }
+    ( Model env (initGame env.frame initialSeed)
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
@@ -393,50 +400,59 @@ initGame frame seed =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
+update message (Model env game) =
     case message of
         GotDomViewPort { viewport } ->
-            ( { model | vri = vec viewport.width viewport.height |> vecScale 0.5 }, Cmd.none )
+            ( Model { env | vri = vec viewport.width viewport.height |> vecScale 0.5 }
+                game
+            , Cmd.none
+            )
 
         OnDomResize w h ->
-            ( { model | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
+            ( Model { env | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }
+                game
+            , Cmd.none
+            )
 
         OnTick _ ->
-            ( { model | game = updateGameOnTick model }
-                |> incFrame
-                |> cachePointer
+            ( Model (env |> incFrame |> cachePointer)
+                (updateGameOnTick env game)
             , Cmd.none
             )
 
         PointerDown isDown pointer ->
-            ( { model
-                | pointerDown = isDown
-                , pointer = pointer |> pageToWorld model
-              }
+            ( Model
+                { env
+                    | pointerDown = isDown
+                    , pointer = pointer |> pageToWorld env
+                }
+                game
             , Cmd.none
             )
 
         PointerMoved pointer ->
-            ( { model
-                | pointer = pointer |> pageToWorld model
-              }
+            ( Model
+                { env
+                    | pointer = pointer |> pageToWorld env
+                }
+                game
             , Cmd.none
             )
 
         RestartGameClicked ->
-            ( { model | game = reStartGame model.frame model.game }, Cmd.none )
+            ( Model env (reStartGame env.frame game), Cmd.none )
 
 
-pageToWorld : Model -> Vec -> Vec
-pageToWorld model pageCord =
+pageToWorld : Env -> Vec -> Vec
+pageToWorld env pageCord =
     let
         svgRI =
-            computeSvgRI model.vri
+            computeSvgRI env.vri
 
         svgScale =
             gc.ri.x / svgRI.x
     in
-    vecSub pageCord model.vri
+    vecSub pageCord env.vri
         |> vecScale svgScale
 
 
@@ -454,13 +470,13 @@ pageToWorld model pageCord =
 --        |> vecScale svgScale
 
 
-cachePointer : Model -> Model
-cachePointer model =
-    { model | prevPointer = model.pointer, prevPointerDown = model.pointerDown }
+cachePointer : Env -> Env
+cachePointer env =
+    { env | prevPointer = env.pointer, prevPointerDown = env.pointerDown }
 
 
-updateGameOnTick : Model -> Game
-updateGameOnTick { pointer, pointerDown, prevPointerDown, frame, game } =
+updateGameOnTick : Env -> Game -> Game
+updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         GameLost _ ->
             game
@@ -582,9 +598,9 @@ clampInputAngle =
     clampMO (turns -0.25) (turns 0.24)
 
 
-incFrame : Model -> Model
-incFrame model =
-    { model | frame = inc model.frame }
+incFrame : Env -> Env
+incFrame env =
+    { env | frame = inc env.frame }
 
 
 stepSimEmitter : Float -> Sim -> Sim
@@ -872,7 +888,7 @@ computeSvgRI vri_ =
 
 
 view : Model -> Html Msg
-view model =
+view (Model env game) =
     div
         [ style "display" "flex"
         , style "align-items" "center"
@@ -883,12 +899,12 @@ view model =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , div [ style "position" "relative" ]
-            (viewStateContent model model.game)
+            (viewGameContent env game)
         ]
 
 
-viewStateContent : Model -> Game -> List (Html Msg)
-viewStateContent { vri, frame, pointer } g =
+viewGameContent : Env -> Game -> List (Html Msg)
+viewGameContent { vri, frame, pointer } g =
     let
         svgSkeleton contentView =
             Svg.svg (svgAttrs vri)
