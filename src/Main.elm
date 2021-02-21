@@ -74,17 +74,36 @@ type alias Flags =
     ()
 
 
-type alias Model =
-    { turn : Int
-    , ballCount : Int
-    , targets : List Target
-    , state : State
-    , pointerDown : Bool
+type Model
+    = Model Env Game
+
+
+type alias Env =
+    { pointerDown : Bool
     , prevPointerDown : Bool
     , pointer : Vec
     , prevPointer : Vec
     , frame : Float
     , vri : Vec
+    }
+
+
+initialEnvironment : Env
+initialEnvironment =
+    { pointerDown = False
+    , prevPointerDown = False
+    , pointer = vecZero
+    , prevPointer = vecZero
+    , frame = 0
+    , vri = gc.ri
+    }
+
+
+type alias Game =
+    { turn : Int
+    , ballCount : Int
+    , targets : List Target
+    , state : State
     , seed : Seed
     }
 
@@ -122,9 +141,18 @@ type alias Sim =
 
 type alias Emitter =
     { start : Float
-    , next : Ball
-    , rest : List Ball
+    , proto : Ball
+    , remaining : Int
     }
+
+
+initEmitter : Float -> Vec -> Float -> Int -> Emitter
+initEmitter frame ballPosition angle ballCount =
+    let
+        proto =
+            initBall ballPosition angle
+    in
+    Emitter frame proto (ballCount - 1)
 
 
 type TargetKind
@@ -350,87 +378,96 @@ init _ =
     let
         initialSeed =
             seedFrom 4
-    in
-    ( { turn = -1
-      , ballCount = -1
-      , targets = []
-      , state = GameLost 0
 
-      -- mock game state above ^
-      , pointerDown = False
-      , prevPointerDown = False
-      , pointer = vecZero
-      , prevPointer = vecZero
-      , frame = 0
-      , vri = gc.ri
-      , seed = initialSeed
-      }
-        |> initGame
+        env =
+            initialEnvironment
+    in
+    ( Model env (initGame env.frame initialSeed)
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
 
-initGame : Model -> Model
-initGame model =
+reStartGame : Float -> Game -> Game
+reStartGame frame game =
+    initGame frame game.seed
+
+
+initGame : Float -> Seed -> Game
+initGame frame seed =
     let
         initialBallCount =
             1
     in
-    { model
-        | ballCount = initialBallCount
-        , targets = []
-        , state = Running <| TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
-        , turn = 1
+    { ballCount = initialBallCount
+    , targets = []
+    , state = Running <| TargetsEntering { start = frame, ballPosition = initialBallPosition }
+    , turn = 1
+    , seed = seed
     }
         |> applyN 8 addNewTargetRowAndIncTurn
         |> identity
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message model =
+update message (Model env game) =
     case message of
         GotDomViewPort { viewport } ->
-            ( { model | vri = vec viewport.width viewport.height |> vecScale 0.5 }, Cmd.none )
+            ( Model { env | vri = vec viewport.width viewport.height |> vecScale 0.5 }
+                game
+            , Cmd.none
+            )
 
         OnDomResize w h ->
-            ( { model | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }, Cmd.none )
+            ( Model
+                { env | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }
+                game
+            , Cmd.none
+            )
 
         OnTick _ ->
-            ( updateOnTick model.frame model
-                |> incFrame
-                |> cachePointer
+            ( Model
+                { env
+                    | frame = inc env.frame
+                    , prevPointer = env.pointer
+                    , prevPointerDown = env.pointerDown
+                }
+                (updateGameOnTick env game)
             , Cmd.none
             )
 
         PointerDown isDown pointer ->
-            ( { model
-                | pointerDown = isDown
-                , pointer = pointer |> pageToWorld model
-              }
+            ( Model
+                { env
+                    | pointerDown = isDown
+                    , pointer = pointer |> pageToWorld env
+                }
+                game
             , Cmd.none
             )
 
         PointerMoved pointer ->
-            ( { model
-                | pointer = pointer |> pageToWorld model
-              }
+            ( Model
+                { env
+                    | pointer = pointer |> pageToWorld env
+                }
+                game
             , Cmd.none
             )
 
         RestartGameClicked ->
-            ( initGame model, Cmd.none )
+            ( Model env (reStartGame env.frame game), Cmd.none )
 
 
-pageToWorld : Model -> Vec -> Vec
-pageToWorld model pageCord =
+pageToWorld : Env -> Vec -> Vec
+pageToWorld env pageCord =
     let
         svgRI =
-            computeSvgRI model.vri
+            computeSvgRI env.vri
 
         svgScale =
             gc.ri.x / svgRI.x
     in
-    vecSub pageCord model.vri
+    vecSub pageCord env.vri
         |> vecScale svgScale
 
 
@@ -448,105 +485,100 @@ pageToWorld model pageCord =
 --        |> vecScale svgScale
 
 
-cachePointer : Model -> Model
-cachePointer model =
-    { model | prevPointer = model.pointer, prevPointerDown = model.pointerDown }
-
-
-updateOnTick : Float -> Model -> Model
-updateOnTick frame model =
-    case model.state of
+updateGameOnTick : Env -> Game -> Game
+updateGameOnTick env game =
+    case game.state of
         GameLost _ ->
-            if model.pointerDown && not model.prevPointerDown then
-                initGame model
-
-            else
-                model
+            game
 
         Running state ->
-            case state of
-                TargetsEntering { start, ballPosition } ->
-                    if transitionDone start frame then
-                        { model | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+            updateRunningGameOnTick env state game
 
-                    else
-                        model
 
-                WaitingForInput { ballPosition } ->
-                    if model.pointerDown && not model.prevPointerDown then
-                        { model
-                            | state =
-                                Running <|
-                                    DraggingPointer
-                                        { dragStartAt = model.pointer |> vecMapY (atMost 0)
-                                        , ballPosition = ballPosition
-                                        }
-                        }
+updateRunningGameOnTick : Env -> RunState -> Game -> Game
+updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state game =
+    case state of
+        TargetsEntering { start, ballPosition } ->
+            if transitionDone start frame then
+                { game | state = Running <| WaitingForInput { ballPosition = ballPosition } }
 
-                    else
-                        model
+            else
+                game
 
-                DraggingPointer { dragStartAt, ballPosition } ->
-                    if not model.pointerDown then
-                        case validInputAngleFromTo dragStartAt model.pointer of
+        WaitingForInput { ballPosition } ->
+            if pointerDown && not prevPointerDown then
+                { game
+                    | state =
+                        Running <|
+                            DraggingPointer
+                                { dragStartAt = pointer |> vecMapY (atMost 0)
+                                , ballPosition = ballPosition
+                                }
+                }
+
+            else
+                game
+
+        DraggingPointer { dragStartAt, ballPosition } ->
+            if not pointerDown then
+                let
+                    rs =
+                        case validInputAngleFromTo dragStartAt pointer of
                             Nothing ->
-                                { model | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+                                WaitingForInput { ballPosition = ballPosition }
 
                             Just angle ->
                                 let
-                                    emitterBall =
-                                        initBall ballPosition angle
-
                                     emitter =
-                                        Emitter model.frame
-                                            emitterBall
-                                            (List.repeat (model.ballCount - 1) emitterBall)
+                                        initEmitter frame ballPosition angle game.ballCount
                                 in
-                                { model | state = Running <| Sim_ { mbEmitter = Just emitter, balls = [], floored = [] } }
+                                Sim_
+                                    { mbEmitter = Just emitter
+                                    , balls = []
+                                    , floored = []
+                                    }
+                in
+                { game | state = Running rs }
 
-                    else
-                        model
+            else
+                game
 
-                Sim_ sim ->
-                    -- check for turn over
-                    if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
-                        case sim.floored |> List.last |> Maybe.map .position of
-                            Nothing ->
-                                model
+        Sim_ sim ->
+            -- check for turn over
+            if
+                (sim.mbEmitter == Nothing)
+                    && (sim.balls == [])
+                    && areFloorBallsSettled sim.floored
+            then
+                case sim.floored |> List.last |> Maybe.map .position of
+                    Nothing ->
+                        game
 
-                            Just ballPosition ->
-                                -- check for game over
-                                let
-                                    newModel =
-                                        { model
-                                            | state =
-                                                Running <|
-                                                    TargetsEntering
-                                                        { start = frame
-                                                        , ballPosition = ballPosition
-                                                        }
-                                        }
-                                in
-                                if canTargetsSafelyMoveDown model.targets then
-                                    newModel
-                                        |> addNewTargetRowAndIncTurn
+                    Just ballPosition ->
+                        { game
+                            | state =
+                                if canTargetsSafelyMoveDown game.targets then
+                                    Running <|
+                                        TargetsEntering
+                                            { start = frame
+                                            , ballPosition = ballPosition
+                                            }
 
                                 else
-                                    -- game over : for now re-simulate current turn.
-                                    -- newModel
-                                    { model | state = GameLost model.frame }
-                                        |> addNewTargetRowAndIncTurn
-
-                    else
-                        let
-                            ( { ebc, targets }, newSim ) =
-                                stepSim frame model.targets sim
-                        in
-                        { model
-                            | state = Running <| Sim_ newSim
-                            , targets = targets
-                            , ballCount = model.ballCount + ebc
+                                    GameLost frame
                         }
+                            |> addNewTargetRowAndIncTurn
+
+            else
+                let
+                    ( { ebc, targets }, newSim ) =
+                        stepSim frame game.targets sim
+                in
+                { game
+                    | state = Running <| Sim_ newSim
+                    , targets = targets
+                    , ballCount = game.ballCount + ebc
+                }
 
 
 stepSim : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
@@ -580,26 +612,20 @@ clampInputAngle =
     clampMO (turns -0.25) (turns 0.24)
 
 
-incFrame : Model -> Model
-incFrame model =
-    { model | frame = inc model.frame }
-
-
 stepSimEmitter : Float -> Sim -> Sim
 stepSimEmitter frame sim =
     sim.mbEmitter
         |> Maybe.filter (\{ start } -> frame - start > 10)
         |> Maybe.map
-            (\emitter ->
+            (\{ proto, remaining } ->
                 { sim
-                    | balls = emitter.next :: sim.balls
+                    | balls = proto :: sim.balls
                     , mbEmitter =
-                        case emitter.rest of
-                            [] ->
-                                Nothing
+                        if remaining <= 0 then
+                            Nothing
 
-                            n :: r ->
-                                Just (Emitter frame n r)
+                        else
+                            Just (Emitter frame proto (remaining - 1))
                 }
             )
         |> Maybe.withDefault sim
@@ -657,15 +683,15 @@ splitBallUpdates ballUpdates =
     { floored = floored, updated = updated }
 
 
-addNewTargetRowAndIncTurn : Model -> Model
-addNewTargetRowAndIncTurn model =
+addNewTargetRowAndIncTurn : Game -> Game
+addNewTargetRowAndIncTurn game =
     let
         ( targets, seed ) =
-            rndStep ( randomTargets model.turn, model.seed )
+            rndStep ( randomTargets game.turn, game.seed )
     in
-    { model
-        | targets = targets ++ List.map moveTargetDown model.targets
-        , turn = inc model.turn
+    { game
+        | targets = targets ++ List.map moveTargetDown game.targets
+        , turn = inc game.turn
         , seed = seed
     }
 
@@ -870,7 +896,7 @@ computeSvgRI vri_ =
 
 
 view : Model -> Html Msg
-view model =
+view (Model env game) =
     div
         [ style "display" "flex"
         , style "align-items" "center"
@@ -881,38 +907,38 @@ view model =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , div [ style "position" "relative" ]
-            (viewStateContent model)
+            (viewGameContent env game)
         ]
 
 
-viewStateContent : Model -> List (Html Msg)
-viewStateContent m =
+viewGameContent : Env -> Game -> List (Html Msg)
+viewGameContent { vri, frame, pointer } g =
     let
         svgSkeleton contentView =
-            Svg.svg (svgAttrs m.vri)
+            Svg.svg (svgAttrs vri)
                 [ rect gc.ri [ fillP black ]
                 , group []
-                    [ viewBallCount m.ballCount
+                    [ viewBallCount g.ballCount
                     , contentView
-                    , viewDebugPointer m.pointer |> hideView
+                    , viewDebugPointer pointer |> hideView
                     ]
                 ]
     in
-    case m.state of
+    case g.state of
         GameLost start ->
             let
                 progress =
-                    transitionProgress start m.frame
+                    transitionProgress start frame
             in
             [ viewLostStateOverlayTransition progress
-            , svgSkeleton (viewTargets progress m.targets)
+            , svgSkeleton (viewTargets progress g.targets)
             ]
 
         Running rs ->
             [ svgSkeleton
                 (group []
-                    [ viewRunStateTargets m.frame rs m.targets
-                    , viewRunningStateContent m.frame m.pointer m.targets rs
+                    [ viewRunStateTargets frame rs g.targets
+                    , viewRunningStateContent frame pointer g.targets rs
                     ]
                 )
             ]
@@ -949,7 +975,7 @@ viewRunningStateContent frame pointer targets rs =
                             sim.balls
 
                         Just em ->
-                            em.next :: sim.balls
+                            em.proto :: sim.balls
             in
             group [] [ viewBalls balls, viewFloorBalls sim.floored ]
 
