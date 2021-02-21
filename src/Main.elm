@@ -108,11 +108,11 @@ type State
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
-    | Sim SimR
+    | SimTag Sim
     | Lost Float
 
 
-type alias SimR =
+type alias Sim =
     { mbEmitter : Maybe Emitter, balls : List Ball, floored : List Ball }
 
 
@@ -488,7 +488,7 @@ updateOnTick frame model =
                                     emitterBall
                                     (List.repeat (model.ballCount - 1) emitterBall)
                         in
-                        { model | state = Sim { mbEmitter = Just emitter, balls = [], floored = [] } }
+                        { model | state = SimTag { mbEmitter = Just emitter, balls = [], floored = [] } }
 
             else
                 model
@@ -500,7 +500,7 @@ updateOnTick frame model =
             else
                 model
 
-        Sim sim ->
+        SimTag sim ->
             -- check for turn over
             if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
                 case sim.floored |> List.last |> Maybe.map .position of
@@ -535,13 +535,13 @@ updateOnTick frame model =
                         stepSim frame model.targets sim
                 in
                 { model
-                    | state = Sim newSim
+                    | state = SimTag newSim
                     , targets = targets
                     , ballCount = model.ballCount + ebc
                 }
 
 
-stepSim : Float -> List Target -> SimR -> ( { ebc : Int, targets : List Target }, SimR )
+stepSim : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
 stepSim frame targets sim =
     sim.balls
         |> List.mapAccuml updateBall { targets = targets, ebc = 0 }
@@ -577,7 +577,7 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
-stepSimEmitter : Float -> SimR -> SimR
+stepSimEmitter : Float -> Sim -> Sim
 stepSimEmitter frame sim =
     sim.mbEmitter
         |> Maybe.filter (\{ start } -> frame - start > 10)
@@ -921,7 +921,7 @@ viewStateContent frame pointer targets state =
         Lost _ ->
             noView
 
-        Sim sim ->
+        SimTag sim ->
             let
                 balls =
                     case sim.mbEmitter of
