@@ -886,52 +886,36 @@ view model =
 
 
 viewStateContent : Model -> List (Html Msg)
-viewStateContent model =
+viewStateContent m =
     let
-        frame =
-            model.frame
-
-        targets =
-            model.targets
-
-        pointer =
-            model.pointer
-
-        state =
-            model.state
+        viewSvg contentView =
+            Svg.svg (svgAttrs m.vri)
+                [ rect gc.ri [ fillP black ]
+                , group []
+                    [ viewBallCount m.ballCount
+                    , contentView
+                    , viewDebugPointer m.pointer |> hideView
+                    ]
+                ]
     in
-    case state of
+    case m.state of
         GameLost start ->
             let
                 progress =
-                    transitionProgress start frame
+                    transitionProgress start m.frame
             in
             [ viewLostStateOverlayTransition progress
-            , viewSvg (viewTransitioningTargets progress targets)
-                model
+            , viewSvg (viewTransitioningTargets progress m.targets)
             ]
 
         Running rs ->
-            let
-                cv =
-                    group []
-                        [ viewRunStateTargets frame rs targets
-                        , viewRunningStateContent frame pointer targets rs
-                        ]
-            in
-            [ viewSvg cv model
+            [ viewSvg
+                (group []
+                    [ viewRunStateTargets m.frame rs m.targets
+                    , viewRunningStateContent m.frame m.pointer m.targets rs
+                    ]
+                )
             ]
-
-
-viewSvg contentView { vri, ballCount, pointer } =
-    Svg.svg (svgAttrs vri)
-        [ rect gc.ri [ fillP black ]
-        , group []
-            [ viewBallCount ballCount
-            , contentView
-            , viewDebugPointer pointer |> hideView
-            ]
-        ]
 
 
 viewRunningStateContent : Float -> Vec -> List Target -> RunState -> Svg Msg
@@ -1266,6 +1250,10 @@ fillH =
 
 group =
     Svg.g
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 fade o =
