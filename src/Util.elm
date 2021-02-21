@@ -701,6 +701,10 @@ reject =
     List.filterNot
 
 
+removeAllEq x =
+    reject (eq x)
+
+
 minimumBy =
     List.minimumBy
 

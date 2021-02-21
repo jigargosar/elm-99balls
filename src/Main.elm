@@ -745,9 +745,7 @@ updateBall acc ball =
                     case target.kind of
                         SolidTarget hp ->
                             if hp <= 1 then
-                                ( { acc
-                                    | targets = reject (eq target) acc.targets
-                                  }
+                                ( { acc | targets = removeAllEq target acc.targets }
                                 , BallMoved newBall
                                 )
 
