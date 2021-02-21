@@ -998,7 +998,13 @@ viewLostStateOverlay start now =
         , style "font-size" "2rem"
         , style "user-select" "none"
         , onClick RestartGameClicked
-        , style "opacity" (lerp 0 0.9 progress |> String.fromFloat)
+        , style "background-color"
+            (let
+                alphaS =
+                    String.fromFloat (lerp 0 0.9 progress)
+             in
+             "rgb(0 0 0 / " ++ alphaS ++ "%)"
+            )
         ]
         [ div [ style "font-size" "3rem" ] [ text "Game Over" ]
         , div [] [ text "Tap to Continue" ]
