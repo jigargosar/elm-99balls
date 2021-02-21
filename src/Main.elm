@@ -611,18 +611,14 @@ stepSimHelp frame targets sim =
 
 
 validAimAngleTowards : Vec -> Vec -> Maybe Float
-validAimAngleTowards start current =
-    if start.y < current.y then
-        vecAngleFromTo current start
-            |> clampInputAngle
+validAimAngleTowards to from =
+    if to.y < from.y then
+        vecAngleFromTo from to
+            |> clampMO (turns -0.25) (turns 0.24)
             |> Just
 
     else
         Nothing
-
-
-clampInputAngle =
-    clampMO (turns -0.25) (turns 0.24)
 
 
 stepSimEmitter : Float -> Sim -> Sim
