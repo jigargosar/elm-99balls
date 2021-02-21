@@ -112,7 +112,7 @@ type State
 
 
 type alias SimR =
-    { me : Maybe Emitter, bs : List Ball, ebc : Int, fbs : List Ball }
+    { me : Maybe Emitter, bs : List Ball, fbs : List Ball }
 
 
 type alias Emitter =
@@ -487,7 +487,7 @@ updateOnTick frame model =
                                     emitterBall
                                     (List.repeat (model.ballCount - 1) emitterBall)
                         in
-                        { model | state = Sim { me = Just emitter, bs = [], ebc = 0, fbs = [] } }
+                        { model | state = Sim { me = Just emitter, bs = [], fbs = [] } }
 
             else
                 model
@@ -516,7 +516,6 @@ updateOnTick frame model =
                                             { start = frame
                                             , ballPosition = ballPosition
                                             }
-                                    , ballCount = model.ballCount + sim.ebc
                                 }
                         in
                         if canTargetsSafelyMoveDown model.targets then
@@ -552,15 +551,13 @@ updateOnTick frame model =
                             Just ( eb, me_ ) ->
                                 ( eb :: updated, me_ )
 
-                    newEbc =
-                        ebc + sim.ebc
-
                     newFbs =
                         floored ++ convergeFloorBalls sim.fbs
                 in
                 { model
-                    | state = Sim { bs = newBs, me = newMe, ebc = newEbc, fbs = newFbs }
+                    | state = Sim { bs = newBs, me = newMe, fbs = newFbs }
                     , targets = targets
+                    , ballCount = model.ballCount + ebc
                 }
 
 
