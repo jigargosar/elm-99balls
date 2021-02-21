@@ -113,7 +113,7 @@ type RunState
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
-    | SimTag Sim
+    | Sim_ Sim
 
 
 type alias Sim =
@@ -502,12 +502,12 @@ updateOnTick frame model =
                                             emitterBall
                                             (List.repeat (model.ballCount - 1) emitterBall)
                                 in
-                                { model | state = Running <| SimTag { mbEmitter = Just emitter, balls = [], floored = [] } }
+                                { model | state = Running <| Sim_ { mbEmitter = Just emitter, balls = [], floored = [] } }
 
                     else
                         model
 
-                SimTag sim ->
+                Sim_ sim ->
                     -- check for turn over
                     if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
                         case sim.floored |> List.last |> Maybe.map .position of
@@ -543,7 +543,7 @@ updateOnTick frame model =
                                 stepSim frame model.targets sim
                         in
                         { model
-                            | state = Running <| SimTag newSim
+                            | state = Running <| Sim_ newSim
                             , targets = targets
                             , ballCount = model.ballCount + ebc
                         }
@@ -941,7 +941,7 @@ viewRunningStateContent frame pointer targets rs =
                             ]
                 ]
 
-        SimTag sim ->
+        Sim_ sim ->
             let
                 balls =
                     case sim.mbEmitter of
