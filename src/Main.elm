@@ -135,6 +135,18 @@ type alias Sim =
     { mbEmitter : Maybe Emitter, balls : List Ball, floored : List Ball }
 
 
+initSim : Float -> Vec -> Float -> Int -> Sim
+initSim frame ballPosition angle ballCount =
+    let
+        emitter =
+            initEmitter frame ballPosition angle ballCount
+    in
+    { mbEmitter = Just emitter
+    , balls = []
+    , floored = []
+    }
+
+
 type alias Emitter =
     { start : Float
     , proto : Ball
@@ -509,24 +521,15 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
         DraggingPointer { dragStartAt, ballPosition } ->
             if not pointerDown then
-                let
-                    state =
+                { game
+                    | state =
                         case validInputAngleFromTo dragStartAt pointer of
                             Nothing ->
                                 WaitingForInput { ballPosition = ballPosition }
 
                             Just angle ->
-                                let
-                                    emitter =
-                                        initEmitter frame ballPosition angle game.ballCount
-                                in
-                                Sim_
-                                    { mbEmitter = Just emitter
-                                    , balls = []
-                                    , floored = []
-                                    }
-                in
-                { game | state = state }
+                                Sim_ (initSim frame ballPosition angle game.ballCount)
+                }
 
             else
                 game
