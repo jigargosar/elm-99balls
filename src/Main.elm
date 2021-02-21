@@ -418,13 +418,21 @@ update message (Model env game) =
             )
 
         OnDomResize w h ->
-            ( Model { env | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }
+            ( Model
+                { env
+                    | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5
+                }
                 game
             , Cmd.none
             )
 
         OnTick _ ->
-            ( Model (env |> incFrame |> cachePointer)
+            ( Model
+                { env
+                    | frame = inc env.frame
+                    , prevPointer = env.pointer
+                    , prevPointerDown = env.pointerDown
+                }
                 (updateGameOnTick env game)
             , Cmd.none
             )
@@ -477,11 +485,6 @@ pageToWorld env pageCord =
 --    in
 --    vecSub svgCord svgRI
 --        |> vecScale svgScale
-
-
-cachePointer : Env -> Env
-cachePointer env =
-    { env | prevPointer = env.pointer, prevPointerDown = env.pointerDown }
 
 
 updateGameOnTick : Env -> Game -> Game
@@ -609,11 +612,6 @@ validInputAngleFromTo start current =
 
 clampInputAngle =
     clampMO (turns -0.25) (turns 0.24)
-
-
-incFrame : Env -> Env
-incFrame env =
-    { env | frame = inc env.frame }
 
 
 stepSimEmitter : Float -> Sim -> Sim
