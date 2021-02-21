@@ -520,7 +520,15 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                             emitterBall
                                             (List.repeat (game.ballCount - 1) emitterBall)
                                 in
-                                { game | state = Running <| Sim_ { mbEmitter = Just emitter, balls = [], floored = [] } }
+                                { game
+                                    | state =
+                                        Running <|
+                                            Sim_
+                                                { mbEmitter = Just emitter
+                                                , balls = []
+                                                , floored = []
+                                                }
+                                }
 
                     else
                         game
