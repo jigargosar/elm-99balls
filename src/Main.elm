@@ -371,8 +371,8 @@ init _ =
     )
 
 
-resetGame : Float -> Game -> Game
-resetGame frame game =
+reStartGame : Float -> Game -> Game
+reStartGame frame game =
     initGame frame game.seed
 
 
@@ -424,7 +424,7 @@ update message model =
             )
 
         RestartGameClicked ->
-            ( { model | game = resetGame model.frame model.game }, Cmd.none )
+            ( { model | game = reStartGame model.frame model.game }, Cmd.none )
 
 
 pageToWorld : Model -> Vec -> Vec
