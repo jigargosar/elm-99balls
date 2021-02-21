@@ -506,6 +506,14 @@ initTargetsEnteringState start ballPosition =
         }
 
 
+initAimingStateTowards : Vec -> Vec -> State
+initAimingStateTowards pointer ballPosition =
+    Aiming
+        { dragStartAt = pointer |> vecMapY (atMost 0)
+        , ballPosition = ballPosition
+        }
+
+
 updateGameOnTick : Env -> Game -> Game
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
@@ -521,13 +529,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
         WaitingForInput { ballPosition } ->
             if pointerDown && not prevPointerDown then
-                { game
-                    | state =
-                        Aiming
-                            { dragStartAt = pointer |> vecMapY (atMost 0)
-                            , ballPosition = ballPosition
-                            }
-                }
+                { game | state = initAimingStateTowards pointer ballPosition }
 
             else
                 game
