@@ -124,15 +124,11 @@ transitionDone start now =
 
 
 type State
-    = Running RunState
-    | GameLost Float
-
-
-type RunState
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
     | Sim_ Sim
+    | GameLost Float
 
 
 type alias Sim =
@@ -400,7 +396,7 @@ initGame frame seed =
     in
     { ballCount = initialBallCount
     , targets = []
-    , state = Running <| TargetsEntering { start = frame, ballPosition = initialBallPosition }
+    , state = TargetsEntering { start = frame, ballPosition = initialBallPosition }
     , turn = 1
     , seed = seed
     }
@@ -486,21 +482,14 @@ pageToWorld env pageCord =
 
 
 updateGameOnTick : Env -> Game -> Game
-updateGameOnTick env game =
+updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         GameLost _ ->
             game
 
-        Running state ->
-            updateRunningGameOnTick env state game
-
-
-updateRunningGameOnTick : Env -> RunState -> Game -> Game
-updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state game =
-    case state of
         TargetsEntering { start, ballPosition } ->
             if transitionDone start frame then
-                { game | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+                { game | state = WaitingForInput { ballPosition = ballPosition } }
 
             else
                 game
@@ -509,11 +498,10 @@ updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state g
             if pointerDown && not prevPointerDown then
                 { game
                     | state =
-                        Running <|
-                            DraggingPointer
-                                { dragStartAt = pointer |> vecMapY (atMost 0)
-                                , ballPosition = ballPosition
-                                }
+                        DraggingPointer
+                            { dragStartAt = pointer |> vecMapY (atMost 0)
+                            , ballPosition = ballPosition
+                            }
                 }
 
             else
@@ -522,7 +510,7 @@ updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state g
         DraggingPointer { dragStartAt, ballPosition } ->
             if not pointerDown then
                 let
-                    rs =
+                    state =
                         case validInputAngleFromTo dragStartAt pointer of
                             Nothing ->
                                 WaitingForInput { ballPosition = ballPosition }
@@ -538,7 +526,7 @@ updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state g
                                     , floored = []
                                     }
                 in
-                { game | state = Running rs }
+                { game | state = state }
 
             else
                 game
@@ -558,11 +546,10 @@ updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state g
                         { game
                             | state =
                                 if canTargetsSafelyMoveDown game.targets then
-                                    Running <|
-                                        TargetsEntering
-                                            { start = frame
-                                            , ballPosition = ballPosition
-                                            }
+                                    TargetsEntering
+                                        { start = frame
+                                        , ballPosition = ballPosition
+                                        }
 
                                 else
                                     GameLost frame
@@ -575,7 +562,7 @@ updateRunningGameOnTick { pointer, pointerDown, prevPointerDown, frame } state g
                         stepSim frame game.targets sim
                 in
                 { game
-                    | state = Running <| Sim_ newSim
+                    | state = Sim_ newSim
                     , targets = targets
                     , ballCount = game.ballCount + ebc
                 }
@@ -913,40 +900,25 @@ view (Model env game) =
 
 viewGameContent : Env -> Game -> List (Html Msg)
 viewGameContent { vri, frame, pointer } g =
-    let
-        svgSkeleton contentView =
-            Svg.svg (svgAttrs vri)
-                [ rect gc.ri [ fillP black ]
-                , group []
-                    [ viewBallCount g.ballCount
-                    , contentView
-                    , viewDebugPointer pointer |> hideView
-                    ]
-                ]
-    in
-    case g.state of
-        GameLost start ->
-            let
-                progress =
-                    transitionProgress start frame
-            in
-            [ viewLostStateOverlayTransition progress
-            , svgSkeleton (viewTargets progress g.targets)
+    [ viewGameLost frame g
+    , Svg.svg (svgAttrs vri)
+        [ rect gc.ri [ fillP black ]
+        , group []
+            [ viewBallCount g.ballCount
+            , viewTargets frame g.state g.targets
+            , viewStateContent frame pointer g.targets g.state
+            , viewDebugPointer pointer |> hideView
             ]
-
-        Running rs ->
-            [ svgSkeleton
-                (group []
-                    [ viewRunStateTargets frame rs g.targets
-                    , viewRunningStateContent frame pointer g.targets rs
-                    ]
-                )
-            ]
+        ]
+    ]
 
 
-viewRunningStateContent : Float -> Vec -> List Target -> RunState -> Svg Msg
-viewRunningStateContent frame pointer targets rs =
-    case rs of
+viewStateContent : Float -> Vec -> List Target -> State -> Svg Msg
+viewStateContent frame pointer targets state =
+    case state of
+        GameLost _ ->
+            noView
+
         TargetsEntering { ballPosition } ->
             viewBallAt ballPosition
 
@@ -1004,8 +976,18 @@ viewBallCount ballCount =
         ]
 
 
-viewLostStateOverlayTransition : Float -> Html Msg
-viewLostStateOverlayTransition progress =
+viewGameLost : Float -> Game -> Html Msg
+viewGameLost now { state } =
+    case state of
+        GameLost start ->
+            viewGameLostHelp (transitionProgress start now)
+
+        _ ->
+            noView
+
+
+viewGameLostHelp : Float -> Html Msg
+viewGameLostHelp progress =
     div
         [ style "position" "absolute"
         , style "width" "100%"
@@ -1112,27 +1094,25 @@ ballTravelPathHelp acc ball pathLen path =
             path
 
 
-targetTransitionProgress : RunState -> Float -> Float
-targetTransitionProgress rs now =
-    case rs of
-        TargetsEntering { start } ->
-            transitionProgress start now
-
-        _ ->
-            1
-
-
-viewRunStateTargets : Float -> RunState -> List Target -> Svg msg
-viewRunStateTargets now rs targets =
+viewTargets : Float -> State -> List Target -> Svg msg
+viewTargets now state targets =
     let
         progress =
-            targetTransitionProgress rs now
+            case state of
+                GameLost start ->
+                    transitionProgress start now
+
+                TargetsEntering { start } ->
+                    transitionProgress start now
+
+                _ ->
+                    1
     in
-    viewTargets progress targets
+    viewTargetsHelp progress targets
 
 
-viewTargets : Float -> List Target -> Svg msg
-viewTargets progress targets =
+viewTargetsHelp : Float -> List Target -> Svg msg
+viewTargetsHelp progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
