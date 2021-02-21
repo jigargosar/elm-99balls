@@ -419,9 +419,7 @@ update message (Model env game) =
 
         OnDomResize w h ->
             ( Model
-                { env
-                    | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5
-                }
+                { env | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }
                 game
             , Cmd.none
             )
