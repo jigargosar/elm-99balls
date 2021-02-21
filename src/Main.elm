@@ -126,7 +126,7 @@ transitionDone start now =
 type State
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
-    | DraggingPointer { dragStartAt : Vec, ballPosition : Vec }
+    | Aiming { dragStartAt : Vec, ballPosition : Vec }
     | Sim_ Sim
     | GameLost Float
 
@@ -523,7 +523,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             if pointerDown && not prevPointerDown then
                 { game
                     | state =
-                        DraggingPointer
+                        Aiming
                             { dragStartAt = pointer |> vecMapY (atMost 0)
                             , ballPosition = ballPosition
                             }
@@ -532,7 +532,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             else
                 game
 
-        DraggingPointer { dragStartAt, ballPosition } ->
+        Aiming { dragStartAt, ballPosition } ->
             if not pointerDown then
                 { game
                     | state =
@@ -947,7 +947,7 @@ viewStateContent frame pointer targets state =
         WaitingForInput { ballPosition } ->
             viewBallAt ballPosition
 
-        DraggingPointer { dragStartAt, ballPosition } ->
+        Aiming { dragStartAt, ballPosition } ->
             group []
                 [ viewBallAt ballPosition
                 , case validInputAngleFromTo dragStartAt pointer of
