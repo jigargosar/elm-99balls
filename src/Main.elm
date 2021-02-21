@@ -548,7 +548,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 game
 
         Sim_ sim ->
-            case ballPositionOnTurnEnd sim of
+            case ballPositionOnSimEnd sim of
                 Just ballPosition ->
                     { game
                         | state =
@@ -564,8 +564,8 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     stepSim frame game sim
 
 
-ballPositionOnTurnEnd : Sim -> Maybe Vec
-ballPositionOnTurnEnd sim =
+ballPositionOnSimEnd : Sim -> Maybe Vec
+ballPositionOnSimEnd sim =
     let
         turnEnded =
             (sim.mbEmitter == Nothing)
