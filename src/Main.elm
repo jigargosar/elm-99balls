@@ -881,44 +881,55 @@ view model =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
         , div [ style "position" "relative" ]
-            (let
-                { vri, ballCount, targets, pointer, frame } =
-                    model
-             in
-             case model.state of
-                GameLost start ->
-                    let
-                        progress =
-                            transitionProgress start frame
-                    in
-                    [ viewLostStateOverlay start frame
-                    , Svg.svg (svgAttrs vri)
-                        [ rect gc.ri [ fillP black ]
-                        , group []
-                            [ viewBallCount ballCount
-                            , viewTransitioningTargets progress targets
-                            , viewDebugPointer pointer |> hideView
-                            ]
-                        ]
-                    ]
-
-                Running rs ->
-                    [ Svg.svg (svgAttrs vri)
-                        [ rect gc.ri [ fillP black ]
-                        , group []
-                            [ viewBallCount ballCount
-                            , viewRunStateTargets frame rs targets
-                            , viewRunningState frame pointer targets rs
-                            , viewDebugPointer pointer |> hideView
-                            ]
-                        ]
-                    ]
-            )
+            (viewStateContent model)
         ]
+
+
+viewStateContent : Model -> List (Html Msg)
+viewStateContent model =
+    let
+        { vri, ballCount, targets, pointer, frame } =
+            model
+    in
+    case model.state of
+        GameLost start ->
+            let
+                progress =
+                    transitionProgress start frame
+            in
+            [ viewLostStateOverlay start frame
+            , Svg.svg (svgAttrs vri)
+                [ rect gc.ri [ fillP black ]
+                , group []
+                    [ viewBallCount ballCount
+                    , viewTransitioningTargets progress targets
+                    , viewDebugPointer pointer |> hideView
+                    ]
+                ]
+            ]
+
+        Running rs ->
+            [ Svg.svg (svgAttrs vri)
+                [ rect gc.ri [ fillP black ]
+                , group []
+                    [ viewBallCount ballCount
+                    , viewRunningState frame pointer targets rs
+                    , viewDebugPointer pointer |> hideView
+                    ]
+                ]
+            ]
 
 
 viewRunningState : Float -> Vec -> List Target -> RunState -> Svg Msg
 viewRunningState frame pointer targets rs =
+    group []
+        [ viewRunStateTargets frame rs targets
+        , viewRunningStateContent frame pointer targets rs
+        ]
+
+
+viewRunningStateContent : Float -> Vec -> List Target -> RunState -> Svg Msg
+viewRunningStateContent frame pointer targets rs =
     case rs of
         TargetsEntering { ballPosition } ->
             viewBallAt ballPosition
