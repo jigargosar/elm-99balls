@@ -487,90 +487,95 @@ cachePointer env =
 
 
 updateGameOnTick : Env -> Game -> Game
-updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
+updateGameOnTick env game =
     case game.state of
         GameLost _ ->
             game
 
         Running state ->
-            case state of
-                TargetsEntering { start, ballPosition } ->
-                    if transitionDone start frame then
-                        { game | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+            updateRunStateOnTick env state game
 
-                    else
+
+updateRunStateOnTick : Env -> RunState -> Game -> Game
+updateRunStateOnTick { pointer, pointerDown, prevPointerDown, frame } state game =
+    case state of
+        TargetsEntering { start, ballPosition } ->
+            if transitionDone start frame then
+                { game | state = Running <| WaitingForInput { ballPosition = ballPosition } }
+
+            else
+                game
+
+        WaitingForInput { ballPosition } ->
+            if pointerDown && not prevPointerDown then
+                { game
+                    | state =
+                        Running <|
+                            DraggingPointer
+                                { dragStartAt = pointer |> vecMapY (atMost 0)
+                                , ballPosition = ballPosition
+                                }
+                }
+
+            else
+                game
+
+        DraggingPointer { dragStartAt, ballPosition } ->
+            if not pointerDown then
+                let
+                    rs =
+                        case validInputAngleFromTo dragStartAt pointer of
+                            Nothing ->
+                                WaitingForInput { ballPosition = ballPosition }
+
+                            Just angle ->
+                                let
+                                    emitter =
+                                        initEmitter frame ballPosition angle game.ballCount
+                                in
+                                Sim_
+                                    { mbEmitter = Just emitter
+                                    , balls = []
+                                    , floored = []
+                                    }
+                in
+                { game | state = Running rs }
+
+            else
+                game
+
+        Sim_ sim ->
+            -- check for turn over
+            if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
+                case sim.floored |> List.last |> Maybe.map .position of
+                    Nothing ->
                         game
 
-                WaitingForInput { ballPosition } ->
-                    if pointerDown && not prevPointerDown then
+                    Just ballPosition ->
                         { game
                             | state =
-                                Running <|
-                                    DraggingPointer
-                                        { dragStartAt = pointer |> vecMapY (atMost 0)
-                                        , ballPosition = ballPosition
-                                        }
-                        }
-
-                    else
-                        game
-
-                DraggingPointer { dragStartAt, ballPosition } ->
-                    if not pointerDown then
-                        let
-                            rs =
-                                case validInputAngleFromTo dragStartAt pointer of
-                                    Nothing ->
-                                        WaitingForInput { ballPosition = ballPosition }
-
-                                    Just angle ->
-                                        let
-                                            emitter =
-                                                initEmitter frame ballPosition angle game.ballCount
-                                        in
-                                        Sim_
-                                            { mbEmitter = Just emitter
-                                            , balls = []
-                                            , floored = []
+                                if canTargetsSafelyMoveDown game.targets then
+                                    Running <|
+                                        TargetsEntering
+                                            { start = frame
+                                            , ballPosition = ballPosition
                                             }
-                        in
-                        { game | state = Running rs }
 
-                    else
-                        game
-
-                Sim_ sim ->
-                    -- check for turn over
-                    if sim.mbEmitter == Nothing && sim.balls == [] && areFloorBallsSettled sim.floored then
-                        case sim.floored |> List.last |> Maybe.map .position of
-                            Nothing ->
-                                game
-
-                            Just ballPosition ->
-                                { game
-                                    | state =
-                                        if canTargetsSafelyMoveDown game.targets then
-                                            Running <|
-                                                TargetsEntering
-                                                    { start = frame
-                                                    , ballPosition = ballPosition
-                                                    }
-
-                                        else
-                                            GameLost frame
-                                }
-                                    |> addNewTargetRowAndIncTurn
-
-                    else
-                        let
-                            ( { ebc, targets }, newSim ) =
-                                stepSim frame game.targets sim
-                        in
-                        { game
-                            | state = Running <| Sim_ newSim
-                            , targets = targets
-                            , ballCount = game.ballCount + ebc
+                                else
+                                    GameLost frame
                         }
+                            |> addNewTargetRowAndIncTurn
+
+            else
+                let
+                    ( { ebc, targets }, newSim ) =
+                        stepSim frame game.targets sim
+                in
+                { game
+                    | state = Running <| Sim_ newSim
+                    , targets = targets
+                    , ballCount = game.ballCount + ebc
+                }
 
 
 stepSim : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
