@@ -552,7 +552,7 @@ stepSim frame targets sim =
                             | bs = updated
                             , fbs = floored ++ convergeFloorBalls sim.fbs
                         }
-                            |> emitBalls frame
+                            |> stepSimEmitter frame
                    )
             )
 
@@ -577,43 +577,24 @@ incFrame model =
     { model | frame = inc model.frame }
 
 
-emitBalls : Float -> SimR -> SimR
-emitBalls frame sim =
-    case
-        sim.me
-            |> Maybe.filter (\{ start } -> frame - start > 10)
-    of
-        Nothing ->
-            sim
+stepSimEmitter : Float -> SimR -> SimR
+stepSimEmitter frame sim =
+    sim.me
+        |> Maybe.filter (\{ start } -> frame - start > 10)
+        |> Maybe.map
+            (\emitter ->
+                { sim
+                    | bs = emitter.next :: sim.bs
+                    , me =
+                        case emitter.rest of
+                            [] ->
+                                Nothing
 
-        Just emitter ->
-            { sim
-                | bs = emitter.next :: sim.bs
-                , me =
-                    case emitter.rest of
-                        [] ->
-                            Nothing
-
-                        n :: r ->
-                            Just (Emitter frame n r)
-            }
-
-
-emitBallsHelp : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
-emitBallsHelp frame emitter =
-    if frame - emitter.start > 10 then
-        Just
-            ( emitter.next
-            , case emitter.rest of
-                [] ->
-                    Nothing
-
-                n :: r ->
-                    Just (Emitter frame n r)
+                            n :: r ->
+                                Just (Emitter frame n r)
+                }
             )
-
-    else
-        Nothing
+        |> Maybe.withDefault sim
 
 
 convergeFloorBalls : List Ball -> List Ball
