@@ -584,20 +584,20 @@ ballPositionOnSimEnd sim =
 stepSim : Float -> Game -> Sim -> Game
 stepSim frame game sim =
     let
-        ( { ebc, targets }, newSim ) =
+        ( { ballsCollected, targets }, newSim ) =
             stepSimHelp frame game.targets sim
     in
     { game
         | state = Sim_ newSim
         , targets = targets
-        , ballCount = game.ballCount + ebc
+        , ballCount = game.ballCount + ballsCollected
     }
 
 
-stepSimHelp : Float -> List Target -> Sim -> ( { ebc : Int, targets : List Target }, Sim )
+stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, Sim )
 stepSimHelp frame targets sim =
     sim.balls
-        |> List.mapAccuml updateBall { targets = targets, ebc = 0 }
+        |> List.mapAccuml updateBall { targets = targets, ballsCollected = 0 }
         |> mapSnd
             (splitBallUpdates
                 >> (\{ floored, updated } ->
@@ -728,7 +728,7 @@ areBallsCloseEnough a b =
 
 type alias BallUpdateAcc =
     { targets : List Target
-    , ebc : Int
+    , ballsCollected : Int
     }
 
 
@@ -788,7 +788,7 @@ updateBall acc ball =
                         ExtraBallTarget ->
                             ( { acc
                                 | targets = reject (eq target) acc.targets
-                                , ebc = acc.ebc + 1
+                                , ballsCollected = acc.ballsCollected + 1
                               }
                             , BallMoved newBall
                             )
@@ -1089,7 +1089,7 @@ ballTravelPath targets ballPosition angle =
     in
     ballTravelPathHelp
         { targets = targets
-        , ebc = 0
+        , ballsCollected = 0
         }
         ball
         0
