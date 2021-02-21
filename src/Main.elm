@@ -382,7 +382,7 @@ initGame model =
         , state = Running <| TargetsEntering { start = model.frame, ballPosition = initialBallPosition }
         , turn = 1
     }
-        |> applyN 1 addNewTargetRowAndIncTurn
+        |> applyN 8 addNewTargetRowAndIncTurn
         |> identity
 
 
@@ -892,10 +892,7 @@ view model =
                             transitionProgress start frame
                     in
                     [ viewLostStateOverlay start frame
-                    , Svg.svg
-                        ((lerp 1 0.1 progress |> fade)
-                            :: svgAttrs vri
-                        )
+                    , Svg.svg (svgAttrs vri)
                         [ rect gc.ri [ fillP black ]
                         , group []
                             [ viewBallCount ballCount
@@ -1001,7 +998,11 @@ viewLostStateOverlay start now =
         , style "background-color"
             (let
                 alphaS =
-                    String.fromFloat (lerp 0 0.9 progress)
+                    progress
+                        |> lerp 0 0.9
+                        |> mul 100
+                        |> round
+                        |> String.fromInt
              in
              "rgb(0 0 0 / " ++ alphaS ++ "%)"
             )
