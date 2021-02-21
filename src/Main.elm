@@ -132,7 +132,7 @@ type State
 
 
 type alias Sim =
-    { mbEmitter : Maybe Emitter, balls : List Ball, floored : List Ball }
+    { mbEmitter : Maybe Emitter, balls : List Ball, floorBalls : List Ball }
 
 
 initSim : Float -> Vec -> Float -> Int -> Sim
@@ -143,7 +143,7 @@ initSim frame ballPosition angle ballCount =
     in
     { mbEmitter = Just emitter
     , balls = []
-    , floored = []
+    , floorBalls = []
     }
 
 
@@ -572,10 +572,10 @@ ballPositionOnSimEnd sim =
         turnEnded =
             (sim.mbEmitter == Nothing)
                 && (sim.balls == [])
-                && areFloorBallsSettled sim.floored
+                && areFloorBallsSettled sim.floorBalls
     in
     if turnEnded then
-        sim.floored |> List.last |> Maybe.map .position
+        sim.floorBalls |> List.last |> Maybe.map .position
 
     else
         Nothing
@@ -603,7 +603,7 @@ stepSimHelp frame targets sim =
                 >> (\{ floored, updated } ->
                         { sim
                             | balls = updated
-                            , floored = floored ++ convergeFloorBalls sim.floored
+                            , floorBalls = floored ++ convergeFloorBalls sim.floorBalls
                         }
                             |> stepSimEmitter frame
                    )
@@ -969,7 +969,7 @@ viewStateContent frame pointer targets state =
                         Just em ->
                             em.proto :: sim.balls
             in
-            group [] [ viewBalls balls, viewFloorBalls sim.floored ]
+            group [] [ viewBalls balls, viewFloorBalls sim.floorBalls ]
 
 
 svgAttrs : Vec -> List (Attribute Msg)
