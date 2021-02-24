@@ -487,7 +487,6 @@ initGame frame seed =
     , seed = seed
     }
         |> applyN 2 addNewTargetRowAndIncTurn
-        |> identity
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
