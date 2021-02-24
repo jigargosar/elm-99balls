@@ -265,6 +265,11 @@ type alias Target =
     }
 
 
+initTarget : GP -> TargetKind -> Target
+initTarget gp kind =
+    Target (gpToWorld gp) kind
+
+
 randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     List.map (randomTarget turns) gc.topRowPS
@@ -272,27 +277,24 @@ randomTargets turns =
         |> Random.map (List.filterMap identity)
 
 
-randomTarget : Int -> ( Int, Int ) -> Generator (Maybe Target)
+randomTarget : Int -> GP -> Generator (Maybe Target)
 randomTarget turns gp =
-    Random.frequency
-        ( 25, Random.constant Nothing )
-        [ ( 70, rnd1 (initSolidTarget gp) (rndInt 1 (maxHP |> atMost (turns + 3))) |> Random.map Just )
-        , ( 5, Random.constant (Just (Target (gpToWorld gp) ExtraBallTarget)) )
-        ]
+    randomTargetKind turns
+        |> rnd1 (Maybe.map (initTarget gp))
 
 
 randomTargetKind : Int -> Generator (Maybe TargetKind)
 randomTargetKind turns =
     Random.frequency
         ( 25, Random.constant Nothing )
-        [ ( 70, rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 3))) |> Random.map Just )
+        [ ( 70, randomSolidTargetKind turns |> Random.map Just )
         , ( 5, Random.constant (Just ExtraBallTarget) )
         ]
 
 
-initSolidTarget : ( Int, Int ) -> Int -> Target
-initSolidTarget gp hp =
-    Target (gpToWorld gp) (SolidTarget hp)
+randomSolidTargetKind : Int -> Generator TargetKind
+randomSolidTargetKind turns =
+    rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 3)))
 
 
 maxHP =
@@ -315,6 +317,10 @@ canTargetsSafelyMoveDown targets =
     maxGY < (gc.h - 2)
 
 
+type alias GP =
+    ( Int, Int )
+
+
 type alias GridConf =
     { ri : Vec
     , w : Int
@@ -325,7 +331,7 @@ type alias GridConf =
     , dx : Float
     , dy : Float
     , aspectRatio : Float
-    , topRowPS : List ( Int, Int )
+    , topRowPS : List GP
     }
 
 
@@ -373,7 +379,7 @@ gc =
     }
 
 
-gpToWorld : ( Int, Int ) -> Vec
+gpToWorld : GP -> Vec
 gpToWorld ( x, y ) =
     let
         { cri, dy, dx } =
@@ -382,7 +388,7 @@ gpToWorld ( x, y ) =
     vec (toFloat x * cri.x * 2 + dx) (toFloat y * cri.y * 2 + dy)
 
 
-gpFromWorld : Vec -> ( Int, Int )
+gpFromWorld : Vec -> GP
 gpFromWorld { x, y } =
     let
         { cri, dy, dx } =
