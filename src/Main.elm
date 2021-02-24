@@ -446,13 +446,9 @@ edges =
     [ top, right, bottom, left ]
 
 
-bottomEdge =
-    screenSegments.bottom
-
-
 isBottomEdge : Seg -> Bool
 isBottomEdge edge =
-    edge == bottomEdge
+    edge == screenSegments.bottom
 
 
 type Msg
