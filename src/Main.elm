@@ -41,7 +41,7 @@ import Util exposing (..)
 
   - [x] extract floor balls
 
-  - try using anim state for floor balls.
+  - [x] using anim state for floor balls.
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
@@ -821,6 +821,7 @@ updateBall acc ball =
                             )
 
 
+resolveBallCollision : Collision -> BallCollision -> Vec -> Ball -> Ball
 resolveBallCollision collision ballCollision velocity ball =
     let
         isSolidCollision =
