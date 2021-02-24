@@ -141,7 +141,7 @@ type alias Sim =
 
 type FloorBalls
     = EmptyFloorBalls
-    | NonEmptyFloorBalls Ball (List Ball)
+    | NonEmptyFloorBalls Ball (List ( Float, Ball ))
 
 
 emptyFloorBalls : FloorBalls
@@ -159,20 +159,22 @@ settledFloorBallsPosition fbs =
             Nothing
 
 
-areBallsCloseEnough : Ball -> Ball -> Bool
-areBallsCloseEnough a b =
-    vecLenSqFromTo a.position b.position
-        |> eqByAtLeast 0.1 0
+
+--areBallsCloseEnough : Ball -> Ball -> Bool
+--areBallsCloseEnough a b =
+--    vecLenSqFromTo a.position b.position
+--        |> eqByAtLeast 0.1 0
 
 
-updateThenAddNewFloorBalls : List Ball -> FloorBalls -> FloorBalls
-updateThenAddNewFloorBalls newBalls fbs =
-    updateFloorBalls fbs
-        |> addNewFloorBalls newBalls
+updateThenAddNewFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
+updateThenAddNewFloorBalls now newBalls fbs =
+    fbs
+        |> updateFloorBalls now
+        |> addNewFloorBalls now newBalls
 
 
-addNewFloorBalls : List Ball -> FloorBalls -> FloorBalls
-addNewFloorBalls balls fbs =
+addNewFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
+addNewFloorBalls now balls fbs =
     case fbs of
         EmptyFloorBalls ->
             case List.unconsLast balls of
@@ -180,42 +182,43 @@ addNewFloorBalls balls fbs =
                     EmptyFloorBalls
 
                 Just ( first, others ) ->
-                    NonEmptyFloorBalls first others
+                    NonEmptyFloorBalls first (others |> List.map (pair now))
 
         NonEmptyFloorBalls first others ->
-            NonEmptyFloorBalls first (balls ++ others)
+            NonEmptyFloorBalls first (List.map (pair now) balls ++ others)
 
 
-updateFloorBalls : FloorBalls -> FloorBalls
-updateFloorBalls fbs =
+updateFloorBalls : Float -> FloorBalls -> FloorBalls
+updateFloorBalls now fbs =
     case fbs of
         EmptyFloorBalls ->
             EmptyFloorBalls
 
         NonEmptyFloorBalls first others ->
-            let
-                convergeBallTowards : Vec -> Ball -> Maybe Ball
-                convergeBallTowards to ball =
-                    let
-                        p =
-                            vecFromTo ball.position to
-                                |> vecScale 0.1
-                                |> vecAdd ball.position
-                    in
-                    Just (setBallPosition p ball)
-                        |> Maybe.filter (areBallsCloseEnough first >> not)
-            in
-            NonEmptyFloorBalls first (List.filterMap (convergeBallTowards first.position) others)
+            NonEmptyFloorBalls first (reject (fst >> (\start -> transitionDone start now)) others)
 
 
-floorBallsToList : FloorBalls -> List Ball
-floorBallsToList fbs =
+viewFloorBalls now fbs =
     case fbs of
         EmptyFloorBalls ->
-            []
+            noView
 
-        NonEmptyFloorBalls first others ->
-            first :: others
+        NonEmptyFloorBalls first anims ->
+            group []
+                (viewBallAt first.position
+                    :: List.map (viewFloorBallAnim now first) anims
+                )
+
+
+viewFloorBallAnim now first ( start, ball ) =
+    let
+        progress =
+            transitionProgress start now
+
+        newPosition =
+            ball.position |> vecMapX (\x -> lerp x first.position.x progress)
+    in
+    viewBallAt newPosition
 
 
 initSim : Float -> Vec -> Float -> Int -> Sim
@@ -684,7 +687,7 @@ stepSimHelp frame targets sim =
                 >> (\{ floored, updated } ->
                         { sim
                             | balls = updated
-                            , floorBalls = updateThenAddNewFloorBalls floored sim.floorBalls
+                            , floorBalls = updateThenAddNewFloorBalls frame floored sim.floorBalls
                         }
                             |> stepSimEmitter frame
                    )
@@ -1011,7 +1014,10 @@ viewStateContent frame pointer targets state =
                         Just em ->
                             em.proto :: sim.balls
             in
-            viewBalls (balls ++ floorBallsToList sim.floorBalls)
+            group []
+                [ viewBalls balls
+                , viewFloorBalls frame sim.floorBalls
+                ]
 
 
 svgAttrs : Vec -> List (Attribute Msg)
