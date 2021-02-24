@@ -1020,6 +1020,7 @@ svgAttrs vri =
     ]
 
 
+viewBallCount : Int -> Svg msg
 viewBallCount ballCount =
     words (String.fromInt ballCount)
         [ fillH 0.15
