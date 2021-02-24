@@ -209,6 +209,7 @@ updateFloorBalls now fbs =
             NonEmptyFloorBalls first (reject (fst >> (\start -> transitionDone start now)) others)
 
 
+viewFloorBalls : Float -> FloorBalls -> Svg msg
 viewFloorBalls now fbs =
     case fbs of
         EmptyFloorBalls ->
