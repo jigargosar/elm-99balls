@@ -12,6 +12,7 @@ import List.Extra as List
 import Maybe.Extra as Maybe
 import Random
 import Random.Extra as Random
+import Random.Float
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task
@@ -270,6 +271,21 @@ initTarget gp kind =
     Target (gpToWorld gp) kind
 
 
+rndGaussLoHi : Float -> Float -> Generator Float
+rndGaussLoHi lo hi =
+    let
+        width =
+            hi - lo
+
+        mean =
+            lo + sd
+
+        sd =
+            width / 2
+    in
+    Random.Float.normal mean sd
+
+
 randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     List.map (randomTarget turns) gc.topRowPS
@@ -294,7 +310,12 @@ randomTargetKind turns =
 
 randomSolidTargetKind : Int -> Generator TargetKind
 randomSolidTargetKind turns =
-    rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 3)))
+    let
+        t =
+            toFloat turns
+    in
+    Random.Float.normal t 3
+        |> rnd1 (atLeast 1 >> atMost (t + 1) >> atMost maxHP >> round >> SolidTarget)
 
 
 maxHP =
@@ -500,7 +521,7 @@ initGame : Float -> Seed -> Game
 initGame frame seed =
     let
         initialBallCount =
-            10
+            1
     in
     { ballCount = initialBallCount
     , targets = []
@@ -508,7 +529,7 @@ initGame frame seed =
     , turn = 1
     , seed = seed
     }
-        |> applyN 2 addNewTargetRowAndIncTurn
+        |> applyN 8 addNewTargetRowAndIncTurn
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
