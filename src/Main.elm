@@ -807,7 +807,7 @@ updateBall acc ball =
 
                         ExtraBallTarget ->
                             ( { acc
-                                | targets = reject (eq target) acc.targets
+                                | targets = removeAllEq target acc.targets
                                 , ballsCollected = acc.ballsCollected + 1
                               }
                             , BallMoved newBall
@@ -815,7 +815,7 @@ updateBall acc ball =
 
                         StarTarget ->
                             ( { acc
-                                | targets = reject (eq target) acc.targets
+                                | targets = removeAllEq target acc.targets
                               }
                             , BallMoved newBall
                             )
