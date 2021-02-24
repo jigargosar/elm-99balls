@@ -138,32 +138,23 @@ type alias Sim =
 
 
 type FloorBalls
-    = FloorBalls (List Ball)
+    = EmptyFloorBalls
+    | NonEmptyFloorBalls Ball (List Ball)
 
 
 emptyFloorBalls : FloorBalls
 emptyFloorBalls =
-    FloorBalls []
+    EmptyFloorBalls
 
 
 settledFloorBallsPosition : FloorBalls -> Maybe Vec
-settledFloorBallsPosition (FloorBalls fbs) =
-    if areFloorBallsSettled fbs then
-        fbs |> List.last |> Maybe.map .position
+settledFloorBallsPosition fbs =
+    case fbs of
+        NonEmptyFloorBalls ball [] ->
+            Just ball.position
 
-    else
-        Nothing
-
-
-areFloorBallsSettled : List Ball -> Bool
-areFloorBallsSettled floorBalls =
-    floorBalls
-        |> List.unconsLast
-        |> Maybe.map
-            (\( first, rest ) ->
-                List.all (areBallsCloseEnough first) rest
-            )
-        |> Maybe.withDefault False
+        _ ->
+            Nothing
 
 
 areBallsCloseEnough : Ball -> Ball -> Bool
@@ -173,42 +164,56 @@ areBallsCloseEnough a b =
 
 
 updateThenAddNewFloorBalls : List Ball -> FloorBalls -> FloorBalls
-updateThenAddNewFloorBalls newFBS (FloorBalls fbs) =
-    newFBS
-        ++ convergeFloorBalls fbs
-        |> FloorBalls
+updateThenAddNewFloorBalls newBalls fbs =
+    updateFloorBalls fbs
+        |> addNewFloorBalls newBalls
+
+
+addNewFloorBalls : List Ball -> FloorBalls -> FloorBalls
+addNewFloorBalls balls fbs =
+    case fbs of
+        EmptyFloorBalls ->
+            case List.unconsLast balls of
+                Nothing ->
+                    EmptyFloorBalls
+
+                Just ( first, others ) ->
+                    NonEmptyFloorBalls first others
+
+        NonEmptyFloorBalls first others ->
+            NonEmptyFloorBalls first (balls ++ others)
+
+
+updateFloorBalls : FloorBalls -> FloorBalls
+updateFloorBalls fbs =
+    case fbs of
+        EmptyFloorBalls ->
+            EmptyFloorBalls
+
+        NonEmptyFloorBalls first others ->
+            let
+                convergeBallTowards : Vec -> Ball -> Maybe Ball
+                convergeBallTowards to ball =
+                    let
+                        p =
+                            vecFromTo ball.position to
+                                |> vecScale 0.1
+                                |> vecAdd ball.position
+                    in
+                    Just (setBallPosition p ball)
+                        |> Maybe.filter (areBallsCloseEnough first >> not)
+            in
+            NonEmptyFloorBalls first (List.filterMap (convergeBallTowards first.position) others)
 
 
 floorBallsToList : FloorBalls -> List Ball
-floorBallsToList (FloorBalls fbs) =
-    case fbs |> List.unconsLast of
-        Nothing ->
+floorBallsToList fbs =
+    case fbs of
+        EmptyFloorBalls ->
             []
 
-        Just ( last, rest ) ->
-            last :: (rest |> reject (areBallsCloseEnough last))
-
-
-convergeFloorBalls : List Ball -> List Ball
-convergeFloorBalls fbs =
-    let
-        convergeBallTowards : Vec -> Ball -> Ball
-        convergeBallTowards to ball =
-            let
-                p =
-                    vecFromTo ball.position to
-                        |> vecScale 0.1
-                        |> vecAdd ball.position
-            in
-            setBallPosition p ball
-    in
-    fbs
-        |> List.unconsLast
-        |> Maybe.map
-            (\( last, others ) ->
-                List.map (convergeBallTowards last.position) others ++ [ last ]
-            )
-        |> Maybe.withDefault fbs
+        NonEmptyFloorBalls first others ->
+            first :: others
 
 
 initSim : Float -> Vec -> Float -> Int -> Sim
