@@ -507,7 +507,7 @@ initGame : Float -> Seed -> Game
 initGame frame seed =
     let
         initialBallCount =
-            10
+            1
     in
     { ballCount = initialBallCount
     , targets = []
