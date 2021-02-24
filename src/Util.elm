@@ -701,8 +701,12 @@ reject =
     List.filterNot
 
 
-removeAllEq x =
+rejectEq x =
     reject (eq x)
+
+
+replace x y =
+    List.setIf (eq x) y
 
 
 minimumBy =

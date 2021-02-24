@@ -791,14 +791,14 @@ updateBall acc ball =
                     case target.kind of
                         SolidTarget hp ->
                             if hp <= 1 then
-                                ( { acc | targets = removeAllEq target acc.targets }
+                                ( { acc | targets = rejectEq target acc.targets }
                                 , BallMoved newBall
                                 )
 
                             else
                                 ( { acc
                                     | targets =
-                                        List.setIf (eq target)
+                                        replace target
                                             { target | kind = SolidTarget (hp - 1) }
                                             acc.targets
                                   }
@@ -807,7 +807,7 @@ updateBall acc ball =
 
                         ExtraBallTarget ->
                             ( { acc
-                                | targets = removeAllEq target acc.targets
+                                | targets = rejectEq target acc.targets
                                 , ballsCollected = acc.ballsCollected + 1
                               }
                             , BallMoved newBall
@@ -815,7 +815,7 @@ updateBall acc ball =
 
                         StarTarget ->
                             ( { acc
-                                | targets = removeAllEq target acc.targets
+                                | targets = rejectEq target acc.targets
                               }
                             , BallMoved newBall
                             )
