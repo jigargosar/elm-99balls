@@ -701,8 +701,8 @@ reject =
     List.filterNot
 
 
-rejectEq : a -> List a -> List a
-rejectEq x =
+remove : a -> List a -> List a
+remove x =
     reject (eq x)
 
 
