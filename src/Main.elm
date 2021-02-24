@@ -136,7 +136,10 @@ type State
 
 
 type alias Sim =
-    { mbEmitter : Maybe Emitter, balls : List Ball, floorBalls : FloorBalls }
+    { mbEmitter : Maybe Emitter
+    , balls : List Ball
+    , floorBalls : FloorBalls
+    }
 
 
 type FloorBalls
