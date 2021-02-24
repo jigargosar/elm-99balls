@@ -281,8 +281,8 @@ randomTarget turns gp =
         ]
 
 
-randomTargetKind : Int -> ( Int, Int ) -> Generator (Maybe TargetKind)
-randomTargetKind turns gp =
+randomTargetKind : Int -> Generator (Maybe TargetKind)
+randomTargetKind turns =
     Random.frequency
         ( 25, Random.constant Nothing )
         [ ( 70, rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 3))) |> Random.map Just )
