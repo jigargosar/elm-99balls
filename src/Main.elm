@@ -176,7 +176,7 @@ settledFloorBallsPosition now fbs =
             else
                 Nothing
 
-        _ ->
+        EmptyFloorBalls ->
             Nothing
 
 
