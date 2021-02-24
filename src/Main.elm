@@ -141,7 +141,21 @@ type alias Sim =
 
 type FloorBalls
     = EmptyFloorBalls
-    | NonEmptyFloorBalls Ball (List ( Float, Ball ))
+    | NonEmptyFloorBalls Vec (List FloorBallAnim)
+
+
+type alias FloorBallAnim =
+    ( Float, Vec )
+
+
+initFloorBallAnim : Float -> Ball -> FloorBallAnim
+initFloorBallAnim now ball =
+    ( now, ball.position )
+
+
+floorBallAnimDone : Float -> FloorBallAnim -> Bool
+floorBallAnimDone now ( start, _ ) =
+    transitionDone start now
 
 
 emptyFloorBalls : FloorBalls
@@ -149,21 +163,18 @@ emptyFloorBalls =
     EmptyFloorBalls
 
 
-settledFloorBallsPosition : FloorBalls -> Maybe Vec
-settledFloorBallsPosition fbs =
+settledFloorBallsPosition : Float -> FloorBalls -> Maybe Vec
+settledFloorBallsPosition now fbs =
     case fbs of
-        NonEmptyFloorBalls ball [] ->
-            Just ball.position
+        NonEmptyFloorBalls first anims ->
+            if List.all (floorBallAnimDone now) anims then
+                Just first
+
+            else
+                Nothing
 
         _ ->
             Nothing
-
-
-
---areBallsCloseEnough : Ball -> Ball -> Bool
---areBallsCloseEnough a b =
---    vecLenSqFromTo a.position b.position
---        |> eqByAtLeast 0.1 0
 
 
 updateThenAddNewFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
@@ -182,10 +193,10 @@ addNewFloorBalls now balls fbs =
                     EmptyFloorBalls
 
                 Just ( first, others ) ->
-                    NonEmptyFloorBalls first (others |> List.map (pair now))
+                    NonEmptyFloorBalls first.position (others |> List.map (initFloorBallAnim now))
 
-        NonEmptyFloorBalls first others ->
-            NonEmptyFloorBalls first (List.map (pair now) balls ++ others)
+        NonEmptyFloorBalls first anims ->
+            NonEmptyFloorBalls first (List.map (initFloorBallAnim now) balls ++ anims)
 
 
 updateFloorBalls : Float -> FloorBalls -> FloorBalls
@@ -205,18 +216,19 @@ viewFloorBalls now fbs =
 
         NonEmptyFloorBalls first anims ->
             group []
-                (viewBallAt first.position
+                (viewBallAt first
                     :: List.map (viewFloorBallAnim now first) anims
                 )
 
 
-viewFloorBallAnim now first ( start, ball ) =
+viewFloorBallAnim : Float -> Vec -> FloorBallAnim -> Svg msg
+viewFloorBallAnim now toPosition ( start, position ) =
     let
         progress =
             transitionProgress start now
 
         newPosition =
-            ball.position |> vecMapX (\x -> lerp x first.position.x progress)
+            position |> vecMapX (\x -> lerp x toPosition.x progress)
     in
     viewBallAt newPosition
 
@@ -411,11 +423,6 @@ ballVelocity ball =
     vecFromRTheta ball.speed ball.angle
 
 
-setBallPosition : Vec -> Ball -> Ball
-setBallPosition p ball =
-    { ball | position = p }
-
-
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
 setBallPositionAndVelocity p v ball =
     { ball | position = p, angle = vecAngle v }
@@ -564,20 +571,6 @@ pageToWorld env pageCord =
         |> vecScale svgScale
 
 
-
---svgToWorld : Model -> Vec -> Vec
---svgToWorld model svgCord =
---    let
---        svgRI =
---            computeSvgRI model
---
---        svgScale =
---            gc.ri.x / svgRI.x
---    in
---    vecSub svgCord svgRI
---        |> vecScale svgScale
-
-
 initWaitingForInputState : Vec -> State
 initWaitingForInputState ballPosition =
     WaitingForInput { ballPosition = ballPosition }
@@ -635,7 +628,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 game
 
         Sim_ sim ->
-            case ballPositionOnSimEnd sim of
+            case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
                     { game
                         | state =
@@ -651,15 +644,15 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     stepSim frame game sim
 
 
-ballPositionOnSimEnd : Sim -> Maybe Vec
-ballPositionOnSimEnd sim =
+ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
+ballPositionOnSimEnd now sim =
     let
         turnEnded =
             (sim.mbEmitter == Nothing)
                 && (sim.balls == [])
     in
     if turnEnded then
-        settledFloorBallsPosition sim.floorBalls
+        settledFloorBallsPosition now sim.floorBalls
 
     else
         Nothing
