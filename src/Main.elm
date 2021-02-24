@@ -293,6 +293,10 @@ randomTargetKind turns =
 
 randomMaybeSolidTargetKind : Int -> Generator (Maybe TargetKind)
 randomMaybeSolidTargetKind turns =
+    let
+        t =
+            toFloat turns
+    in
     Random.frequency
         ( 25, Random.constant Nothing )
         [ ( 75, randomSolidTargetKind turns |> Random.map Just )
