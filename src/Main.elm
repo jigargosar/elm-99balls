@@ -43,6 +43,8 @@ import Util exposing (..)
 
   - [x] using anim state for floor balls.
 
+  - simplify target generation
+
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
@@ -276,6 +278,15 @@ randomTarget turns gp =
         ( 25, Random.constant Nothing )
         [ ( 70, rnd1 (initSolidTarget gp) (rndInt 1 (maxHP |> atMost (turns + 3))) |> Random.map Just )
         , ( 5, Random.constant (Just (Target (gpToWorld gp) ExtraBallTarget)) )
+        ]
+
+
+randomTargetKind : Int -> ( Int, Int ) -> Generator (Maybe TargetKind)
+randomTargetKind turns gp =
+    Random.frequency
+        ( 25, Random.constant Nothing )
+        [ ( 70, rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 3))) |> Random.map Just )
+        , ( 5, Random.constant (Just ExtraBallTarget) )
         ]
 
 
