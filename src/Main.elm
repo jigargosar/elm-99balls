@@ -39,7 +39,9 @@ import Util exposing (..)
 
   - [x] turn relative ball count. don't spend too much time. also check the 99balls game.
 
-  - extract floor balls
+  - [x] extract floor balls
+
+  - try using anim state for floor balls.
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
