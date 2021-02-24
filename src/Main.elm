@@ -177,13 +177,6 @@ settledFloorBallsPosition now fbs =
             Nothing
 
 
-updateThenAddNewFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
-updateThenAddNewFloorBalls now newBalls fbs =
-    fbs
-        |> updateFloorBalls now
-        |> addNewFloorBalls now newBalls
-
-
 addNewFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
 addNewFloorBalls now balls fbs =
     case fbs of
@@ -199,16 +192,6 @@ addNewFloorBalls now balls fbs =
             NonEmptyFloorBalls first (List.map (initFloorBallAnim now) balls ++ anims)
 
 
-updateFloorBalls : Float -> FloorBalls -> FloorBalls
-updateFloorBalls now fbs =
-    case fbs of
-        EmptyFloorBalls ->
-            EmptyFloorBalls
-
-        NonEmptyFloorBalls first others ->
-            NonEmptyFloorBalls first (reject (fst >> (\start -> transitionDone start now)) others)
-
-
 viewFloorBalls : Float -> FloorBalls -> Svg msg
 viewFloorBalls now fbs =
     case fbs of
@@ -218,7 +201,10 @@ viewFloorBalls now fbs =
         NonEmptyFloorBalls first anims ->
             group []
                 (viewBallAt first
-                    :: List.map (viewFloorBallAnim now first) anims
+                    :: (anims
+                            |> reject (floorBallAnimDone now)
+                            |> List.map (viewFloorBallAnim now first)
+                       )
                 )
 
 
@@ -681,7 +667,7 @@ stepSimHelp frame targets sim =
                 >> (\{ floored, updated } ->
                         { sim
                             | balls = updated
-                            , floorBalls = updateThenAddNewFloorBalls frame floored sim.floorBalls
+                            , floorBalls = addNewFloorBalls frame floored sim.floorBalls
                         }
                             |> stepSimEmitter frame
                    )
