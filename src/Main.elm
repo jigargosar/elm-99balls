@@ -860,9 +860,11 @@ type BallCollision
 detectBallCollision : List Target -> Vec -> Ball -> Maybe ( Collision, BallCollision )
 detectBallCollision targets velocity ball =
     let
+        mc : MovingCircle
         mc =
             ( ( ball.position, ball.radius ), velocity )
 
+        c1 : List ( Collision, BallCollision )
         c1 =
             edges
                 |> List.filterMap
@@ -871,6 +873,7 @@ detectBallCollision targets velocity ball =
                             |> Maybe.map (pairTo (BallEdgeCollision e))
                     )
 
+        c2 : List ( Collision, BallCollision )
         c2 =
             targets
                 |> List.filterMap
