@@ -286,15 +286,22 @@ randomTarget turns gp =
 randomTargetKind : Int -> Generator (Maybe TargetKind)
 randomTargetKind turns =
     Random.frequency
+        ( 95, randomMaybeSolidTargetKind turns )
+        [ ( 5, Random.constant (Just ExtraBallTarget) )
+        ]
+
+
+randomMaybeSolidTargetKind : Int -> Generator (Maybe TargetKind)
+randomMaybeSolidTargetKind turns =
+    Random.frequency
         ( 25, Random.constant Nothing )
-        [ ( 70, randomSolidTargetKind turns |> Random.map Just )
-        , ( 5, Random.constant (Just ExtraBallTarget) )
+        [ ( 75, randomSolidTargetKind turns |> Random.map Just )
         ]
 
 
 randomSolidTargetKind : Int -> Generator TargetKind
 randomSolidTargetKind turns =
-    rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 3)))
+    rnd1 SolidTarget (rndInt 1 (maxHP |> atMost (turns + 1)))
 
 
 maxHP =
