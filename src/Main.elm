@@ -322,8 +322,8 @@ rndTargetHealth turns =
         t =
             toFloat turns
     in
-    rndNormal t 3
-        |> rnd1 (atLeast 1 >> atMost (t + 1) >> atMost maxHP >> round)
+    rndNormal t 5
+        |> rnd1 (abs >> atLeast 1 >> atMost (t + 1) >> atMost maxHP >> round)
 
 
 maxHP =
