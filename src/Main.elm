@@ -4,8 +4,8 @@ import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import Html exposing (Attribute, Html, div, node, text)
-import Html.Attributes as A exposing (style)
+import Html exposing (Attribute, Html, div, text)
+import Html.Attributes exposing (style)
 import Html.Events as E exposing (onClick)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
@@ -295,15 +295,14 @@ initTarget gp kind =
 
 randomTargets : Int -> Generator (List Target)
 randomTargets turns =
-    List.map (randomTarget turns) gc.topRowPS
-        |> rndCombine
-        |> Random.map (List.filterMap identity)
+    rndList gc.w (randomTargetKind turns)
+        |> rnd1 initMaybeTargetKinds
 
 
-randomTarget : Int -> GP -> Generator (Maybe Target)
-randomTarget turns gp =
-    randomTargetKind turns
-        |> rnd1 (Maybe.map (initTarget gp))
+initMaybeTargetKinds : List (Maybe TargetKind) -> List Target
+initMaybeTargetKinds mbTKs =
+    List.map2 (\gp -> Maybe.map (initTarget gp)) gc.topRowPS mbTKs
+        |> List.filterMap identity
 
 
 randomTargetKind : Int -> Generator (Maybe TargetKind)
