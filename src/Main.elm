@@ -284,6 +284,7 @@ randomTargets turns =
         (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds)
 
 
+bellN : Int -> Generator Float
 bellN n =
     rndList n (rndF -1 1)
         |> rnd1 (List.sum >> (\total -> total / toFloat n))
