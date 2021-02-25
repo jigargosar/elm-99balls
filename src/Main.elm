@@ -12,7 +12,6 @@ import List.Extra as List
 import Maybe.Extra as Maybe
 import Random
 import Random.Extra as Random
-import Random.Float
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task
@@ -45,6 +44,8 @@ import Util exposing (..)
   - [x] using anim state for floor balls.
 
   - [x] simplify target generation
+
+  - try limit based target generation
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
@@ -295,18 +296,13 @@ initTarget gp kind =
 
 randomTargets : Int -> Generator (List Target)
 randomTargets turns =
-    rndList gc.w (randomTargetKind turns)
-        |> rnd1 initMaybeTargetKinds
+    rnd2 (List.map2 initTarget)
+        (shuffle gc.topRowPS)
+        (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds)
 
 
-initMaybeTargetKinds : List (Maybe TargetKind) -> List Target
-initMaybeTargetKinds mbTKs =
-    List.map2 (\gp -> Maybe.map (initTarget gp)) gc.topRowPS mbTKs
-        |> List.filterMap identity
-
-
-randomTargetKind : Int -> Generator (Maybe TargetKind)
-randomTargetKind turns =
+randomMaybeTargetKind : Int -> Generator (Maybe TargetKind)
+randomMaybeTargetKind turns =
     Random.frequency
         ( 25, Random.constant Nothing )
         [ ( 70, randomSolidTargetKind turns |> Random.map Just )
@@ -314,14 +310,35 @@ randomTargetKind turns =
         ]
 
 
-randomSolidTargetKind : Int -> Generator TargetKind
-randomSolidTargetKind turns =
+randomExtraBallTargetKinds =
+    rndNormal 0 2
+        |> rnd1 (atLeast 0 >> round >> (\i -> List.repeat i ExtraBallTarget))
+
+
+randomSolidTargetKinds : Int -> Generator (List TargetKind)
+randomSolidTargetKinds turns =
     let
         t =
             toFloat turns
     in
-    Random.Float.normal t 3
-        |> rnd1 (atLeast 1 >> atMost (t + 1) >> atMost maxHP >> round >> SolidTarget)
+    rndNormal t 2
+        |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
+        |> rndAndThen (\i -> rndList i (randomSolidTargetKind turns))
+
+
+randomSolidTargetKind : Int -> Generator TargetKind
+randomSolidTargetKind turns =
+    rndTargetHealth turns |> rnd1 SolidTarget
+
+
+rndTargetHealth : Int -> Generator Int
+rndTargetHealth turns =
+    let
+        t =
+            toFloat turns
+    in
+    rndNormal t 3
+        |> rnd1 (atLeast 1 >> atMost (t + 1) >> atMost maxHP >> round)
 
 
 maxHP =

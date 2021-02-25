@@ -10,6 +10,7 @@ import List.Extra as List
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Random.Extra as Random
+import Random.Float
 import Random.List
 import TypedSvg.Attributes as T
 import TypedSvg.Types exposing (..)
@@ -758,6 +759,11 @@ rnd2 =
     Random.map2
 
 
+rndNormal : Float -> Float -> Generator Float
+rndNormal =
+    Random.Float.normal
+
+
 rnd1 =
     Random.map
 
@@ -766,12 +772,20 @@ rndList =
     Random.list
 
 
+shuffle =
+    Random.List.shuffle
+
+
 rndConstant =
     Random.constant
 
 
 rndAndThen =
     Random.andThen
+
+
+rndAndThen2 =
+    Random.andThen2
 
 
 rndShuffle =
