@@ -1,9 +1,11 @@
 {
   "scripts": {
-    "start": "parcel src/index.html --no-hmr"
+    "start": "parcel src/index.html --no-hmr",
+    "postinstall": "patch-package"
   },
   "devDependencies": {
     "node-elm-compiler": "^5.0.5",
-    "parcel-bundler": "^1.12.4"
+    "parcel-bundler": "^1.12.4",
+    "patch-package": "^6.2.2"
   }
 }
