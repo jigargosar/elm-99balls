@@ -537,7 +537,7 @@ initGame frame seed =
     , turn = 1
     , seed = seed
     }
-        |> applyN 8 addNewTargetRowAndIncTurn
+        |> applyN 1 addNewTargetRowAndIncTurn
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
