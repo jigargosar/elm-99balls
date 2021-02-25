@@ -1,6 +1,6 @@
 module Main exposing (main)
 
-import Browser
+import Browser exposing (Document)
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
@@ -68,8 +68,14 @@ import Util exposing (..)
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
 
 -}
+
+
+
+{- -}
+
+
 main =
-    Browser.element
+    Browser.document
         { init = init
         , update = update
         , subscriptions = subscriptions
@@ -969,20 +975,24 @@ computeSvgRI vri_ =
         vec vri.x (vri.x / ar)
 
 
-view : Model -> Html Msg
+view : Model -> Document Msg
 view (Model env game) =
-    div
-        [ style "display" "flex"
-        , style "align-items" "center"
-        , style "justify-content" "center"
-        , style "height" "100%"
-        , E.on "pointerup" (pageXYDecoder |> JD.map (PointerDown False))
-        , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
+    { title = ""
+    , body =
+        [ div
+            [ style "display" "flex"
+            , style "align-items" "center"
+            , style "justify-content" "center"
+            , style "height" "100%"
+            , E.on "pointerup" (pageXYDecoder |> JD.map (PointerDown False))
+            , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
+            ]
+            [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
+            , div [ style "position" "relative" ]
+                (viewGameContent env game)
+            ]
         ]
-        [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
-        , div [ style "position" "relative" ]
-            (viewGameContent env game)
-        ]
+    }
 
 
 viewGameContent : Env -> Game -> List (Html Msg)

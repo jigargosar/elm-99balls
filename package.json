@@ -1,5 +1,9 @@
 {
-  "dependencies": {
-    "jq.node": "^2.3.0"
+  "scripts": {
+    "start": "parcel src/index.html --no-hmr"
+  },
+  "devDependencies": {
+    "node-elm-compiler": "^5.0.5",
+    "parcel-bundler": "^1.12.4"
   }
 }
