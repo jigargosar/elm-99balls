@@ -21,14 +21,16 @@ async function main() {
             const filePath = e.path;
             const problems = e["problems"];
             const firstProblem = problems[0]
-            console.log(util.inspect(firstProblem, {depth: 3}))
-            const filePathWithLineAndColumn = `${filePath}:${(firstProblem.region.start.line)}:${(firstProblem.region.start.column)}`;
+            // console.log(util.inspect(firstProblem, {depth: 3}))
+            const start = firstProblem.region.start;
+            const filePathWithLineAndColumn = `${filePath}:${(start.line)}:${(start.column)}`;
             return `Error: ${firstProblem.title} ${filePathWithLineAndColumn} ${firstProblem.title}`;
         })
         .join('\n')
 
 
-    console.log(output);
+    console.error(output);
+    process.exit(1)
 
 
 }
