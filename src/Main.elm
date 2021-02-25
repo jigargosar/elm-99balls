@@ -289,7 +289,7 @@ bellN n =
         |> rnd1 (List.sum >> (\total -> total / toFloat n))
 
 
-randomExtraBallTargetKinds : Random.Generator (List TargetKind)
+randomExtraBallTargetKinds : Generator (List TargetKind)
 randomExtraBallTargetKinds =
     bellN 2
         |> rnd1 (mul 2 >> abs >> round >> (\i -> List.repeat i ExtraBallTarget))
