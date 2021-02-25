@@ -271,19 +271,20 @@ initTarget gp kind =
     Target (gpToWorld gp) kind
 
 
-rndGaussLoHi : Float -> Float -> Generator Float
-rndGaussLoHi lo hi =
-    let
-        width =
-            hi - lo
 
-        mean =
-            lo + sd
-
-        sd =
-            width / 2
-    in
-    Random.Float.normal mean sd
+--rndGaussLoHi : Float -> Float -> Generator Float
+--rndGaussLoHi lo hi =
+--    let
+--        width =
+--            hi - lo
+--
+--        mean =
+--            lo + sd
+--
+--        sd =
+--            width / 2
+--    in
+--    Random.Float.normal mean sd
 
 
 randomTargets : Int -> Generator (List Target)
@@ -529,9 +530,7 @@ initGame frame seed =
     , turn = 1
     , seed = seed
     }
-        |> applyN 1
-            addNewTargetRowAndIncTurn
-            1
+        |> applyN 1 addNewTargetRowAndIncTurn
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
