@@ -44,7 +44,7 @@ import Util exposing (..)
 
   - [x] using anim state for floor balls.
 
-  - simplify target generation
+  - [x] simplify target generation
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
