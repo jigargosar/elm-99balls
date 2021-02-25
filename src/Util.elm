@@ -755,11 +755,6 @@ rnd2 =
     Random.map2
 
 
-rndNormal : Float -> Float -> Generator Float
-rndNormal =
-    Random.Float.normal
-
-
 rnd1 =
     Random.map
 

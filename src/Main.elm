@@ -292,8 +292,8 @@ bellN n =
 
 randomExtraBallTargetKinds : Generator (List TargetKind)
 randomExtraBallTargetKinds =
-    bellN 2
-        |> rnd1 (mul 2 >> abs >> round >> (\i -> List.repeat i ExtraBallTarget))
+    rndNormal 0 2
+        |> rnd1 (abs >> round >> (\i -> List.repeat i ExtraBallTarget))
 
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
@@ -310,6 +310,10 @@ rndSolidTargetCount turns =
     in
     rndNormal t 2
         |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
+
+
+rndNormal m sd =
+    bellN 2 |> rnd1 (mul sd >> add m)
 
 
 rndTargetHealth : Int -> Generator Int
