@@ -308,12 +308,12 @@ rndSolidTargetCount turns =
         t =
             toFloat turns
     in
-    rndNormal t 2
+    rndNormal (t |> atMost (toFloat gc.w - 2)) 2
         |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
 
 
 rndNormal m sd =
-    bellN 2 |> rnd1 (mul sd >> add m)
+    bellN 3 |> rnd1 (mul sd >> add m)
 
 
 rndTargetHealth : Int -> Generator Int
@@ -537,7 +537,7 @@ initGame frame seed =
     , turn = 1
     , seed = seed
     }
-        |> applyN 1 addNewTargetRowAndIncTurn
+        |> applyN 8 addNewTargetRowAndIncTurn
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
