@@ -317,18 +317,23 @@ randomExtraBallTargetKinds =
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
 randomSolidTargetKinds turns =
-    let
-        t =
-            toFloat turns
-    in
-    rndNormal t 2
-        |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
+    rndSolidTargetCount turns
         |> rndAndThen (\i -> rndList i (randomSolidTargetKind turns))
 
 
 randomSolidTargetKind : Int -> Generator TargetKind
 randomSolidTargetKind turns =
     rndTargetHealth turns |> rnd1 SolidTarget
+
+
+rndSolidTargetCount : Int -> Generator Int
+rndSolidTargetCount turns =
+    let
+        t =
+            toFloat turns
+    in
+    rndNormal t 2
+        |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
 
 
 rndTargetHealth : Int -> Generator Int
