@@ -10,7 +10,7 @@ import Html.Events as E exposing (onClick)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Maybe.Extra as Maybe
-import Random
+import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task

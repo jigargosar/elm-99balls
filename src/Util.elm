@@ -727,10 +727,6 @@ maximum =
 -- Random
 
 
-type alias Generator a =
-    Random.Generator a
-
-
 type alias Seed =
     Random.Seed
 
