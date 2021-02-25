@@ -11,7 +11,6 @@ import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Maybe.Extra as Maybe
 import Random
-import Random.Extra as Random
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task
@@ -278,22 +277,6 @@ initTarget gp kind =
     Target (gpToWorld gp) kind
 
 
-
---rndGaussLoHi : Float -> Float -> Generator Float
---rndGaussLoHi lo hi =
---    let
---        width =
---            hi - lo
---
---        mean =
---            lo + sd
---
---        sd =
---            width / 2
---    in
---    Random.Float.normal mean sd
-
-
 randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     rnd2 (List.map2 initTarget)
@@ -301,9 +284,15 @@ randomTargets turns =
         (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds)
 
 
+bellN n =
+    rndList n (rndF 0 1)
+        |> rnd1 (List.sum >> (\total -> total / toFloat n))
+
+
+randomExtraBallTargetKinds : Random.Generator (List TargetKind)
 randomExtraBallTargetKinds =
-    rndNormal 0 2
-        |> rnd1 (atLeast 0 >> round >> (\i -> List.repeat i ExtraBallTarget))
+    bellN 2
+        |> rnd1 (mul 2 >> abs >> round >> (\i -> List.repeat i ExtraBallTarget))
 
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
