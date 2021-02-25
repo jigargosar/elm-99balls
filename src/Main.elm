@@ -301,15 +301,6 @@ randomTargets turns =
         (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds)
 
 
-randomMaybeTargetKind : Int -> Generator (Maybe TargetKind)
-randomMaybeTargetKind turns =
-    Random.frequency
-        ( 25, Random.constant Nothing )
-        [ ( 70, randomSolidTargetKind turns |> Random.map Just )
-        , ( 5, Random.constant (Just ExtraBallTarget) )
-        ]
-
-
 randomExtraBallTargetKinds =
     rndNormal 0 2
         |> rnd1 (atLeast 0 >> round >> (\i -> List.repeat i ExtraBallTarget))
@@ -318,12 +309,7 @@ randomExtraBallTargetKinds =
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
 randomSolidTargetKinds turns =
     rndSolidTargetCount turns
-        |> rndAndThen (\i -> rndList i (randomSolidTargetKind turns))
-
-
-randomSolidTargetKind : Int -> Generator TargetKind
-randomSolidTargetKind turns =
-    rndTargetHealth turns |> rnd1 SolidTarget
+        |> rndAndThen (\i -> rndList i (rndTargetHealth turns |> rnd1 SolidTarget))
 
 
 rndSolidTargetCount : Int -> Generator Int
