@@ -1,3 +1,4 @@
-import {Elm} from "./Main.elm"
+import {Elm} from "./main.elm.js"
 
 Elm.Main.init()
+

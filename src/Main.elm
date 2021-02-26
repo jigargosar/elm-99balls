@@ -313,7 +313,7 @@ rndSolidTargetCount turns =
 
 
 rndNormal m sd =
-    bellN 3 |> rnd1 (mul sd >> add m)
+    bellN 2 |> rnd1 (mul sd >> add m)
 
 
 rndTargetHealth : Int -> Generator Int
