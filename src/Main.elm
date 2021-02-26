@@ -530,6 +530,9 @@ initGame frame seed =
     let
         initialBallCount =
             1
+
+        _ =
+            2
     in
     { ballCount = initialBallCount
     , targets = []

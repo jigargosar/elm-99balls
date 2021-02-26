@@ -6,12 +6,13 @@ const {spawnSync} = require('child_process');
 let spawnSyncReturns = spawnSync("elm.cmd", [
     "make",
     "src/Main.elm",
-    "--output=/dev/null",
+    "--output=src/main.elm.js",
     "--report=json",
 ]);
 
 async function main() {
     const stdErrString = spawnSyncReturns.stderr.toString();
+    if(stdErrString.length === 0) return
     const json = JSON.parse(stdErrString);
 
     const output = json
@@ -28,11 +29,8 @@ async function main() {
         })
         .join('\n')
 
-
     console.error(output);
     process.exit(1)
-
-
 }
 
 main().catch(console.error)
