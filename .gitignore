@@ -4,3 +4,4 @@
 /dist/
 *.elm.js
 /.parcel-cache/
+/public/index.js

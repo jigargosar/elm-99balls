@@ -1,6 +1,7 @@
 {
   "scripts": {
     "start": "parcel src/index.html --no-hmr",
+    "roll": "npx rollup -p live-server=\"{root:'public/',host:'localhost'}\" -p node-resolve -p elm2=\"{debug:false}\" -w -d public src/index.js",
     "_postinstall": "patch-package"
   },
   "browserslist": [
@@ -16,9 +17,13 @@
     "@parcel/transformer-html": "^2.0.0-nightly.611",
     "@parcel/transformer-postcss": "^2.0.0-nightly.611",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.611",
+    "@rollup/plugin-node-resolve": "^11.2.0",
     "elm": "^0.19.1-5",
     "parcel": "^2.0.0-nightly.609",
     "postcss": "^8.2.6",
+    "rollup": "^2.40.0",
+    "rollup-plugin-elm2": "^0.2.0",
+    "rollup-plugin-live-server": "^2.0.0",
     "tauri": "^0.14.1"
   }
 }
