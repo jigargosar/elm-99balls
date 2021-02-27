@@ -1,11 +1,23 @@
 {
   "scripts": {
     "start": "parcel src/index.html --no-hmr",
-    "postinstall": "patch-package"
+    "_postinstall": "patch-package"
   },
+  "browserslist": [
+    "last 1 chrome version"
+  ],
   "devDependencies": {
-    "node-elm-compiler": "^5.0.5",
-    "parcel-bundler": "^1.12.4",
-    "patch-package": "^6.2.2"
+    "@parcel/optimizer-cssnano": "^2.0.0-nightly.611",
+    "@parcel/optimizer-htmlnano": "^2.0.0-nightly.611",
+    "@parcel/packager-css": "^2.0.0-nightly.611",
+    "@parcel/packager-html": "^2.0.0-nightly.611",
+    "@parcel/transformer-css": "^2.0.0-nightly.611",
+    "@parcel/transformer-elm": "^2.0.0-nightly.2233",
+    "@parcel/transformer-html": "^2.0.0-nightly.611",
+    "@parcel/transformer-postcss": "^2.0.0-nightly.611",
+    "@parcel/transformer-posthtml": "^2.0.0-nightly.611",
+    "elm": "^0.19.1-5",
+    "parcel": "^2.0.0-nightly.609",
+    "postcss": "^8.2.6"
   }
 }
