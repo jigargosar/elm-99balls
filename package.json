@@ -18,6 +18,7 @@
     "@parcel/transformer-posthtml": "^2.0.0-nightly.611",
     "elm": "^0.19.1-5",
     "parcel": "^2.0.0-nightly.609",
-    "postcss": "^8.2.6"
+    "postcss": "^8.2.6",
+    "tauri": "^0.14.1"
   }
 }
