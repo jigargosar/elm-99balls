@@ -24,7 +24,7 @@ import Util exposing (..)
 {-|
 
 
-# Todo
+# Tasks
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
