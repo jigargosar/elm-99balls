@@ -439,6 +439,14 @@ gc =
     }
 
 
+type alias WorldConf =
+    { ri : Vec
+    , header : { ri : Vec, c : Vec }
+    , footer : { ri : Vec, c : Vec }
+    }
+
+
+wc : WorldConf
 wc =
     let
         headerRI =
