@@ -1143,6 +1143,9 @@ viewTutorial start now =
 
         viewHand =
             circle 10 [ strokeP white, transform [ translate handPosition ] ]
+
+        viewStartingHandPosition =
+            circle (gc.ballR * 0.5) [ fillP white ]
     in
     group
         [--transform [ translateXY 0 (gc.ri.y * 0.4) ]
@@ -1157,7 +1160,7 @@ viewTutorial start now =
             _ ->
                 noView
         , viewHand
-        , circle (gc.ballR * 0.5) [ fillP white ]
+        , viewStartingHandPosition
         ]
 
 
