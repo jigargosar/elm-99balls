@@ -1140,7 +1140,7 @@ viewTutorial start now =
             vecFromTo currHandPosition nextHandPosition
                 |> vecScale progress
                 |> vecAdd currHandPosition
-                |> vecScale 2.5
+                |> vecScale 1
 
         viewHand =
             circle 10 [ strokeP white, transform [ translate handPosition ] ]
@@ -1160,6 +1160,7 @@ viewTutorial start now =
 
             _ ->
                 noView
+        , viewTravelPath now [ vecZero, handPosition |> vecNegate ]
         , viewHand
         , viewStartingHandPosition
         ]
