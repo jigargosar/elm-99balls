@@ -1041,7 +1041,6 @@ viewGameContent { vri, frame, pointer } g =
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
             , viewFooter g.ballCount
-            , viewTutorial 0 frame
             ]
         ]
     ]
@@ -1066,8 +1065,8 @@ viewFooter ballCount =
         ]
 
 
-viewStateContent : Float -> Vec -> List Target -> State -> Svg Msg
-viewStateContent frame pointer targets state =
+viewStateContent : Float -> Vec -> Int -> List Target -> State -> Svg Msg
+viewStateContent frame pointer turn targets state =
     case state of
         GameLost _ ->
             noView
@@ -1076,11 +1075,23 @@ viewStateContent frame pointer targets state =
             viewBallAt ballPosition
 
         WaitingForInput { ballPosition } ->
-            viewBallAt ballPosition
+            group []
+                [ viewBallAt ballPosition
+                , if turn == 1 then
+                    viewTutorial 0 frame
+
+                  else
+                    noView
+                ]
 
         Aiming { dragStartAt, ballPosition } ->
             group []
                 [ viewBallAt ballPosition
+                , if turn == 1 then
+                    viewTutorial 0 frame
+
+                  else
+                    noView
                 , case validAimAngleTowards dragStartAt pointer of
                     Nothing ->
                         noView
