@@ -1052,23 +1052,33 @@ viewGameContent { vri, frame, pointer } g =
     , Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
         , group []
-            [ group [ transform [ translate wc.header.c ] ]
-                [ rect wc.header.ri [ fillP darkCharcoal ]
-                , words (String.fromInt g.turn)
-                    [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-                ]
-            , group [ transform [ translate wc.footer.c ] ]
-                [ rect wc.footer.ri [ fillH 0.07 ]
-                , circle gc.ballR [ fillP white, transform [ translateXY -gc.cellR 0 ] ]
-                , words (String.fromInt g.ballCount)
-                    [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-                ]
+            [ viewHeader g.turn
+            , viewFooter g.ballCount
             , viewTargets frame g.state g.targets
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
             ]
         ]
     ]
+
+
+viewHeader : Int -> Svg msg
+viewHeader turn =
+    group [ transform [ translate wc.header.c ] ]
+        [ rect wc.header.ri [ fillP darkCharcoal ]
+        , words (String.fromInt turn)
+            [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
+        ]
+
+
+viewFooter : Int -> Svg msg
+viewFooter ballCount =
+    group [ transform [ translate wc.footer.c ] ]
+        [ rect wc.footer.ri [ fillH 0.07 ]
+        , circle gc.ballR [ fillP white, transform [ translateXY -gc.cellR 0 ] ]
+        , words (String.fromInt ballCount)
+            [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
+        ]
 
 
 viewStateContent : Float -> Vec -> List Target -> State -> Svg Msg
