@@ -26,31 +26,6 @@ import Util exposing (..)
 
 # Todo
 
-  - [x] Bug: angle always showing at center
-      - for v1 on mobile, check other cases.
-
-  - [x] allow multiple input handling mode for quick switch during testing
-      - for now we are using hardcoded constant for switching
-
-  - [x] goodies: extra ball
-
-  - [x] game over
-
-  - [x] turn relative ball count. don't spend too much time. also check the 99balls game.
-
-  - [x] extract floor balls
-
-  - [x] using anim state for floor balls.
-
-  - [x] simplify target generation
-
-  - [x] try limit based target generation
-      - level progression is really good enough.
-      - perhaps, we should not touch it all.
-      - before any further modifications, record params, do more play testing.
-
-  - [x] score at top, ball ct at bottom.
-
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
