@@ -451,6 +451,8 @@ wc =
             gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
     in
     { ri = ri
+    , headerHeight = headerHeight
+    , footerHeight = footerHeight
     }
 
 
@@ -1044,7 +1046,13 @@ viewGameContent { vri, frame, pointer } g =
     , Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
         , group []
-            [ viewBallCount g.ballCount
+            [ group []
+                [ words (String.fromInt g.turn)
+                    [ fillH 1
+                    , transform [ translateXY 0 -(gc.ri.y + wc.headerHeight / 2), scale 3 ]
+                    ]
+                ]
+            , viewBallCount g.ballCount
             , viewTargets frame g.state g.targets
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
