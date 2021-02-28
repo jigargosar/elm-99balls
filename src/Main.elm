@@ -311,8 +311,11 @@ rndSolidTargetCount turns =
     let
         t =
             toFloat turns
+
+        ( mean, sd ) =
+            ( (t / 2) |> atMost (toFloat gc.w - 2), 2 )
     in
-    rndNormal (t |> atMost (toFloat gc.w - 2)) 2
+    rndNormal mean sd
         |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
 
 
