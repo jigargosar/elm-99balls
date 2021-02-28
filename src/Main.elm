@@ -1041,27 +1041,7 @@ viewGameContent { vri, frame, pointer } g =
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
             , viewFooter g.ballCount
-            , if
-                if g.turn == 1 then
-                    case g.state of
-                        TargetsEntering _ ->
-                            False
-
-                        WaitingForInput _ ->
-                            True
-
-                        Aiming record ->
-                            True
-
-                        Sim_ sim ->
-                            False
-
-                        GameLost float ->
-                            False
-
-                else
-                    False
-              then
+            , if shouldDisplayTutorial g.turn g.state then
                 viewTutorial 0 frame
 
               else
@@ -1069,6 +1049,29 @@ viewGameContent { vri, frame, pointer } g =
             ]
         ]
     ]
+
+
+shouldDisplayTutorial : Int -> State -> Bool
+shouldDisplayTutorial turn state =
+    if turn == 1 then
+        case state of
+            TargetsEntering _ ->
+                False
+
+            WaitingForInput _ ->
+                True
+
+            Aiming _ ->
+                True
+
+            Sim_ _ ->
+                False
+
+            GameLost _ ->
+                False
+
+    else
+        False
 
 
 viewHeader : Int -> Svg msg
