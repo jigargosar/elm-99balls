@@ -594,6 +594,11 @@ update message (Model env game) =
             )
 
         OnTick _ ->
+            let
+                _ =
+                    --Debug.log "state"
+                    game.state
+            in
             ( Model
                 { env
                     | frame = inc env.frame
