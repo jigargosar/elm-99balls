@@ -1144,7 +1144,8 @@ viewTutorial start now =
 
         viewHand =
             group [ transform [ translate handPosition ] ]
-                [ circle 10 [ strokeP white ]
+                [ circle (gc.ballR * 0.6) [ Px.strokeWidth 2, strokeP white ]
+                , circle (gc.ballR * 0.4) [ Px.strokeWidth 2, strokeP white ]
                 , group [ transform [ translateXY -20 0, scale 0.3, Scale 0.8 1 ], fillP white ]
                     [ handSvg ]
                 ]
