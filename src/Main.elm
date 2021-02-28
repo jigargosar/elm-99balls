@@ -1187,7 +1187,10 @@ viewTutorial start now =
         viewStartingHandPosition =
             circle (gc.ballR * 0.5) [ fillP white ]
     in
-    group [ transform [ translateXY 0 (gc.ri.y * 0.4) ] ]
+    group
+        [ transform [ translateXY 0 (gc.ri.y * 0.4) ]
+        , fade 0.7
+        ]
         [ case phase of
             0 ->
                 noView
