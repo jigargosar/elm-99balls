@@ -52,12 +52,14 @@ import Util exposing (..)
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
-  - Next milestone ???
-
-  - pretty ui / mobile fixes / play-testing ???
-      - towards what end??
-      - check how close we are to 99balls game.
-      - what will it take to declare the project complete?
+  - 99 balls game features:
+      - score/turn -- top
+      - ball count -- bottom
+      - end screen: score/hi-score on over.
+      - start screen:
+      - transitions for ui elements.
+      - sound effects.
+      - star/shop gimmick. Not sure. But is part of clone.
 
 
 # Later
