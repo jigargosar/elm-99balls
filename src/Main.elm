@@ -442,6 +442,19 @@ gc =
     }
 
 
+wc : { aspectRatio : Float }
+wc =
+    let
+        ri =
+            gc.ri
+
+        ar =
+            vecApply fdiv ri
+    in
+    { aspectRatio = ar
+    }
+
+
 gpToWorld : GP -> Vec
 gpToWorld ( x, y ) =
     let
@@ -994,20 +1007,20 @@ computeSvgRI : Vec -> Vec
 computeSvgRI vri_ =
     let
         ar =
-            gc.aspectRatio
+            wc.aspectRatio
 
-        vri =
+        viewportRI =
             vri_
                 |> vecScale 0.95
 
         viewportAR =
-            vecApply fdiv vri
+            vecApply fdiv viewportRI
     in
     if ar < viewportAR then
-        vec (vri.y * ar) vri.y
+        vec (viewportRI.y * ar) viewportRI.y
 
     else
-        vec vri.x (vri.x / ar)
+        vec viewportRI.x (viewportRI.x / ar)
 
 
 view : Model -> Html Msg
