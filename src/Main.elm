@@ -1050,7 +1050,8 @@ viewGameContent { vri, frame, pointer } g =
         , group []
             [ group [ transform [ translateXY 0 -(gc.ri.y + wc.headerRI.y) ] ]
                 [ rect wc.headerRI [ fillH 0.14 ]
-                , words (String.fromInt g.turn) [ fillP black, transform [ scale 3 ] ]
+                , words (String.fromInt g.turn)
+                    [ fillP black, transform [ scale 4 ], T.fontWeight FontWeightBold ]
                 ]
             , viewBallCount g.ballCount
             , viewTargets frame g.state g.targets
