@@ -441,8 +441,11 @@ gc =
 
 wc =
     let
+        headerRI =
+            vec gc.ri.x gc.cr
+
         headerHeight =
-            gc.cr * 2
+            headerRI.y * 2
 
         footerHeight =
             headerHeight
@@ -451,8 +454,7 @@ wc =
             gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
     in
     { ri = ri
-    , headerHeight = headerHeight
-    , footerHeight = footerHeight
+    , headerRI = headerRI
     }
 
 
@@ -1046,11 +1048,9 @@ viewGameContent { vri, frame, pointer } g =
     , Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
         , group []
-            [ group []
-                [ words (String.fromInt g.turn)
-                    [ fillH 1
-                    , transform [ translateXY 0 -(gc.ri.y + wc.headerHeight / 2), scale 3 ]
-                    ]
+            [ group [ transform [ translateXY 0 -(gc.ri.y + wc.headerRI.y) ] ]
+                [ rect wc.headerRI [ fillH 0.14 ]
+                , words (String.fromInt g.turn) [ fillP black, transform [ scale 3 ] ]
                 ]
             , viewBallCount g.ballCount
             , viewTargets frame g.state g.targets
