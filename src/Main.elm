@@ -12,7 +12,7 @@ import List.Extra as List
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Svg exposing (Svg)
-import Svg.Attributes as S exposing (fill)
+import Svg.Attributes as S
 import Task
 import Tuple exposing (pair)
 import TypedSvg.Attributes as T
@@ -455,14 +455,8 @@ wc =
         footerRI =
             headerRI
 
-        headerHeight =
-            headerRI.y * 2
-
-        footerHeight =
-            footerRI.y * 2
-
         ri =
-            gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
+            gc.ri |> vecMapY (add (headerRI.y + footerRI.y))
     in
     { ri = ri
     , header = { ri = headerRI, c = vec 0 -(gc.ri.y + headerRI.y) }
@@ -1151,14 +1145,6 @@ svgAttrs vri =
 
 viewBoxFromRI ri =
     T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
-
-
-viewBallCount : Int -> Svg msg
-viewBallCount ballCount =
-    words (String.fromInt ballCount)
-        [ fillH 0.15
-        , transform [ translateXY (-gc.ri.x + 20) (-gc.ri.y + 20), scale 3 ]
-        ]
 
 
 viewGameLost : Float -> Game -> Html Msg
