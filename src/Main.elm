@@ -449,13 +449,13 @@ wc =
 
         ri =
             gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
-
-        ar =
-            vecApply fdiv ri
     in
     { ri = ri
-    , aspectRatio = ar
     }
+
+
+aspectRatioFromRI =
+    vecApply fdiv
 
 
 gpToWorld : GP -> Vec
@@ -1010,14 +1010,14 @@ computeSvgRI : Vec -> Vec
 computeSvgRI vri_ =
     let
         ar =
-            wc.aspectRatio
+            aspectRatioFromRI wc.ri
 
         viewportRI =
             vri_
                 |> vecScale 0.95
 
         viewportAR =
-            vecApply fdiv viewportRI
+            aspectRatioFromRI viewportRI
     in
     if ar < viewportAR then
         vec (viewportRI.y * ar) viewportRI.y
