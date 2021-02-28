@@ -1194,7 +1194,7 @@ viewTutorial start now =
     in
     group
         [ transform [ translateXY 0 (gc.ri.y * 0.4) ]
-        , fade 0.7
+        , fade 0.6
         ]
         [ case phase of
             0 ->
