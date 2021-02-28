@@ -348,7 +348,7 @@ rndNormal m sd =
 
 
 maxHP =
-    20
+    50
 
 
 moveTargetDown : Target -> Target
@@ -536,7 +536,7 @@ init _ =
         env =
             initialEnvironment
     in
-    ( Model env (initGame env.frame initialSeed)
+    ( Model env (initGame env.frame initialSeed |> applyN 4 (reStartGame 0))
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
@@ -558,7 +558,7 @@ initGame frame seed =
     , turn = 1
     , seed = seed
     }
-        |> applyN 8 addNewTargetRowAndIncTurn
+        |> applyN 1 addNewTargetRowAndIncTurn
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
