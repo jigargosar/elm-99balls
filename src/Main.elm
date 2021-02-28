@@ -34,6 +34,7 @@ import Util exposing (..)
 
 # 99 balls game features:
 
+  - restart game
   - end screen: score/hi-score on over.
       - start screen:
   - star/shop gimmick. Not sure. But is part of clone.
