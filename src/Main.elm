@@ -302,8 +302,7 @@ bellN n =
 
 randomExtraBallTargetKinds : Generator (List TargetKind)
 randomExtraBallTargetKinds =
-    rndNormal 0 2
-        |> rnd1 (abs >> round >> (\i -> List.repeat i ExtraBallTarget))
+    rndExtraBallCount |> rnd1 (\i -> List.repeat i ExtraBallTarget)
 
 
 rndExtraBallCount : Generator Int
