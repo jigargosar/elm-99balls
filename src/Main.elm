@@ -1062,7 +1062,6 @@ viewGameContent { vri, frame, pointer } g =
                 , words (String.fromInt g.ballCount)
                     [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
                 ]
-            , viewBallCount g.ballCount
             , viewTargets frame g.state g.targets
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
