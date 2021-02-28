@@ -1108,6 +1108,7 @@ viewStateContent frame pointer targets state =
                 ]
 
 
+viewTutorial : Float -> Float -> Svg msg
 viewTutorial start now =
     let
         dur =
