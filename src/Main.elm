@@ -388,7 +388,7 @@ type alias GridConf =
     { ri : Vec
     , w : Int
     , h : Int
-    , cr : Float
+    , cellR : Float
     , cri : Vec
     , targetR : Float
     , ballR : Float
@@ -429,7 +429,7 @@ gc =
     { ri = ri
     , w = w
     , h = h
-    , cr = cr
+    , cellR = cr
     , cri = cri
     , targetR = tr
     , ballR = br
@@ -442,7 +442,7 @@ gc =
 wc =
     let
         headerRI =
-            vec gc.ri.x gc.cr
+            vec gc.ri.x gc.cellR
 
         footerRI =
             headerRI
@@ -1059,7 +1059,7 @@ viewGameContent { vri, frame, pointer } g =
                 ]
             , group [ transform [ translateXY 0 (gc.ri.y + wc.footerRI.y) ] ]
                 [ rect wc.footerRI [ fillH 0.07 ]
-                , circle gc.ballR [ fillP white, transform [ translateXY -gc.cr 0 ] ]
+                , circle gc.ballR [ fillP white, transform [ translateXY -gc.cellR 0 ] ]
                 , words (String.fromInt g.ballCount)
                     [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
                 ]
