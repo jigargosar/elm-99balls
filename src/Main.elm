@@ -54,6 +54,11 @@ import Util exposing (..)
 
   - Next milestone ???
 
+  - pretty ui / mobile fixes / play-testing ???
+      - towards what end??
+      - check how close we are to 99balls game.
+      - what will it take to declare the project complete?
+
 
 # Later
 
