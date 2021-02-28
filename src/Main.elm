@@ -457,8 +457,8 @@ wc =
             gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
     in
     { ri = ri
-    , headerRI = headerRI
-    , footerRI = footerRI
+    , header = { ri = headerRI, c = vec 0 -(gc.ri.y + headerRI.y) }
+    , footer = { ri = footerRI, c = vec 0 (gc.ri.y + footerRI.y) }
     }
 
 
@@ -1052,13 +1052,13 @@ viewGameContent { vri, frame, pointer } g =
     , Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
         , group []
-            [ group [ transform [ translateXY 0 -(gc.ri.y + wc.headerRI.y) ] ]
-                [ rect wc.headerRI [ fillP darkCharcoal ]
+            [ group [ transform [ translate wc.header.c ] ]
+                [ rect wc.header.ri [ fillP darkCharcoal ]
                 , words (String.fromInt g.turn)
                     [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
                 ]
-            , group [ transform [ translateXY 0 (gc.ri.y + wc.footerRI.y) ] ]
-                [ rect wc.footerRI [ fillH 0.07 ]
+            , group [ transform [ translate wc.footer.c ] ]
+                [ rect wc.footer.ri [ fillH 0.07 ]
                 , circle gc.ballR [ fillP white, transform [ translateXY -gc.cellR 0 ] ]
                 , words (String.fromInt g.ballCount)
                     [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
