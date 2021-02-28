@@ -316,7 +316,7 @@ rndSolidTargetCount turns =
             ( (t / 2) |> atMost (toFloat gc.w - 2), 2 )
     in
     rndNormal mean sd
-        |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
+        |> rnd1 (abs >> atLeast 1 >> round >> atMost (gc.w - 1))
 
 
 rndTargetHealth : Int -> Generator Int
