@@ -300,6 +300,12 @@ bellN n =
         |> rnd1 (List.sum >> (\total -> total / toFloat n))
 
 
+rndExtraBallCount : Generator Int
+rndExtraBallCount =
+    rndNormal 0 2
+        |> rnd1 (abs >> round)
+
+
 rndSolidTargetCount : Int -> Generator Int
 rndSolidTargetCount turns =
     let
@@ -310,10 +316,14 @@ rndSolidTargetCount turns =
         |> rnd1 (atLeast 1 >> round >> atMost (gc.w - 1))
 
 
-rndExtraBallCount : Generator Int
-rndExtraBallCount =
-    rndNormal 0 2
-        |> rnd1 (abs >> round)
+rndTargetHealth : Int -> Generator Int
+rndTargetHealth turns =
+    let
+        t =
+            toFloat turns
+    in
+    rndNormal t 10
+        |> rnd1 (abs >> clamp 1 (t + 1) >> atMost maxHP >> round)
 
 
 randomExtraBallTargetKinds : Generator (List TargetKind)
@@ -329,16 +339,6 @@ randomSolidTargetKinds turns =
 
 rndNormal m sd =
     bellN 3 |> rnd1 (mul sd >> add m)
-
-
-rndTargetHealth : Int -> Generator Int
-rndTargetHealth turns =
-    let
-        t =
-            toFloat turns
-    in
-    rndNormal t 10
-        |> rnd1 (abs >> clamp 1 (t + 1) >> atMost maxHP >> round)
 
 
 maxHP =
