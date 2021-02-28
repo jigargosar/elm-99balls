@@ -29,7 +29,9 @@ import Util exposing (..)
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
-  - 99 balls game features:
+
+# 99 balls game features:
+
       - score/turn -- top
       - ball count -- bottom
       - end screen: score/hi-score on over.
