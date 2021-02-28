@@ -1168,13 +1168,17 @@ viewTutorial start now =
             vecFromTo currHandPosition nextHandPosition
                 |> vecScale progress
                 |> vecAdd currHandPosition
-                |> vecScale 1
 
         viewHand =
             group [ transform [ translate handPosition ] ]
-                [ circle (gc.ballR * 0.6) [ Px.strokeWidth 2, strokeP white ]
-                , circle (gc.ballR * 0.4) [ Px.strokeWidth 2, strokeP white ]
-                , group [ transform [ scale 0.25, Scale 0.8 1, translateXY -80 0 ], fillP white ]
+                [ group [ Px.strokeWidth 2, strokeP white ]
+                    [ circle (gc.ballR * 0.6) []
+                    , circle (gc.ballR * 0.4) []
+                    ]
+                , group
+                    [ fillP white
+                    , transform [ scale 0.25, Scale 0.8 1, translateXY -80 0 ]
+                    ]
                     [ handSvg ]
                 ]
 
