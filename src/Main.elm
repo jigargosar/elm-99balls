@@ -1009,20 +1009,20 @@ subscriptions _ =
 computeSvgRI : Vec -> Vec
 computeSvgRI vri_ =
     let
-        ar =
+        war =
             aspectRatioFromRI wc.ri
 
-        viewportRI =
+        vri =
             vri_ |> vecScale 0.95
 
-        viewportAR =
-            aspectRatioFromRI viewportRI
+        var =
+            aspectRatioFromRI vri
     in
-    if ar < viewportAR then
-        vec (viewportRI.y * ar) viewportRI.y
+    if war < var then
+        vec (vri.y * war) vri.y
 
     else
-        vec viewportRI.x (viewportRI.x / ar)
+        vec vri.x (vri.x / war)
 
 
 view : Model -> Html Msg
