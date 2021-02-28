@@ -26,6 +26,8 @@ import Util exposing (..)
 
 # Tasks
 
+    - [x] indicator to communicate how to start playing by pointer drag.
+
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
@@ -34,11 +36,11 @@ import Util exposing (..)
 
       - end screen: score/hi-score on over.
       - start screen:
-      - pause state
-      - indicator to communicate how to start playing by pointer drag.
-      - transitions for ui elements.
+
       - sound effects.
       - star/shop gimmick. Not sure. But is part of clone.
+      - transitions for ui elements.
+      - pause state
 
 
 # Later
