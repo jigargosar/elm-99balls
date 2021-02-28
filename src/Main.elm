@@ -63,8 +63,7 @@ import Util exposing (..)
     i.e. when objects already intersecting, what is effect on collision response.
 
   - Invalid states, that are representable.
-      - +1 ball outside screen edges / sim never ending.
-          - Bug: ball outside world, invariant failed during mobile testing InputV1
+      - +3 ball outside screen edges / sim never ending.
       - total number of balls before and after simulation are different.
 
   - -1 Concern: Input handling is much better, but there is room for improvement.
