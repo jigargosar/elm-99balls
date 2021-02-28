@@ -49,7 +49,7 @@ import Util exposing (..)
       - perhaps, we should not touch it all.
       - before any further modifications, record params, do more play testing.
 
-  - score at top, ball ct at bottom.
+  - [x] score at top, ball ct at bottom.
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
