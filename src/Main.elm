@@ -1116,15 +1116,18 @@ viewTutorial start now =
         elapsed =
             fmodBy (dur * 3) (now - start |> atLeast 0)
     in
-    case elapsed / dur |> floor of
-        0 ->
-            noView
+    group [ transform [ translateXY 0 (gc.ri.y * 0.4) ] ]
+        [ case elapsed / dur |> floor of
+            0 ->
+                noView
 
-        1 ->
-            noView
+            1 ->
+                noView
 
-        _ ->
-            noView
+            _ ->
+                noView
+        , circle (gc.ballR * 0.5) [ fillP white ]
+        ]
 
 
 svgAttrs : Vec -> List (Attribute Msg)
