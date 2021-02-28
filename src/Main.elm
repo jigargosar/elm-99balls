@@ -1018,7 +1018,7 @@ svgRIFromBrowserViewportRI bri =
             aspectRatioFromRI wc.ri
 
         vri =
-            bri |> vecScale 0.95
+            bri |> vecScale 1
 
         viewportAR =
             aspectRatioFromRI vri
@@ -1127,6 +1127,7 @@ svgAttrs vri =
     , E.on "pointerdown" (pageXYDecoder |> JD.map (PointerDown True))
     , style "touch-action" "none"
     , style "user-select" "none"
+    , style "display" "block"
     ]
 
 
