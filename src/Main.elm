@@ -12,7 +12,7 @@ import List.Extra as List
 import Maybe.Extra as Maybe
 import Random exposing (Generator)
 import Svg exposing (Svg)
-import Svg.Attributes as S
+import Svg.Attributes as S exposing (fill)
 import Task
 import Tuple exposing (pair)
 import TypedSvg.Attributes as T
@@ -444,17 +444,21 @@ wc =
         headerRI =
             vec gc.ri.x gc.cr
 
+        footerRI =
+            headerRI
+
         headerHeight =
             headerRI.y * 2
 
         footerHeight =
-            headerHeight
+            footerRI.y * 2
 
         ri =
             gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
     in
     { ri = ri
     , headerRI = headerRI
+    , footerRI = footerRI
     }
 
 
@@ -1049,9 +1053,14 @@ viewGameContent { vri, frame, pointer } g =
         [ rect wc.ri [ fillP black ]
         , group []
             [ group [ transform [ translateXY 0 -(gc.ri.y + wc.headerRI.y) ] ]
-                [ rect wc.headerRI [ fillH 0.14 ]
+                [ rect wc.headerRI [ fillP darkCharcoal ]
                 , words (String.fromInt g.turn)
-                    [ fillP black, transform [ scale 4 ], T.fontWeight FontWeightBold ]
+                    [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
+                ]
+            , group [ transform [ translateXY 0 (gc.ri.y + wc.footerRI.y) ] ]
+                [ rect wc.footerRI [ fillH 0.07 ]
+                , words (String.fromInt g.ballCount)
+                    [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
                 ]
             , viewBallCount g.ballCount
             , viewTargets frame g.state g.targets
