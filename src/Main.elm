@@ -1013,8 +1013,7 @@ computeSvgRI vri_ =
             aspectRatioFromRI wc.ri
 
         viewportRI =
-            vri_
-                |> vecScale 0.95
+            vri_ |> vecScale 0.95
 
         viewportAR =
             aspectRatioFromRI viewportRI
