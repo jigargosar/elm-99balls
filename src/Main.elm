@@ -1150,18 +1150,18 @@ viewTutorial start now =
         phase =
             elapsed / dur |> floor
 
-        handPath =
+        handTravelPath =
             [ vecZero, vec 50 100, vec -50 100 ]
 
         currHandPosition =
-            handPath
+            handTravelPath
                 |> List.getAt phase
                 |> Maybe.withDefault vecZero
 
         nextHandPosition =
-            handPath
+            handTravelPath
                 |> List.getAt (phase + 1)
-                |> Maybe.orElse (List.head handPath)
+                |> Maybe.orElse (List.head handTravelPath)
                 |> Maybe.withDefault vecZero
 
         handPosition =
