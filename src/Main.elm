@@ -1059,6 +1059,7 @@ viewGameContent { vri, frame, pointer } g =
                 ]
             , group [ transform [ translateXY 0 (gc.ri.y + wc.footerRI.y) ] ]
                 [ rect wc.footerRI [ fillH 0.07 ]
+                , circle gc.ballR [ fillP white, transform [ translateXY -gc.cr 0 ] ]
                 , words (String.fromInt g.ballCount)
                     [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
                 ]
