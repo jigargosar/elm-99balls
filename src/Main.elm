@@ -644,7 +644,7 @@ pageToWorld : Env -> Vec -> Vec
 pageToWorld env pageCord =
     let
         svgRI =
-            computeSvgRI env.vri
+            svgRIFromBrowserViewportRI env.vri
 
         svgScale =
             gc.ri.x / svgRI.x
@@ -1006,14 +1006,14 @@ subscriptions _ =
         ]
 
 
-computeSvgRI : Vec -> Vec
-computeSvgRI vri_ =
+svgRIFromBrowserViewportRI : Vec -> Vec
+svgRIFromBrowserViewportRI bri =
     let
         war =
             aspectRatioFromRI wc.ri
 
         vri =
-            vri_ |> vecScale 0.95
+            bri |> vecScale 0.95
 
         var =
             aspectRatioFromRI vri
@@ -1102,7 +1102,7 @@ svgAttrs : Vec -> List (Attribute Msg)
 svgAttrs vri =
     let
         svgRi =
-            computeSvgRI vri
+            svgRIFromBrowserViewportRI vri
     in
     [ viewBoxFromRI wc.ri
     , Px.width (svgRi.x * 2)
