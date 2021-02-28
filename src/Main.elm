@@ -306,6 +306,12 @@ randomExtraBallTargetKinds =
         |> rnd1 (abs >> round >> (\i -> List.repeat i ExtraBallTarget))
 
 
+rndExtraBallCount : Generator Int
+rndExtraBallCount =
+    rndNormal 0 2
+        |> rnd1 (abs >> round)
+
+
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
 randomSolidTargetKinds turns =
     rndSolidTargetCount turns
