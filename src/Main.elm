@@ -643,16 +643,8 @@ update message (Model env game) =
 pageToWorld : Env -> Vec -> Vec
 pageToWorld env pageCord =
     let
-        svgAR =
-            svgRIFromBrowserViewportRI env.vri
-                |> aspectRatioFromRI
-
-        worldAR =
-            wc.ri
-                |> aspectRatioFromRI
-
         svgScale =
-            worldAR / svgAR
+            wc.ri.x / (svgRIFromBrowserViewportRI env.vri).x
     in
     vecSub pageCord env.vri
         |> vecScale svgScale
