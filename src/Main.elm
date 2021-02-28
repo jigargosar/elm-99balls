@@ -32,10 +32,10 @@ import Util exposing (..)
 
 # 99 balls game features:
 
-      - score/turn -- top
-      - ball count -- bottom
       - end screen: score/hi-score on over.
       - start screen:
+      - pause state
+      - indicator to communicate how to start playing by pointer drag.
       - transitions for ui elements.
       - sound effects.
       - star/shop gimmick. Not sure. But is part of clone.
