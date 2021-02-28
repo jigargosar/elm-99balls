@@ -1041,6 +1041,31 @@ viewGameContent { vri, frame, pointer } g =
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
             , viewFooter g.ballCount
+            , if
+                if g.turn == 1 then
+                    case g.state of
+                        TargetsEntering _ ->
+                            False
+
+                        WaitingForInput _ ->
+                            True
+
+                        Aiming record ->
+                            True
+
+                        Sim_ sim ->
+                            False
+
+                        GameLost float ->
+                            False
+
+                else
+                    False
+              then
+                viewTutorial 0 frame
+
+              else
+                noView
             ]
         ]
     ]
@@ -1065,8 +1090,8 @@ viewFooter ballCount =
         ]
 
 
-viewStateContent : Float -> Vec -> Int -> List Target -> State -> Svg Msg
-viewStateContent frame pointer turn targets state =
+viewStateContent : Float -> Vec -> List Target -> State -> Svg Msg
+viewStateContent frame pointer targets state =
     case state of
         GameLost _ ->
             noView
@@ -1075,23 +1100,11 @@ viewStateContent frame pointer turn targets state =
             viewBallAt ballPosition
 
         WaitingForInput { ballPosition } ->
-            group []
-                [ viewBallAt ballPosition
-                , if turn == 1 then
-                    viewTutorial 0 frame
-
-                  else
-                    noView
-                ]
+            viewBallAt ballPosition
 
         Aiming { dragStartAt, ballPosition } ->
             group []
                 [ viewBallAt ballPosition
-                , if turn == 1 then
-                    viewTutorial 0 frame
-
-                  else
-                    noView
                 , case validAimAngleTowards dragStartAt pointer of
                     Nothing ->
                         noView
