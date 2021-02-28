@@ -388,12 +388,12 @@ type alias GridConf =
     { ri : Vec
     , w : Int
     , h : Int
+    , cr : Float
     , cri : Vec
     , targetR : Float
     , ballR : Float
     , dx : Float
     , dy : Float
-    , aspectRatio : Float
     , topRowPS : List GP
     }
 
@@ -404,17 +404,14 @@ gc =
         ( w, h ) =
             ( 7, 10 )
 
-        cw =
+        cr =
             50
 
         cri =
-            vec cw cw
+            vec cr cr
 
         ri =
             vec (toFloat w * cri.x) (toFloat h * cri.y)
-
-        ar =
-            vecApply fdiv ri
 
         tr =
             cri.x * 0.7
@@ -432,26 +429,32 @@ gc =
     { ri = ri
     , w = w
     , h = h
+    , cr = cr
     , cri = cri
     , targetR = tr
     , ballR = br
     , dx = cell0Center.x
     , dy = cell0Center.y
-    , aspectRatio = ar
     , topRowPS = topRowPS
     }
 
 
-wc : { aspectRatio : Float }
 wc =
     let
+        headerHeight =
+            gc.cr * 2
+
+        footerHeight =
+            headerHeight
+
         ri =
-            gc.ri
+            gc.ri |> vecMapY (add ((headerHeight + footerHeight) / 2))
 
         ar =
             vecApply fdiv ri
     in
-    { aspectRatio = ar
+    { ri = ri
+    , aspectRatio = ar
     }
 
 
