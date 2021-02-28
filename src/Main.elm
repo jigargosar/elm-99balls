@@ -1053,10 +1053,10 @@ viewGameContent { vri, frame, pointer } g =
         [ rect wc.ri [ fillP black ]
         , group []
             [ viewHeader g.turn
-            , viewFooter g.ballCount
             , viewTargets frame g.state g.targets
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
+            , viewFooter g.ballCount
             ]
         ]
     ]
