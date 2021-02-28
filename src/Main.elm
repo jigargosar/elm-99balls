@@ -643,11 +643,16 @@ update message (Model env game) =
 pageToWorld : Env -> Vec -> Vec
 pageToWorld env pageCord =
     let
-        svgRI =
+        svgAR =
             svgRIFromBrowserViewportRI env.vri
+                |> aspectRatioFromRI
+
+        worldAR =
+            wc.ri
+                |> aspectRatioFromRI
 
         svgScale =
-            gc.ri.x / svgRI.x
+            worldAR / svgAR
     in
     vecSub pageCord env.vri
         |> vecScale svgScale
@@ -1009,20 +1014,20 @@ subscriptions _ =
 svgRIFromBrowserViewportRI : Vec -> Vec
 svgRIFromBrowserViewportRI bri =
     let
-        war =
+        worldAR =
             aspectRatioFromRI wc.ri
 
         vri =
             bri |> vecScale 0.95
 
-        var =
+        viewportAR =
             aspectRatioFromRI vri
     in
-    if war < var then
-        vec (vri.y * war) vri.y
+    if worldAR < viewportAR then
+        vec (vri.y * worldAR) vri.y
 
     else
-        vec vri.x (vri.x / war)
+        vec vri.x (vri.x / worldAR)
 
 
 view : Model -> Html Msg
