@@ -324,9 +324,12 @@ rndTargetHealth turns =
     let
         t =
             toFloat turns
+
+        ( mean, sd ) =
+            ( t / 2 |> atMost (maxHP / 2), 5 )
     in
-    rndNormal t 10
-        |> rnd1 (abs >> clamp 1 (t + 1) >> atMost maxHP >> round)
+    rndNormal mean sd
+        |> rnd1 (clamp 1 (min (t + 1) maxHP) >> round)
 
 
 randomExtraBallTargetKinds : Generator (List TargetKind)
