@@ -26,21 +26,19 @@ import Util exposing (..)
 
 # Tasks
 
-    - [x] indicator to communicate how to start playing by pointer drag.
-
+  - [x] indicator to communicate how to start playing by pointer drag.
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
 
 # 99 balls game features:
 
-      - end screen: score/hi-score on over.
+  - sound effects.
+  - end screen: score/hi-score on over.
       - start screen:
-
-      - sound effects.
-      - star/shop gimmick. Not sure. But is part of clone.
-      - transitions for ui elements.
-      - pause state
+  - star/shop gimmick. Not sure. But is part of clone.
+  - transitions for ui elements.
+  - pause state
 
 
 # Later
