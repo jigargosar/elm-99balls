@@ -586,7 +586,7 @@ initGame frame seed =
     { ballCount = initialBallCount
     , targets = []
     , state = TargetsEntering { start = frame, ballPosition = initialBallPosition }
-    , turn = 1
+    , turn = 0
     , seed = seed
     }
         |> applyN 1 addNewTargetRowAndIncTurn
