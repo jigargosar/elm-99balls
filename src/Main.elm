@@ -44,7 +44,10 @@ import Util exposing (..)
 
   - [x] simplify target generation
 
-  - try limit based target generation
+  - [x] try limit based target generation
+      - level progression is really good enough.
+      - perhaps, we should not touch it all.
+      - before any further modifications, record params, do more play testing.
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
