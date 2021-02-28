@@ -1045,7 +1045,7 @@ viewGameContent : Env -> Game -> List (Html Msg)
 viewGameContent { vri, frame, pointer } g =
     [ viewGameLost frame g
     , Svg.svg (svgAttrs vri)
-        [ rect gc.ri [ fillP black ]
+        [ rect wc.ri [ fillP black ]
         , group []
             [ viewBallCount g.ballCount
             , viewTargets frame g.state g.targets
@@ -1104,7 +1104,7 @@ svgAttrs vri =
         svgRi =
             computeSvgRI vri
     in
-    [ T.viewBox -gc.ri.x -gc.ri.y (gc.ri.x * 2) (gc.ri.y * 2)
+    [ viewBoxFromRI wc.ri
     , Px.width (svgRi.x * 2)
     , Px.height (svgRi.y * 2)
     , S.fill "none"
@@ -1113,6 +1113,10 @@ svgAttrs vri =
     , style "touch-action" "none"
     , style "user-select" "none"
     ]
+
+
+viewBoxFromRI ri =
+    T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
 
 
 viewBallCount : Int -> Svg msg
