@@ -1111,13 +1111,43 @@ viewStateContent frame pointer targets state =
 viewTutorial start now =
     let
         dur =
-            transitionDuration
+            transitionDuration * 10
 
         elapsed =
             fmodBy (dur * 3) (now - start |> atLeast 0)
+
+        progress =
+            fmodBy dur elapsed / dur
+
+        phase =
+            elapsed / dur |> floor
+
+        handPath =
+            [ vecZero, vec 50 100, vec -50 100 ]
+
+        currHandPosition =
+            handPath
+                |> List.getAt phase
+                |> Maybe.withDefault vecZero
+
+        nextHandPosition =
+            handPath
+                |> List.getAt (phase + 1)
+                |> Maybe.orElse (List.head handPath)
+                |> Maybe.withDefault vecZero
+
+        handPosition =
+            vecFromTo currHandPosition nextHandPosition
+                |> vecScale progress
+                |> vecAdd currHandPosition
+
+        viewHand =
+            circle 10 [ strokeP white, transform [ translate handPosition ] ]
     in
-    group [ transform [ translateXY 0 (gc.ri.y * 0.4) ] ]
-        [ case elapsed / dur |> floor of
+    group
+        [--transform [ translateXY 0 (gc.ri.y * 0.4) ]
+        ]
+        [ case phase of
             0 ->
                 noView
 
@@ -1126,6 +1156,7 @@ viewTutorial start now =
 
             _ ->
                 noView
+        , viewHand
         , circle (gc.ballR * 0.5) [ fillP white ]
         ]
 
