@@ -1041,6 +1041,7 @@ viewGameContent { vri, frame, pointer } g =
             , viewStateContent frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
             , viewFooter g.ballCount
+            , viewTutorial 0 frame
             ]
         ]
     ]
@@ -1105,6 +1106,25 @@ viewStateContent frame pointer targets state =
                 [ viewBalls balls
                 , viewFloorBalls frame sim.floorBalls
                 ]
+
+
+viewTutorial start now =
+    let
+        dur =
+            transitionDuration
+
+        elapsed =
+            fmodBy (dur * 3) (now - start |> atLeast 0)
+    in
+    case elapsed / dur |> floor of
+        0 ->
+            noView
+
+        1 ->
+            noView
+
+        _ ->
+            noView
 
 
 svgAttrs : Vec -> List (Attribute Msg)

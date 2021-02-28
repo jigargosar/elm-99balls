@@ -573,6 +573,10 @@ idiv =
     (//)
 
 
+fmodBy =
+    Basics.Extra.fractionalModBy
+
+
 eq =
     (==)
 
