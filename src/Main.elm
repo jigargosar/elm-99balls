@@ -1111,7 +1111,7 @@ viewStateContent frame pointer targets state =
 viewTutorial start now =
     let
         dur =
-            transitionDuration * 10
+            transitionDuration * 5
 
         elapsed =
             fmodBy (dur * 3) (now - start |> atLeast 0)
@@ -1140,6 +1140,7 @@ viewTutorial start now =
             vecFromTo currHandPosition nextHandPosition
                 |> vecScale progress
                 |> vecAdd currHandPosition
+                |> vecScale 2.5
 
         viewHand =
             circle 10 [ strokeP white, transform [ translate handPosition ] ]
