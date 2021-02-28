@@ -1111,7 +1111,7 @@ viewStateContent frame pointer targets state =
 viewTutorial start now =
     let
         dur =
-            transitionDuration * 5
+            transitionDuration * 4
 
         elapsed =
             fmodBy (dur * 3) (now - start |> atLeast 0)
@@ -1148,9 +1148,7 @@ viewTutorial start now =
         viewStartingHandPosition =
             circle (gc.ballR * 0.5) [ fillP white ]
     in
-    group
-        [--transform [ translateXY 0 (gc.ri.y * 0.4) ]
-        ]
+    group [ transform [ translateXY 0 (gc.ri.y * 0.4) ] ]
         [ case phase of
             0 ->
                 noView
@@ -1160,7 +1158,7 @@ viewTutorial start now =
 
             _ ->
                 noView
-        , viewTravelPath now [ vecZero, handPosition |> vecNegate ]
+        , viewTravelPath now [ handPosition |> vecNegate |> vecScale 2, vecZero ]
         , viewHand
         , viewStartingHandPosition
         ]
