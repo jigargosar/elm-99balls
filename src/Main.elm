@@ -35,14 +35,24 @@ import Util exposing (..)
 # 99 balls game features:
 
   - restart game
+
   - end screen: score/hi-score on over.
       - start screen:
+
   - star/shop gimmick. Not sure. But is part of clone.
+
+  - try using ease for tutorial anim.
+
+  - adjust aim path length, when drag distance is smaller.
+
   - transitions for ui elements.
+
   - pause state
 
 
 # Later
+
+  - try reverse drag for aiming.
 
   - add nice `ting` sound on target ball collision
 
