@@ -2,7 +2,7 @@
   "name": "elm-99balls",
   "private": true,
   "scripts": {
-    "start": "parcel src/index.html --no-hmr"
+    "start": "parcel src/index.html --no-hmr --no-source-maps --log-level info"
   },
   "devDependencies": {
     "@parcel/optimizer-cssnano": "^2.0.0-nightly.612",
@@ -15,6 +15,7 @@
     "@parcel/transformer-postcss": "^2.0.0-nightly.612",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
     "elm": "^0.19.1-5",
+    "howler": "^2.2.1",
     "parcel": "^2.0.0-nightly.610",
     "postcss": "^8.2.6"
   }
