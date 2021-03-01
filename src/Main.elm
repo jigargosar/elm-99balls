@@ -425,11 +425,17 @@ wc =
 
         ri =
             gc.ri |> vecMapY (add (headerRI.y + footerRI.y))
+
+        header =
+            { ri = headerRI, c = vec 0 -(gc.ri.y + headerRI.y) }
+
+        footer =
+            { ri = footerRI, c = vec 0 (gc.ri.y + footerRI.y) }
     in
     { ri = ri
-    , header = { ri = headerRI, c = vec 0 -(gc.ri.y + headerRI.y) }
-    , footer = { ri = footerRI, c = vec 0 (gc.ri.y + footerRI.y) }
-    , restartBtn = { ri = gc.cri, c = vecZero }
+    , header = header
+    , footer = footer
+    , restartBtn = { ri = gc.cri, c = vec (-header.ri.x + gc.cellR) 0 }
     }
 
 
@@ -1075,6 +1081,7 @@ viewHeader turn =
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
+        , words "o" [ fillP white, transform [ translate wc.restartBtn.c, scale 4 ] ]
         ]
 
 
