@@ -306,10 +306,10 @@ rndTargetHealth turns =
             toFloat turns
 
         ( mean, sd ) =
-            ( t / 2 |> atMost (maxHP * 0.7), 5 )
+            ( t / 2 |> clamp 2 (maxHP * 0.7), 5 )
     in
     rndNormal mean sd
-        |> rnd1 (clamp 1 (min (t + 1) maxHP) >> round)
+        |> rnd1 (abs >> clamp 1 (min (t + 1) maxHP) >> round)
 
 
 randomExtraBallTargetKinds : Generator (List TargetKind)
@@ -564,7 +564,7 @@ initGame frame seed =
     , turn = 0
     , seed = seed
     }
-        |> applyN 1 addNewTargetRowAndIncTurn
+        |> applyN 1 incTurnThenAddTargetRow
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -699,7 +699,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             else
                                 GameLost frame
                     }
-                        |> addNewTargetRowAndIncTurn
+                        |> incTurnThenAddTargetRow
 
                 Nothing ->
                     stepSim frame game sim
@@ -808,15 +808,18 @@ splitBallUpdates ballUpdates =
     { floored = floored, updated = updated }
 
 
-addNewTargetRowAndIncTurn : Game -> Game
-addNewTargetRowAndIncTurn game =
+incTurnThenAddTargetRow : Game -> Game
+incTurnThenAddTargetRow game =
     let
+        turn =
+            game.turn + 1
+
         ( targets, seed ) =
-            rndStep ( randomTargets game.turn, game.seed )
+            rndStep ( randomTargets turn, game.seed )
     in
     { game
         | targets = targets ++ List.map moveTargetDown game.targets
-        , turn = inc game.turn
+        , turn = turn
         , seed = seed
     }
 
