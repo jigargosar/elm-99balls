@@ -2,7 +2,7 @@
   "name": "elm-99balls",
   "private": true,
   "scripts": {
-    "start": "cross-env PARCEL_ELM_NO_DEBUG=TRUE parcel src/index.html --no-hmr --no-source-maps --log-level verbose",
+    "start": "cross-env PARCEL_ELM_NO_DEBUG=TRUE parcel src/index.html --no-hmr --no-source-maps",
     "_start": "parcel src/index.html --no-hmr --no-source-maps --log-level info"
   },
   "devDependencies": {

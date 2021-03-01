@@ -1,4 +1,4 @@
-module Main exposing (main)
+port module Main exposing (main)
 
 import Browser
 import Browser.Dom as Dom
@@ -19,6 +19,9 @@ import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
 import TypedSvg.Types exposing (..)
 import Util exposing (..)
+
+
+port play : String -> Cmd msg
 
 
 {-|
