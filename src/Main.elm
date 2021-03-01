@@ -1088,8 +1088,7 @@ viewHeader turn =
         , group [ transform [ translate wc.restartBtn.c ] ]
             [ group [ transform [ scale 4 ], fillP white ] [ restartIcon ]
             , rect wc.restartBtn.ri
-                [ strokeP white
-                , S.pointerEvents "fill"
+                [ S.pointerEvents "fill"
                 , S.cursor "pointer"
                 , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
                 ]
