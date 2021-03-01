@@ -289,6 +289,7 @@ rndSolidTargetCount turns =
 
         ( mean, sd ) =
             ( (t / 2) |> atMost (toFloat gc.w - 2), 2 )
+                |> always ( toFloat gc.w / 2, toFloat gc.w / 2 )
     in
     rndNormal mean sd
         |> rnd1 (abs >> round >> clamp 1 (gc.w - 1))
@@ -301,7 +302,7 @@ rndTargetHealth turns =
             toFloat turns
 
         ( mean, sd ) =
-            ( t / 2 |> atMost (maxHP / 2), 5 )
+            ( t / 2 |> atMost (maxHP * 0.7), 5 )
     in
     rndNormal mean sd
         |> rnd1 (clamp 1 (min (t + 1) maxHP) >> round)
