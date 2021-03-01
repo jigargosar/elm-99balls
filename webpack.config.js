@@ -1,13 +1,16 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const {CleanWebpackPlugin} = require("clean-webpack-plugin");
-const path = require("path")
+// const path = require("path")
 
 module.exports = {
     mode: "development",
     entry: './src/index.js',
     devtool: 'inline-source-map',
-    devServer: {
+    devServer:  {
+
         contentBase: 'public',
+        overlay:true
+
     },
     module: {
         rules: [
