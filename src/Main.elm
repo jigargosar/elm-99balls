@@ -28,9 +28,7 @@ import Util exposing (..)
 
   - [x] indicator to communicate how to start playing by pointer drag.
 
-  - restart game btn
-
-  - restart btn icon
+  - [x] restart game btn with icon
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
