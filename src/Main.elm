@@ -262,22 +262,6 @@ initTarget gp kind =
     Target (gpToWorld gp) kind
 
 
-
---rndGaussLoHi : Float -> Float -> Generator Float
---rndGaussLoHi lo hi =
---    let
---        width =
---            hi - lo
---
---        mean =
---            lo + sd
---
---        sd =
---            width / 2
---    in
---    Random.Float.normal mean sd
-
-
 randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     rnd2 (List.map2 initTarget)
