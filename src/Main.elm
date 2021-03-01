@@ -410,6 +410,7 @@ type alias WorldConf =
     { ri : Vec
     , header : { ri : Vec, c : Vec }
     , footer : { ri : Vec, c : Vec }
+    , restartBtn : { ri : Vec, c : Vec }
     }
 
 
@@ -428,6 +429,7 @@ wc =
     { ri = ri
     , header = { ri = headerRI, c = vec 0 -(gc.ri.y + headerRI.y) }
     , footer = { ri = footerRI, c = vec 0 (gc.ri.y + footerRI.y) }
+    , restartBtn = { ri = gc.cri, c = vecZero }
     }
 
 
