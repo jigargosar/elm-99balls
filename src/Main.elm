@@ -1075,13 +1075,18 @@ shouldDisplayTutorial turn state =
         False
 
 
-viewHeader : Int -> Svg msg
+viewHeader : Int -> Svg Msg
 viewHeader turn =
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , group [ S.pointerEvents "fill", transform [ translate wc.restartBtn.c ] ]
+        , group
+            [ S.pointerEvents "fill"
+            , S.cursor "pointer"
+            , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
+            , transform [ translate wc.restartBtn.c ]
+            ]
             [ rect wc.restartBtn.ri [ strokeP white ]
             , words "R" [ fillP white, transform [ scale 4 ] ]
             ]
