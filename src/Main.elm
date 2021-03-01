@@ -1115,7 +1115,7 @@ restartIcon =
 viewFooter : Int -> Svg msg
 viewFooter ballCount =
     group [ transform [ translate wc.footer.c ] ]
-        [ rect wc.footer.ri [ fillH 0.07 ]
+        [ rect wc.footer.ri [ fillP <| hsl 0.07 0.8 0.5 ]
         , circle gc.ballR [ fillP white, transform [ translateXY -gc.cellR 0 ] ]
         , words (String.fromInt ballCount)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
