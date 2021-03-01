@@ -60,7 +60,7 @@ import Util exposing (..)
     i.e. when objects already intersecting, what is effect on collision response.
 
   - Invalid states, that are representable.
-      - +3 ball outside screen edges / sim never ending.
+      - +4 sim stuck: ball disappears.
       - total number of balls before and after simulation are different.
 
   - -1 Concern: Input handling is much better, but there is room for improvement.
