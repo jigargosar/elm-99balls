@@ -1026,6 +1026,7 @@ view (Model env game) =
         , E.on "pointermove" (pageXYDecoder |> JD.map PointerMoved)
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
+            |> always noView
         , div [ style "position" "relative" ]
             (viewGameContent env game)
         ]

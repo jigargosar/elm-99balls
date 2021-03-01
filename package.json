@@ -1,0 +1,21 @@
+{
+  "name": "elm-99balls",
+  "private": true,
+  "scripts": {
+    "start": "parcel src/index.html --no-hmr"
+  },
+  "devDependencies": {
+    "@parcel/optimizer-cssnano": "^2.0.0-nightly.612",
+    "@parcel/optimizer-htmlnano": "^2.0.0-nightly.612",
+    "@parcel/packager-css": "^2.0.0-nightly.612",
+    "@parcel/packager-html": "^2.0.0-nightly.612",
+    "@parcel/transformer-css": "^2.0.0-nightly.612",
+    "@parcel/transformer-elm": "^2.0.0-nightly.2234",
+    "@parcel/transformer-html": "^2.0.0-nightly.612",
+    "@parcel/transformer-postcss": "^2.0.0-nightly.612",
+    "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
+    "elm": "^0.19.1-5",
+    "parcel": "^2.0.0-nightly.610",
+    "postcss": "^8.2.6"
+  }
+}
