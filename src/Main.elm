@@ -435,7 +435,7 @@ wc =
     { ri = ri
     , header = header
     , footer = footer
-    , restartBtn = { ri = gc.cri, c = vec (-header.ri.x + gc.cellR) 0 }
+    , restartBtn = { ri = gc.cri, c = vec (-header.ri.x + gc.cellR * 2) 0 }
     }
 
 
@@ -1081,7 +1081,10 @@ viewHeader turn =
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , words "o" [ fillP white, transform [ translate wc.restartBtn.c, scale 4 ] ]
+        , group [ transform [ translate wc.restartBtn.c, scale 0.5 ] ]
+            [ rect wc.restartBtn.ri [ strokeP white ]
+            , words "R" [ fillP white, transform [ scale 4 ] ]
+            ]
         ]
 
 
