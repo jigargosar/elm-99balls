@@ -2,7 +2,8 @@
   "name": "elm-99balls",
   "private": true,
   "scripts": {
-    "start": "parcel src/index.html --no-hmr --no-source-maps --log-level info"
+    "start": "cross-env PARCEL_ELM_NO_DEBUG=TRUE parcel src/index.html --no-hmr --no-source-maps --log-level verbose",
+    "_start": "parcel src/index.html --no-hmr --no-source-maps --log-level info"
   },
   "devDependencies": {
     "@parcel/optimizer-cssnano": "^2.0.0-nightly.612",
@@ -14,6 +15,7 @@
     "@parcel/transformer-html": "^2.0.0-nightly.612",
     "@parcel/transformer-postcss": "^2.0.0-nightly.612",
     "@parcel/transformer-posthtml": "^2.0.0-nightly.612",
+    "cross-env": "^7.0.3",
     "elm": "^0.19.1-5",
     "howler": "^2.2.1",
     "parcel": "^2.0.0-nightly.610",

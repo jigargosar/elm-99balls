@@ -1027,6 +1027,7 @@ view (Model env game) =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
             |> always noView
+            |> always noView
         , div [ style "position" "relative" ]
             (viewGameContent env game)
         ]
