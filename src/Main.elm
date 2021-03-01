@@ -21,7 +21,7 @@ import TypedSvg.Types exposing (..)
 import Util exposing (..)
 
 
-port play : String -> Cmd msg
+port playSound : String -> Cmd msg
 
 
 {-|
@@ -621,7 +621,7 @@ update message (Model env game) =
                     , pointer = pointer |> pageToWorld env
                 }
                 game
-            , Cmd.none
+            , Cmd.batch [ playSound "xx" ]
             )
 
         PointerMoved pointer ->
