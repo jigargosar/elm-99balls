@@ -1204,13 +1204,13 @@ viewTutorial start now =
                     [ circle (gc.ballR * 0.6) []
                     , circle (gc.ballR * 0.4) []
                     ]
-                , handSvg
+                , handIcon
                     [ fillP white
                     , transform [ scale 0.25, Scale 0.8 1, translateXY -80 0 ]
                     ]
                 ]
 
-        handSvg aa =
+        handIcon aa =
             Svg.path
                 (S.d
                     """
