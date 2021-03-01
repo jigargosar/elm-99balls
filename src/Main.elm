@@ -33,6 +33,8 @@ port playSound : String -> Cmd msg
 
   - [x] restart game btn with icon
 
+  - [x] play sample sound
+
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
