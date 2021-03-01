@@ -868,14 +868,10 @@ updateBall acc ball =
             case ballCollision of
                 BallEdgeCollision e ->
                     if isBottomEdge e then
-                        ( acc
-                        , BallFloored newBall
-                        )
+                        ( acc, BallFloored newBall )
 
                     else
-                        ( acc
-                        , BallMoved newBall
-                        )
+                        ( acc, BallMoved newBall )
 
                 BallTargetCollision target ->
                     case target.kind of
