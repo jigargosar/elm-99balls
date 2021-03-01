@@ -1091,9 +1091,8 @@ viewHeader turn =
             , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
             , transform [ translate wc.restartBtn.c ]
             ]
-            [ rect wc.restartBtn.ri [ strokeP white ] -- for pointer event
-
-            --, words (Char.fromCode 0x0001F504 |> String.fromChar) [ fillP white, transform [ scale 4 ] ]
+            [ -- for pointer event
+              rect wc.restartBtn.ri [ strokeP white ]
             , group [ transform [ scale 4 ], fillP white ] [ restartIcon ]
             ]
         ]
