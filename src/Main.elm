@@ -1081,7 +1081,7 @@ viewHeader turn =
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , group [ transform [ translate wc.restartBtn.c, scale 0.5 ] ]
+        , group [ transform [ translate wc.restartBtn.c ] ]
             [ rect wc.restartBtn.ri [ strokeP white ]
             , words "R" [ fillP white, transform [ scale 4 ] ]
             ]
