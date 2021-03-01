@@ -48,6 +48,8 @@ import Util exposing (..)
 
 # Later
 
+  - concern: sim speed seems slow, with 50+ balls
+
   - try reverse drag for aiming.
 
   - add nice `ting` sound on target ball collision
