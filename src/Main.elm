@@ -152,6 +152,7 @@ type alias Sim =
     { emitter : Emitter
     , balls : List Ball
     , floorBalls : FloorBalls
+    , killCount : Int
     }
 
 
@@ -241,6 +242,7 @@ initSim frame ballPosition angle ballCount =
     { emitter = initEmitter frame ballPosition angle ballCount
     , balls = []
     , floorBalls = emptyFloorBalls
+    , killCount = 0
     }
 
 
@@ -780,9 +782,12 @@ stepSim frame game sim =
     let
         ( { ballsCollected, targets, solidTargetHits, solidTargetKills }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
+
+        newKillCount =
+            atMost 1 solidTargetKills + sim.killCount
     in
     ( { game
-        | state = Sim_ newSim
+        | state = Sim_ { newSim | killCount = newKillCount }
         , targets = targets
         , ballCount = game.ballCount + ballsCollected
       }
@@ -793,8 +798,8 @@ stepSim frame game sim =
 
           else
             Cmd.none
-        , if solidTargetKills >= 1 then
-            playSound "kill_1"
+        , if newKillCount > sim.killCount then
+            playSound ("kill_" ++ String.fromInt (atMost 8 newKillCount))
 
           else
             Cmd.none
