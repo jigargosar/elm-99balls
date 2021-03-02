@@ -775,7 +775,7 @@ stepSimHelp frame targets sim =
                             | balls = updated
                             , floorBalls = addNewFloorBalls frame floored sim.floorBalls
                         }
-                            |> (\xx -> stepSimEmitter frame xx |> Maybe.withDefault ( sim, Cmd.none ))
+                            |> (\xx -> stepSimEmitter frame xx |> Maybe.withDefault ( xx, Cmd.none ))
                    )
             )
 

@@ -10,9 +10,9 @@ const app = Elm["Main"].init({
 });
 
 app.ports["playSound"]["subscribe"]((function () {
-    const sound = new Howl({src: ['snd1.ogg']})
+    const shoot = new Howl({src: ['snd_swoosh.ogg']})
     return function () {
-        sound.play()
+        shoot.play()
     }
 })())
 
