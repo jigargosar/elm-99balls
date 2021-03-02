@@ -14,7 +14,7 @@ function mapValues(fn, obj) {
     return Object
         .keys(obj)
         .reduce(
-            (acc, k) => Object.assign(acc, {[k]: fn(obj[k])}),
+            (acc, k) => Object.assign(acc, {[k]: fn(obj[k], k)}),
             {},
         )
 }
@@ -35,7 +35,13 @@ app.ports["playSound"]["subscribe"]((function () {
             kill_8: 'snd_kill_8.ogg',
         }
 
-    const soundMap = mapValues((v) => new Howl({src: [v]}), soundPathMapping)
+    const soundMap = mapValues(
+        (v, k) => new Howl({
+            src: [v],
+            volume: k.contains("kill") ? 0.5 : 1
+        }),
+        soundPathMapping,
+    )
 
     return function (name) {
         const sound = soundMap[name]
