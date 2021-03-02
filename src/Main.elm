@@ -31,6 +31,8 @@ port playSound : String -> Cmd msg
 
   - stars
 
+  - mute btn
+
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
