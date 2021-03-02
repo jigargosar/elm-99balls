@@ -255,6 +255,42 @@ initEmitter frame ballPosition angle ballCount =
         { start = frame, remaining = ballCount - 1 }
 
 
+emitterBall : Emitter -> Maybe Ball
+emitterBall emitter =
+    case emitter of
+        Emitting ball _ ->
+            Just ball
+
+        _ ->
+            Nothing
+
+
+isEmitterDone : Emitter -> Bool
+isEmitterDone =
+    eq EmitterDone
+
+
+stepEmitter : Float -> Emitter -> Maybe ( Ball, Emitter )
+stepEmitter now emitter =
+    case emitter of
+        Emitting ball { start, remaining } ->
+            if now - start > 8 then
+                Just
+                    ( ball
+                    , if remaining <= 0 then
+                        EmitterDone
+
+                      else
+                        Emitting ball { start = now, remaining = remaining - 1 }
+                    )
+
+            else
+                Nothing
+
+        EmitterDone ->
+            Nothing
+
+
 type TargetKind
     = SolidTarget Int
     | ExtraBallTarget
@@ -730,7 +766,7 @@ ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
 ballPositionOnSimEnd now sim =
     let
         simDone =
-            (sim.emitter == EmitterDone) && (sim.balls == [])
+            isEmitterDone sim.emitter && (sim.balls == [])
     in
     if simDone then
         settledFloorBallsPosition now sim.floorBalls
@@ -794,27 +830,6 @@ stepSimEmitter frame sim =
 
         Nothing ->
             ( sim, Cmd.none )
-
-
-stepEmitter : Float -> Emitter -> Maybe ( Ball, Emitter )
-stepEmitter now emitter =
-    case emitter of
-        Emitting ball { start, remaining } ->
-            if now - start > 8 then
-                Just
-                    ( ball
-                    , if remaining <= 0 then
-                        EmitterDone
-
-                      else
-                        Emitting ball { start = now, remaining = remaining - 1 }
-                    )
-
-            else
-                Nothing
-
-        EmitterDone ->
-            Nothing
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
@@ -1191,17 +1206,8 @@ viewStateContent frame pointer targets state =
                 ]
 
         Sim_ sim ->
-            let
-                balls =
-                    case sim.emitter of
-                        Emitting ball _ ->
-                            ball :: sim.balls
-
-                        _ ->
-                            sim.balls
-            in
             group []
-                [ viewBalls balls
+                [ viewBalls (Maybe.cons (emitterBall sim.emitter) sim.balls)
                 , viewFloorBalls frame sim.floorBalls
                 ]
 
