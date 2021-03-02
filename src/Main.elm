@@ -35,7 +35,7 @@ port playSound : String -> Cmd msg
 
   - [x] play sample sound
 
-  - shoot sound
+  - [x] shoot sound
 
   - hit sound
 
