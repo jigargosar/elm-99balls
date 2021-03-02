@@ -793,7 +793,7 @@ stepSim frame game sim =
 stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, ( Sim, Cmd msg ) )
 stepSimHelp frame targets sim =
     sim.balls
-        |> List.mapAccuml updateBall { targets = targets, ballsCollected = 0 }
+        |> List.mapAccuml updateBall { targets = targets, ballsCollected = 0, solidTargetHits = 0 }
         |> mapSnd
             (splitBallUpdates
                 >> (\{ floored, updated } ->
@@ -881,6 +881,7 @@ incTurnThenAddTargetRow game =
 type alias BallUpdateAcc =
     { targets : List Target
     , ballsCollected : Int
+    , solidTargetHits : Int
     }
 
 
@@ -1383,6 +1384,7 @@ ballTravelPath targets ballPosition angle =
     ballTravelPathHelp
         { targets = targets
         , ballsCollected = 0
+        , solidTargetHits = 0
         }
         ball
         0
