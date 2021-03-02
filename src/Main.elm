@@ -47,7 +47,6 @@ port playSound : String -> Cmd msg
 
 # 99 balls game features:
 
-  - sound effects.
   - end screen: score/hi-score on over.
   - start screen
   - star/shop gimmick. Not sure. But is part of clone.
@@ -55,6 +54,7 @@ port playSound : String -> Cmd msg
   - adjust aim path length, when drag distance is smaller.
   - transitions for ui elements.
   - pause state
+  - sound effects.
 
 
 # Later
