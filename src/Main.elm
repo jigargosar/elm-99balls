@@ -594,7 +594,10 @@ init _ =
         env =
             initialEnvironment
     in
-    ( Model env (initGame env.frame initialSeed |> applyN 4 (reStartGame 0))
+    ( Model env
+        (initGame env.frame initialSeed
+            |> applyN 4 (reStartGame 0)
+        )
     , Dom.getViewport |> Task.perform GotDomViewPort
     )
 
