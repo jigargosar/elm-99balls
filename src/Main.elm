@@ -37,7 +37,7 @@ port playSound : String -> Cmd msg
 
   - [x] shoot sound
 
-  - hit sound
+  - play hit sound
 
   - destroy sound
 
