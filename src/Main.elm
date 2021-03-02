@@ -785,20 +785,31 @@ validAimAngleTowards to from =
 stepSimEmitter : Float -> Sim -> Sim
 stepSimEmitter frame sim =
     sim.mbEmitter
-        |> Maybe.filter (\{ start } -> frame - start > 10)
+        |> Maybe.andThen (stepEmitter frame)
         |> Maybe.map
-            (\{ proto, remaining } ->
+            (\( ball, mbEmitter ) ->
                 { sim
-                    | balls = proto :: sim.balls
-                    , mbEmitter =
-                        if remaining <= 0 then
-                            Nothing
-
-                        else
-                            Just (Emitter frame proto (remaining - 1))
+                    | balls = ball :: sim.balls
+                    , mbEmitter = mbEmitter
                 }
             )
         |> Maybe.withDefault sim
+
+
+stepEmitter : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
+stepEmitter now { start, proto, remaining } =
+    if now - start > 10 then
+        Just
+            ( proto
+            , if remaining <= 0 then
+                Nothing
+
+              else
+                Just (Emitter now proto (remaining - 1))
+            )
+
+    else
+        Nothing
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
