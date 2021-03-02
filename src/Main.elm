@@ -1470,12 +1470,16 @@ viewTargetsHelp now progress targets =
                     viewSolidTarget position hp
 
                 BonusBallTarget ->
-                    viewBallAt position
+                    viewBonusBallTarget now position
 
                 StarTarget ->
                     viewSolidTarget position -1
     in
     group [] (List.map viewTarget targets)
+
+
+viewBonusBallTarget now position =
+    viewBallAt position
 
 
 viewSolidTarget position hp =
