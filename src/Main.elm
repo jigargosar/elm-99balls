@@ -609,17 +609,13 @@ reStartGame frame game =
 
 initGame : Float -> Seed -> Game
 initGame frame seed =
-    let
-        initialBallCount =
-            10
-    in
-    { ballCount = initialBallCount
+    { ballCount = 10
     , targets = []
     , state = TargetsEntering { start = frame, ballPosition = initialBallPosition }
     , turn = 0
     , seed = seed
     }
-        |> applyN 1 incTurnThenAddTargetRow
+        |> applyN 8 incTurnThenAddTargetRow
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
