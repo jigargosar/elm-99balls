@@ -6,11 +6,9 @@ module.exports = {
     mode: "development",
     entry: './src/index.js',
     devtool: 'inline-source-map',
-    devServer:  {
-
+    devServer: {
         contentBase: 'public',
-        overlay:true
-
+        overlay: true
     },
     module: {
         rules: [
