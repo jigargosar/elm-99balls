@@ -23,15 +23,17 @@ app.ports["playSound"]["subscribe"]((function () {
             case 'hit' :
                 hit.play()
                 break
-            case 'kill1' :
+            case 'kill_1' :
                 kill1.play()
                 break
-            case 'kill2' :
+            case 'kill_2' :
                 kill2.play()
                 break
-            case 'kill3' :
+            case 'kill_3' :
                 kill3.play()
                 break
+            default :
+                console.warn("sound not found", name)
         }
     }
 })())
