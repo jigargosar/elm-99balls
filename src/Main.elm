@@ -628,7 +628,7 @@ update message (Model env game) =
                     , pointer = pointer |> pageToWorld env
                 }
                 game
-            , Cmd.batch [ playSound "xx" ]
+            , Cmd.batch []
             )
 
         PointerMoved pointer ->
