@@ -149,7 +149,7 @@ type State
 
 
 type alias Sim =
-    { mbEmitter : Maybe Emitter
+    { emitter : Emitter
     , balls : List Ball
     , floorBalls : FloorBalls
     }
@@ -238,21 +238,15 @@ viewFloorBallAnim now toPosition ( start, position ) =
 
 initSim : Float -> Vec -> Float -> Int -> Sim
 initSim frame ballPosition angle ballCount =
-    let
-        emitter =
-            initEmitter frame ballPosition angle ballCount
-    in
-    { mbEmitter = Just emitter
+    { emitter = initEmitter frame ballPosition angle ballCount
     , balls = []
     , floorBalls = emptyFloorBalls
     }
 
 
-type alias Emitter =
-    { start : Float
-    , proto : Ball
-    , remaining : Int
-    }
+type Emitter
+    = Emitting { start : Float, proto : Ball, remaining : Int }
+    | EmitterDone
 
 
 initEmitter : Float -> Vec -> Float -> Int -> Emitter
@@ -261,7 +255,7 @@ initEmitter frame ballPosition angle ballCount =
         proto =
             initBall ballPosition angle
     in
-    Emitter frame proto (ballCount - 1)
+    Emitting { start = frame, proto = proto, remaining = ballCount - 1 }
 
 
 type TargetKind
@@ -579,7 +573,7 @@ initGame : Float -> Seed -> Game
 initGame frame seed =
     let
         initialBallCount =
-            1
+            10
     in
     { ballCount = initialBallCount
     , targets = []
@@ -738,11 +732,10 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
 ballPositionOnSimEnd now sim =
     let
-        turnEnded =
-            (sim.mbEmitter == Nothing)
-                && (sim.balls == [])
+        simDone =
+            (sim.emitter == EmitterDone) && (sim.balls == [])
     in
-    if turnEnded then
+    if simDone then
         settledFloorBallsPosition now sim.floorBalls
 
     else
@@ -775,7 +768,7 @@ stepSimHelp frame targets sim =
                             | balls = updated
                             , floorBalls = addNewFloorBalls frame floored sim.floorBalls
                         }
-                            |> (\xx -> stepSimEmitter frame xx |> Maybe.withDefault ( xx, Cmd.none ))
+                            |> stepSimEmitter frame
                    )
             )
 
@@ -791,35 +784,40 @@ validAimAngleTowards to from =
         Nothing
 
 
-stepSimEmitter : Float -> Sim -> Maybe ( Sim, Cmd msg )
+stepSimEmitter : Float -> Sim -> ( Sim, Cmd msg )
 stepSimEmitter frame sim =
-    sim.mbEmitter
-        |> Maybe.andThen (stepEmitter frame)
-        |> Maybe.map
-            (\( ball, mbEmitter ) ->
-                ( { sim
-                    | balls = ball :: sim.balls
-                    , mbEmitter = mbEmitter
-                  }
-                , playSound "shoot"
-                )
+    case stepEmitter frame sim.emitter of
+        Just ( ball, emitter ) ->
+            ( { sim
+                | balls = ball :: sim.balls
+                , emitter = emitter
+              }
+            , playSound "shoot"
             )
 
+        Nothing ->
+            ( sim, Cmd.none )
 
-stepEmitter : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
-stepEmitter now { start, proto, remaining } =
-    if now - start > 10 then
-        Just
-            ( proto
-            , if remaining <= 0 then
+
+stepEmitter : Float -> Emitter -> Maybe ( Ball, Emitter )
+stepEmitter now emitter =
+    case emitter of
+        Emitting ({ start, proto, remaining } as emitting) ->
+            if now - start > 8 then
+                Just
+                    ( proto
+                    , if remaining <= 0 then
+                        EmitterDone
+
+                      else
+                        Emitting { emitting | remaining = remaining - 1 }
+                    )
+
+            else
                 Nothing
 
-              else
-                Just (Emitter now proto (remaining - 1))
-            )
-
-    else
-        Nothing
+        EmitterDone ->
+            Nothing
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
@@ -1198,7 +1196,7 @@ viewStateContent frame pointer targets state =
         Sim_ sim ->
             let
                 balls =
-                    case sim.mbEmitter of
+                    case sim.emitter of
                         Nothing ->
                             sim.balls
 
