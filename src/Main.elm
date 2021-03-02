@@ -41,7 +41,7 @@ port playSound : String -> Cmd msg
 
   - [x] destroy sound
 
-  - fix footer ui
+  - [x] fix footer ui
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
