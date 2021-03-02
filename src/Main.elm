@@ -40,6 +40,10 @@ port playSound : String -> Cmd msg
 # 99 balls game features:
 
   - mute btn
+  - anim
+      - bonus ball
+      - target hit
+      - target fall
   - adjust aim path length, when drag distance is smaller.
   - end screen: score/hi-score on over.
   - start screen
