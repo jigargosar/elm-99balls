@@ -29,20 +29,6 @@ port playSound : String -> Cmd msg
 
 # Tasks
 
-  - [x] indicator to communicate how to start playing by pointer drag.
-
-  - [x] restart game btn with icon
-
-  - [x] play sample sound
-
-  - [x] shoot sound
-
-  - [x] play hit sound
-
-  - [x] destroy sound
-
-  - [x] fix footer ui
-
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
