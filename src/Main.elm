@@ -608,9 +608,8 @@ update message (Model env game) =
 
         OnTick _ ->
             let
-                _ =
-                    --Debug.log "state"
-                    game.state
+                ( newGame, cmd ) =
+                    updateGameOnTick env game
             in
             ( Model
                 { env
@@ -618,8 +617,8 @@ update message (Model env game) =
                     , prevPointer = env.pointer
                     , prevPointerDown = env.pointerDown
                 }
-                (updateGameOnTick env game)
-            , Cmd.none
+                newGame
+            , cmd
             )
 
         PointerDown isDown pointer ->
@@ -676,28 +675,32 @@ initAimingStateTowards pointer ballPosition =
         }
 
 
-updateGameOnTick : Env -> Game -> Game
+updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         GameLost _ ->
-            game
+            ( game, Cmd.none )
 
         TargetsEntering { start, ballPosition } ->
-            if transitionDone start frame then
+            ( if transitionDone start frame then
                 { game | state = initWaitingForInputState ballPosition }
 
-            else
+              else
                 game
+            , Cmd.none
+            )
 
         WaitingForInput { ballPosition } ->
-            if pointerDown && not prevPointerDown then
+            ( if pointerDown && not prevPointerDown then
                 { game | state = initAimingStateTowards pointer ballPosition }
 
-            else
+              else
                 game
+            , Cmd.none
+            )
 
         Aiming { dragStartAt, ballPosition } ->
-            if not pointerDown then
+            ( if not pointerDown then
                 { game
                     | state =
                         case validAimAngleTowards dragStartAt pointer of
@@ -708,21 +711,25 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 Sim_ (initSim frame ballPosition angle game.ballCount)
                 }
 
-            else
+              else
                 game
+            , Cmd.none
+            )
 
         Sim_ sim ->
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
-                    { game
+                    ( { game
                         | state =
                             if canTargetsSafelyMoveDown game.targets then
                                 initTargetsEnteringState frame ballPosition
 
                             else
                                 GameLost frame
-                    }
+                      }
                         |> incTurnThenAddTargetRow
+                    , Cmd.none
+                    )
 
                 Nothing ->
                     stepSim frame game sim
@@ -742,20 +749,22 @@ ballPositionOnSimEnd now sim =
         Nothing
 
 
-stepSim : Float -> Game -> Sim -> Game
+stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { ballsCollected, targets }, newSim ) =
+        ( { ballsCollected, targets }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
     in
-    { game
+    ( { game
         | state = Sim_ newSim
         , targets = targets
         , ballCount = game.ballCount + ballsCollected
-    }
+      }
+    , cmd
+    )
 
 
-stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, Sim )
+stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, ( Sim, Cmd msg ) )
 stepSimHelp frame targets sim =
     sim.balls
         |> List.mapAccuml updateBall { targets = targets, ballsCollected = 0 }
@@ -766,13 +775,9 @@ stepSimHelp frame targets sim =
                             | balls = updated
                             , floorBalls = addNewFloorBalls frame floored sim.floorBalls
                         }
-                            |> withRollback (stepSimEmitter frame)
+                            |> (\xx -> stepSimEmitter frame xx |> Maybe.withDefault ( sim, Cmd.none ))
                    )
             )
-
-
-withRollback fn x =
-    fn x |> Maybe.withDefault x
 
 
 validAimAngleTowards : Vec -> Vec -> Maybe Float
@@ -786,16 +791,18 @@ validAimAngleTowards to from =
         Nothing
 
 
-stepSimEmitter : Float -> Sim -> Maybe Sim
+stepSimEmitter : Float -> Sim -> Maybe ( Sim, Cmd msg )
 stepSimEmitter frame sim =
     sim.mbEmitter
         |> Maybe.andThen (stepEmitter frame)
         |> Maybe.map
             (\( ball, mbEmitter ) ->
-                { sim
+                ( { sim
                     | balls = ball :: sim.balls
                     , mbEmitter = mbEmitter
-                }
+                  }
+                , playSound "shoot"
+                )
             )
 
 
