@@ -780,7 +780,7 @@ ballPositionOnSimEnd now sim =
 stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { ballsCollected, targets, solidTargetHits, solidTargetKills }, ( newSim, cmd ) ) =
+        ( { bonusBallsCollected, targets, solidTargetHits, solidTargetKills }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
 
         newKillCount =
@@ -789,7 +789,7 @@ stepSim frame game sim =
     ( { game
         | state = Sim_ { newSim | killCount = newKillCount }
         , targets = targets
-        , ballCount = game.ballCount + ballsCollected
+        , ballCount = game.ballCount + bonusBallsCollected
       }
     , Cmd.batch
         [ cmd
@@ -812,7 +812,7 @@ stepSimHelp frame targets sim =
     sim.balls
         |> List.mapAccuml updateBall
             { targets = targets
-            , ballsCollected = 0
+            , bonusBallsCollected = 0
             , solidTargetHits = 0
             , solidTargetKills = 0
             }
@@ -902,7 +902,7 @@ incTurnThenAddTargetRow game =
 
 type alias BallUpdateAcc =
     { targets : List Target
-    , ballsCollected : Int
+    , bonusBallsCollected : Int
     , solidTargetHits : Int
     , solidTargetKills : Int
     }
@@ -964,7 +964,7 @@ updateBall acc ball =
                         ExtraBallTarget ->
                             ( { acc
                                 | targets = remove target acc.targets
-                                , ballsCollected = acc.ballsCollected + 1
+                                , bonusBallsCollected = acc.bonusBallsCollected + 1
                               }
                             , BallMoved newBall
                             )
@@ -1410,7 +1410,7 @@ ballTravelPath targets ballPosition angle =
     in
     ballTravelPathHelp
         { targets = targets
-        , ballsCollected = 0
+        , bonusBallsCollected = 0
         , solidTargetHits = 0
         , solidTargetKills = 0
         }
