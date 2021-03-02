@@ -29,12 +29,15 @@ port playSound : String -> Cmd msg
 
 # Tasks
 
+  - stars
+
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
 
 
 # 99 balls game features:
 
+  - mute btn
   - adjust aim path length, when drag distance is smaller.
   - end screen: score/hi-score on over.
   - start screen
