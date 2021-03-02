@@ -23,13 +23,13 @@ app.ports["playSound"]["subscribe"]((function () {
             case 'hit' :
                 hit.play()
                 break
-            case 'kill_1' :
+            case 'kill1' :
                 kill1.play()
                 break
-            case 'kill_2' :
+            case 'kill2' :
                 kill2.play()
                 break
-            case 'kill_3' :
+            case 'kill3' :
                 kill3.play()
                 break
         }
