@@ -35,34 +35,16 @@ app.ports["playSound"]["subscribe"]((function () {
             kill_8: 'snd_kill_8.ogg',
         }
 
-    const sounds = mapValues((v) => new Howl({src: [v]}), soundPathMapping)
+    const soundMap = mapValues((v) => new Howl({src: [v]}), soundPathMapping)
 
-
-    const shoot = new Howl({src: ['snd_swoosh.ogg']})
-    const hit = new Howl({src: ['snd_hit.ogg']})
-    const kill1 = new Howl({src: ['snd_kill_1.ogg']})
-    const kill2 = new Howl({src: ['snd_kill_2.ogg']})
-    const kill3 = new Howl({src: ['snd_kill_3.ogg']})
     return function (name) {
-        switch (name) {
-            case 'shoot' :
-                shoot.play()
-                break
-            case 'hit' :
-                hit.play()
-                break
-            case 'kill_1' :
-                kill1.play()
-                break
-            case 'kill_2' :
-                kill2.play()
-                break
-            case 'kill_3' :
-                kill3.play()
-                break
-            default :
-                console.warn("sound not found", name)
+        const sound = soundMap[name]
+        if (sound) {
+            sound.play()
+        } else {
+            console.warn("sound not found", name)
         }
+
     }
 })())
 
