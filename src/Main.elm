@@ -37,9 +37,9 @@ port playSound : String -> Cmd msg
 
   - [x] shoot sound
 
-  - play hit sound
+  - [x] play hit sound
 
-  - destroy sound
+  - [x] destroy sound
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release

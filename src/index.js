@@ -39,7 +39,7 @@ app.ports["playSound"]["subscribe"]((function () {
         (v, k) => {
             return new Howl({
                 src: [v],
-                volume: k.startsWith("kill_") ? 0.4 : 1
+                volume: k.startsWith("kill_") ? 0.3 : 1
             });
         },
         soundPathMapping,
