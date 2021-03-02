@@ -292,7 +292,7 @@ stepEmitter now emitter =
 
 type TargetKind
     = SolidTarget Int
-    | ExtraBallTarget
+    | BonusBallTarget
     | StarTarget
 
 
@@ -355,7 +355,7 @@ rndTargetHealth turns =
 
 randomExtraBallTargetKinds : Generator (List TargetKind)
 randomExtraBallTargetKinds =
-    rndExtraBallCount |> rnd1 (\i -> List.repeat i ExtraBallTarget)
+    rndExtraBallCount |> rnd1 (\i -> List.repeat i BonusBallTarget)
 
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
@@ -957,7 +957,7 @@ updateBall acc ball =
                                 , BallMoved newBall
                                 )
 
-                        ExtraBallTarget ->
+                        BonusBallTarget ->
                             ( { acc
                                 | targets = remove target acc.targets
                                 , bonusBallsCollected = acc.bonusBallsCollected + 1
@@ -986,7 +986,7 @@ resolveBallCollision collision ballCollision velocity ball =
                         SolidTarget _ ->
                             True
 
-                        ExtraBallTarget ->
+                        BonusBallTarget ->
                             False
 
                         StarTarget ->
@@ -1046,7 +1046,7 @@ targetToCircle t =
         SolidTarget _ ->
             gc.targetR
 
-        ExtraBallTarget ->
+        BonusBallTarget ->
             gc.ballR
 
         StarTarget ->
@@ -1451,11 +1451,11 @@ viewTargets now state targets =
                 _ ->
                     1
     in
-    viewTargetsHelp progress targets
+    viewTargetsHelp now progress targets
 
 
-viewTargetsHelp : Float -> List Target -> Svg msg
-viewTargetsHelp progress targets =
+viewTargetsHelp : Float -> Float -> List Target -> Svg msg
+viewTargetsHelp now progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
@@ -1469,7 +1469,7 @@ viewTargetsHelp progress targets =
                 SolidTarget hp ->
                     viewSolidTarget position hp
 
-                ExtraBallTarget ->
+                BonusBallTarget ->
                     viewBallAt position
 
                 StarTarget ->
