@@ -778,7 +778,7 @@ ballPositionOnSimEnd now sim =
 stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { ballsCollected, targets, solidTargetHits }, ( newSim, cmd ) ) =
+        ( { ballsCollected, targets, solidTargetHits, solidTargetKills }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
     in
     ( { game
@@ -793,6 +793,11 @@ stepSim frame game sim =
 
           else
             Cmd.none
+        , if solidTargetKills >= 1 then
+            playSound "kill_1"
+
+          else
+            Cmd.none
         ]
     )
 
@@ -800,7 +805,12 @@ stepSim frame game sim =
 stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, ( Sim, Cmd msg ) )
 stepSimHelp frame targets sim =
     sim.balls
-        |> List.mapAccuml updateBall { targets = targets, ballsCollected = 0, solidTargetHits = 0 }
+        |> List.mapAccuml updateBall
+            { targets = targets
+            , ballsCollected = 0
+            , solidTargetHits = 0
+            , solidTargetKills = 0
+            }
         |> mapSnd
             (splitBallUpdates
                 >> (\{ floored, updated } ->
@@ -889,6 +899,7 @@ type alias BallUpdateAcc =
     { targets : List Target
     , ballsCollected : Int
     , solidTargetHits : Int
+    , solidTargetKills : Int
     }
 
 
@@ -1393,6 +1404,7 @@ ballTravelPath targets ballPosition angle =
         { targets = targets
         , ballsCollected = 0
         , solidTargetHits = 0
+        , solidTargetKills = 0
         }
         ball
         0
