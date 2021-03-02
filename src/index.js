@@ -23,7 +23,7 @@ function mapValues(fn, obj) {
 app.ports["playSound"]["subscribe"]((function () {
     const soundPathMapping =
         {
-            shoot: 'snd_swoosh.ogg',
+            shoot: 'snd_shoot.ogg',
             hit: 'snd_hit.ogg',
             kill_1: 'snd_kill_1.ogg',
             kill_2: 'snd_kill_2.ogg',
