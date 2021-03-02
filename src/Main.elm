@@ -778,7 +778,7 @@ ballPositionOnSimEnd now sim =
 stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { ballsCollected, targets }, ( newSim, cmd ) ) =
+        ( { ballsCollected, targets, solidTargetHits }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
     in
     ( { game
@@ -786,7 +786,14 @@ stepSim frame game sim =
         , targets = targets
         , ballCount = game.ballCount + ballsCollected
       }
-    , cmd
+    , Cmd.batch
+        [ cmd
+        , if solidTargetHits >= 1 then
+            playSound "hit"
+
+          else
+            Cmd.none
+        ]
     )
 
 
