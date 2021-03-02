@@ -766,9 +766,13 @@ stepSimHelp frame targets sim =
                             | balls = updated
                             , floorBalls = addNewFloorBalls frame floored sim.floorBalls
                         }
-                            |> stepSimEmitter frame
+                            |> withRollback (stepSimEmitter frame)
                    )
             )
+
+
+withRollback fn x =
+    fn x |> Maybe.withDefault x
 
 
 validAimAngleTowards : Vec -> Vec -> Maybe Float
@@ -782,7 +786,7 @@ validAimAngleTowards to from =
         Nothing
 
 
-stepSimEmitter : Float -> Sim -> Sim
+stepSimEmitter : Float -> Sim -> Maybe Sim
 stepSimEmitter frame sim =
     sim.mbEmitter
         |> Maybe.andThen (stepEmitter frame)
@@ -793,7 +797,6 @@ stepSimEmitter frame sim =
                     , mbEmitter = mbEmitter
                 }
             )
-        |> Maybe.withDefault sim
 
 
 stepEmitter : Float -> Emitter -> Maybe ( Ball, Maybe Emitter )
