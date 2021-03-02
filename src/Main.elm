@@ -427,7 +427,7 @@ gc =
             vec (toFloat w * cri.x) (toFloat h * cri.y)
 
         tr =
-            cri.x * 0.7
+            cr * 0.8
 
         br =
             tr * 0.6
