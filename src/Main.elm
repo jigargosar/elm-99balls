@@ -245,17 +245,14 @@ initSim frame ballPosition angle ballCount =
 
 
 type Emitter
-    = Emitting { start : Float, proto : Ball, remaining : Int }
+    = Emitting Ball { start : Float, remaining : Int }
     | EmitterDone
 
 
 initEmitter : Float -> Vec -> Float -> Int -> Emitter
 initEmitter frame ballPosition angle ballCount =
-    let
-        proto =
-            initBall ballPosition angle
-    in
-    Emitting { start = frame, proto = proto, remaining = ballCount - 1 }
+    Emitting (initBall ballPosition angle)
+        { start = frame, remaining = ballCount - 1 }
 
 
 type TargetKind
@@ -802,15 +799,15 @@ stepSimEmitter frame sim =
 stepEmitter : Float -> Emitter -> Maybe ( Ball, Emitter )
 stepEmitter now emitter =
     case emitter of
-        Emitting ({ start, proto, remaining } as emitting) ->
+        Emitting ball { start, remaining } ->
             if now - start > 8 then
                 Just
-                    ( proto
+                    ( ball
                     , if remaining <= 0 then
                         EmitterDone
 
                       else
-                        Emitting { emitting | remaining = remaining - 1 }
+                        Emitting ball { start = now, remaining = remaining - 1 }
                     )
 
             else
@@ -1197,11 +1194,11 @@ viewStateContent frame pointer targets state =
             let
                 balls =
                     case sim.emitter of
-                        Nothing ->
-                            sim.balls
+                        Emitting ball _ ->
+                            ball :: sim.balls
 
-                        Just em ->
-                            em.proto :: sim.balls
+                        _ ->
+                            sim.balls
             in
             group []
                 [ viewBalls balls
