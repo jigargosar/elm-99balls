@@ -806,17 +806,6 @@ stepSimHelp frame targets sim =
             )
 
 
-validAimAngleTowards : Vec -> Vec -> Maybe Float
-validAimAngleTowards to from =
-    if to.y < from.y then
-        vecAngleFromTo from to
-            |> clampMO (turns -0.25) (turns 0.24)
-            |> Just
-
-    else
-        Nothing
-
-
 stepSimEmitter : Float -> Sim -> ( Sim, Cmd msg )
 stepSimEmitter frame sim =
     case stepEmitter frame sim.emitter of
@@ -830,6 +819,17 @@ stepSimEmitter frame sim =
 
         Nothing ->
             ( sim, Cmd.none )
+
+
+validAimAngleTowards : Vec -> Vec -> Maybe Float
+validAimAngleTowards to from =
+    if to.y < from.y then
+        vecAngleFromTo from to
+            |> clampMO (turns -0.25) (turns 0.24)
+            |> Just
+
+    else
+        Nothing
 
 
 splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
