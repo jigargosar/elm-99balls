@@ -930,6 +930,7 @@ updateBall acc ball =
                                         replace target
                                             { target | kind = SolidTarget (hp - 1) }
                                             acc.targets
+                                    , solidTargetHits = acc.solidTargetHits + 1
                                   }
                                 , BallMoved newBall
                                 )
