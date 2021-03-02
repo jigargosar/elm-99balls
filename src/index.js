@@ -36,10 +36,12 @@ app.ports["playSound"]["subscribe"]((function () {
         }
 
     const soundMap = mapValues(
-        (v, k) => new Howl({
-            src: [v],
-            volume: k.contains("kill") ? 0.5 : 1
-        }),
+        (v, k) => {
+            return new Howl({
+                src: [v],
+                volume: k.startsWith("kill_") ? 0.4 : 1
+            });
+        },
         soundPathMapping,
     )
 
