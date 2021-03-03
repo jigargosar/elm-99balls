@@ -609,22 +609,18 @@ toFrac duration elapsed =
     fmodBy duration elapsed / duration
 
 
-zigZag : Float -> Float -> Float -> Float
-zigZag duration start now =
-    let
-        elapsed =
-            now - start
-    in
+zigZag : Float -> Float -> Float
+zigZag duration elapsed =
     abs (2 * toFrac (duration * 2) elapsed - 1)
 
 
-wave : Float -> Float -> Float -> Float
-wave duration start now =
-    let
-        elapsed =
-            now - start
-    in
+wave : Float -> Float -> Float
+wave duration elapsed =
     (1 + cos (turns (toFrac (duration * 2) elapsed))) / 2
+
+
+normToNegNorm n =
+    1 - n * 2
 
 
 clampMO midA offA =
