@@ -794,6 +794,11 @@ stepSim frame game sim =
 
           else
             Cmd.none
+        , if bonusBallsCollected >= 1 then
+            playSound "bonus_hit"
+
+          else
+            Cmd.none
         , if newKillCount > sim.killCount then
             playSound ("kill_" ++ String.fromInt (atMost 8 newKillCount))
 
