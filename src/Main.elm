@@ -1482,6 +1482,7 @@ viewBonusBallTarget now position =
     let
         dx =
             zigZag 30 0 now
+                |> mul 10
 
         p2 =
             position
@@ -1493,8 +1494,14 @@ viewBonusBallTarget now position =
 zigZag : Float -> Float -> Float -> Float
 zigZag duration start now =
     let
+        elapsed =
+            now - start
+
+        duration2 =
+            duration * 2
+
         progress2 =
-            fmodBy (duration * 2) (now - start) * 2
+            (fmodBy duration2 elapsed / duration2) * 2
     in
     if progress2 < 1 then
         progress2
