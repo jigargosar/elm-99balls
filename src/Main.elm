@@ -1470,7 +1470,7 @@ viewTargetsHelp now progress targets =
                     viewSolidTarget position hp
 
                 BonusBallTarget ->
-                    viewBonusBallTarget now position
+                    viewBonusBall now position
 
                 StarTarget ->
                     viewSolidTarget position -1
@@ -1478,7 +1478,7 @@ viewTargetsHelp now progress targets =
     group [] (List.map viewTarget targets)
 
 
-viewBonusBallTarget now position =
+viewBonusBall now position =
     let
         dxy =
             vec (wave 60 0 now * 10) (zigZag 50 0 now * 10)
