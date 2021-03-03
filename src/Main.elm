@@ -1479,7 +1479,15 @@ viewTargetsHelp now progress targets =
 
 
 viewBonusBallTarget now position =
-    viewBallAt position
+    let
+        dx =
+            0
+
+        p2 =
+            position
+                |> vecMapX (add dx)
+    in
+    viewBallAt p2
 
 
 viewSolidTarget position hp =
