@@ -1497,21 +1497,14 @@ zigZag duration start now =
         elapsed =
             now - start
 
-        duration2 =
-            duration * 2
-
         progress2 =
-            (fmodBy duration2 elapsed / duration2) * 2
+            toFrac (duration * 2) elapsed * 2
     in
     if progress2 < 1 then
         progress2
 
     else
         2 - progress2
-
-
-norm lo hi val =
-    val - lo / hi - lo
 
 
 viewSolidTarget position hp =

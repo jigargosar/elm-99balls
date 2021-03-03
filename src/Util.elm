@@ -601,6 +601,14 @@ roundFloat2 =
     mapEach roundFloat
 
 
+norm lo hi val =
+    val - lo / hi - lo
+
+
+toFrac duration elapsed =
+    fmodBy duration elapsed / duration
+
+
 clampMO midA offA =
     if offA < 0 then
         clampMO midA -offA
