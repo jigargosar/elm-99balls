@@ -1481,7 +1481,7 @@ viewTargetsHelp now progress targets =
 viewBonusBallTarget now position =
     let
         dx =
-            zigZag 30
+            zigZag 30 0 now
 
         p2 =
             position
