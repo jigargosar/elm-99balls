@@ -29,6 +29,8 @@ port playSound : String -> Cmd msg
 
 # Tasks
 
+  - target fall anim
+
   - stars
 
   - mute btn
@@ -41,7 +43,7 @@ port playSound : String -> Cmd msg
 
   - mute btn
   - anim
-      - bonus ball
+      - bonus star
       - target hit
       - target fall
   - adjust aim path length, when drag distance is smaller.
