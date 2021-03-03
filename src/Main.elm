@@ -1480,13 +1480,11 @@ viewTargetsHelp now progress targets =
 
 viewBonusBallTarget now position =
     let
-        dx =
-            wave 30 0 now
-                |> mul 10
+        dxy =
+            vec (wave 60 0 now * 10) (zigZag 50 0 now * 10)
 
         p2 =
-            position
-                |> vecMapX (add dx)
+            vecAdd position dxy
     in
     viewBallAt p2
 
