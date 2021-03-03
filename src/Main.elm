@@ -1480,11 +1480,15 @@ viewTargetsHelp now progress targets =
 
 viewBonusBall now position =
     let
+        foo n =
+            1 - n * 2
+
         ( ndx, ndy ) =
-            ( wave 60 0 now, zigZag 50 0 now )
+            ( wave 80 0 now |> foo, zigZag 90 0 now |> foo )
 
         dxy =
-            vec (ndx * 10) (ndy * 10)
+            vec ndx ndy
+                |> vecScale (gc.ballR * 0.3)
 
         p2 =
             vecAdd position dxy
