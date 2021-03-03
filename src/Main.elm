@@ -1481,13 +1481,26 @@ viewTargetsHelp now progress targets =
 viewBonusBallTarget now position =
     let
         dx =
-            0
+            zigZag 30
 
         p2 =
             position
                 |> vecMapX (add dx)
     in
     viewBallAt p2
+
+
+zigZag : Float -> Float -> Float -> Float
+zigZag duration start now =
+    let
+        progress2 =
+            fmodBy (duration * 2) (now - start) * 2
+    in
+    if progress2 < 1 then
+        progress2
+
+    else
+        2 - progress2
 
 
 viewSolidTarget position hp =
