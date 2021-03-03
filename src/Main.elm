@@ -1510,6 +1510,10 @@ zigZag duration start now =
         2 - progress2
 
 
+norm lo hi val =
+    val - lo / hi - lo
+
+
 viewSolidTarget position hp =
     let
         radius =
