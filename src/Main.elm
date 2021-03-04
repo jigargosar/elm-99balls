@@ -161,7 +161,7 @@ type alias KillAnim =
 
 
 killAnimDur =
-    60
+    40
 
 
 initKillAnim : Float -> Vec -> KillAnim
@@ -1293,7 +1293,7 @@ viewKillAnims now kas =
 
                 dxy =
                     vec 0 1
-                        |> vecScale (elapsed * gc.ballSpeed)
+                        |> vecScale (progress * gc.ri.y)
 
                 p2 : Vec
                 p2 =
