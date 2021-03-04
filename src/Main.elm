@@ -29,7 +29,7 @@ port playSound : String -> Cmd msg
 
 # Tasks
 
-  - target kill anim
+  - [x] target kill anim
 
   - stars
 
