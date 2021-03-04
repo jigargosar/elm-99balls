@@ -1291,6 +1291,9 @@ viewKillAnims now kas =
                 progress =
                     elapsed / killAnimDur |> clamp 0 1
 
+                reverseProgress =
+                    1 - progress
+
                 s =
                     if progress < 0.2 then
                         progress * -(gc.targetR * 2)
@@ -1308,7 +1311,7 @@ viewKillAnims now kas =
             in
             group
                 [ transform [ translate p2 ]
-                , fade (1 - (progress * 0.5))
+                , fade (lerp 2.5 0 progress)
 
                 --, fade 1
                 ]
