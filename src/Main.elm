@@ -1312,7 +1312,16 @@ viewKillAnims now kas =
 
                 --, fade 1
                 ]
-                [ Svg.circle [ Px.r gc.targetR, fillH 0 ] [] ]
+                [ Svg.circle
+                    [ Px.r gc.targetR
+                    , fillH 0
+                    , transform
+                        [ SkewX (progress * (-gc.targetR * 0.5))
+                        , SkewY (progress * (-gc.targetR * 0.5))
+                        ]
+                    ]
+                    []
+                ]
     in
     group [] (List.map vka kas)
 
