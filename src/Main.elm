@@ -809,7 +809,9 @@ stepSim frame game sim =
             Sim_
                 { newSim
                     | killCount = newKillCount
-                    , killAnims = List.map (initKillAnim frame) solidTargetsKilled ++ reject (isKillAnimDone frame) sim.killAnims
+                    , killAnims =
+                        List.map (initKillAnim frame) solidTargetsKilled
+                            ++ reject (isKillAnimDone frame) sim.killAnims
                 }
         , targets = targets
         , ballCount = game.ballCount + bonusBallsCollected
