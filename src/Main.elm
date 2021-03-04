@@ -29,7 +29,7 @@ port playSound : String -> Cmd msg
 
 # Tasks
 
-  - target fall anim
+  - target kill anim
 
   - stars
 
@@ -778,11 +778,11 @@ ballPositionOnSimEnd now sim =
 stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { bonusBallsCollected, targets, solidTargetHits, solidTargetKills }, ( newSim, cmd ) ) =
+        ( { bonusBallsCollected, targets, solidTargetHits, solidTargetKilled }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
 
         newKillCount =
-            atMost 1 solidTargetKills + sim.killCount
+            atMost 1 (List.length solidTargetKilled) + sim.killCount
     in
     ( { game
         | state = Sim_ { newSim | killCount = newKillCount }
@@ -813,12 +813,7 @@ stepSim frame game sim =
 stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, ( Sim, Cmd msg ) )
 stepSimHelp frame targets sim =
     sim.balls
-        |> List.mapAccuml updateBall
-            { targets = targets
-            , bonusBallsCollected = 0
-            , solidTargetHits = 0
-            , solidTargetKills = 0
-            }
+        |> List.mapAccuml updateBall (initBallUpdateAcc targets)
         |> mapSnd
             (splitBallUpdates
                 >> (\{ floored, updated } ->
@@ -907,7 +902,16 @@ type alias BallUpdateAcc =
     { targets : List Target
     , bonusBallsCollected : Int
     , solidTargetHits : Int
-    , solidTargetKills : Int
+    , solidTargetKilled : List Vec
+    }
+
+
+initBallUpdateAcc : List Target -> BallUpdateAcc
+initBallUpdateAcc targets =
+    { targets = targets
+    , bonusBallsCollected = 0
+    , solidTargetHits = 0
+    , solidTargetKilled = []
     }
 
 
@@ -948,7 +952,7 @@ updateBall acc ball =
                             if hp <= 1 then
                                 ( { acc
                                     | targets = remove target acc.targets
-                                    , solidTargetKills = acc.solidTargetKills + 1
+                                    , solidTargetKilled = target.position :: acc.solidTargetKilled
                                   }
                                 , BallMoved newBall
                                 )
@@ -1411,12 +1415,7 @@ ballTravelPath targets ballPosition angle =
         ball =
             initBall ballPosition angle
     in
-    ballTravelPathHelp
-        { targets = targets
-        , bonusBallsCollected = 0
-        , solidTargetHits = 0
-        , solidTargetKills = 0
-        }
+    ballTravelPathHelp (initBallUpdateAcc targets)
         ball
         0
         [ ball.position ]
