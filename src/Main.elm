@@ -1281,7 +1281,7 @@ viewKillAnims now kas =
             let
                 progress : Float
                 progress =
-                    (now - start) / killAnimDur
+                    (now - start) / killAnimDur |> clamp 0 1
 
                 dxy =
                     vec 0 1
@@ -1291,7 +1291,7 @@ viewKillAnims now kas =
                 p2 =
                     vecAdd position dxy
             in
-            group [ transform [ translate p2 ] ]
+            group [ transform [ translate p2 ], fade (1 - progress) ]
                 [ Svg.circle [ Px.r gc.targetR, fillH 0 ] [] ]
     in
     group [] (List.map vka kas)
