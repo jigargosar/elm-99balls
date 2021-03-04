@@ -152,6 +152,7 @@ type alias Sim =
     , balls : List Ball
     , floorBalls : FloorBalls
     , killCount : Int
+    , killAnims : List { start : Float, position : Vec }
     }
 
 
@@ -242,6 +243,7 @@ initSim frame ballPosition angle ballCount =
     , balls = []
     , floorBalls = emptyFloorBalls
     , killCount = 0
+    , killAnims = []
     }
 
 
