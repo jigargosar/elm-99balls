@@ -1298,26 +1298,20 @@ viewKillAnims now kas =
                     else
                         (-(gc.targetR * 2) * 0.2) + (progress - 0.2) * (gc.targetR * 6)
 
-                dxy =
-                    vec 0 1
-                        |> vecScale s
-
-                p2 : Vec
-                p2 =
-                    vecAdd position dxy
+                animPosition : Vec
+                animPosition =
+                    vecAdd position (vec 0 1 |> vecScale s)
             in
             group
-                [ transform [ translate p2 ]
+                [ transform [ translate animPosition, Rotate (progress * -45) 0 0 ]
                 , fade (lerp 2.5 0 progress)
-
-                --, fade 1
                 ]
                 [ Svg.circle
                     [ Px.r gc.targetR
                     , fillH 0
                     , transform
-                        [ SkewX (progress * (-gc.targetR * 0.5))
-                        , SkewY (progress * (-gc.targetR * 0.5))
+                        [ SkewX (wave 0.5 progress * 15 - 7)
+                        , SkewY (wave 0.5 progress * 15 - 7)
                         ]
                     ]
                     []
