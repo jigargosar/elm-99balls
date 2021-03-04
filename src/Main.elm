@@ -161,7 +161,7 @@ type alias KillAnim =
 
 
 killAnimDur =
-    140
+    40
 
 
 initKillAnim : Float -> Vec -> KillAnim
@@ -1291,9 +1291,16 @@ viewKillAnims now kas =
                 progress =
                     elapsed / killAnimDur |> clamp 0 1
 
+                s =
+                    if progress < 0.2 then
+                        progress * -(gc.targetR * 2)
+
+                    else
+                        (-(gc.targetR * 2) * 0.2) + (progress - 0.2) * (gc.targetR * 6)
+
                 dxy =
                     vec 0 1
-                        |> vecScale (wave (killAnimDur / 2) elapsed * -50)
+                        |> vecScale s
 
                 p2 : Vec
                 p2 =
@@ -1302,7 +1309,8 @@ viewKillAnims now kas =
             group
                 [ transform [ translate p2 ]
                 , fade (1 - (progress * 0.5))
-                , fade 1
+
+                --, fade 1
                 ]
                 [ Svg.circle [ Px.r gc.targetR, fillH 0 ] [] ]
     in
