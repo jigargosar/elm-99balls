@@ -422,6 +422,7 @@ type alias GridConf =
     , cri : Vec
     , targetR : Float
     , ballR : Float
+    , ballSpeed : Float
     , dx : Float
     , dy : Float
     , topRowPS : List GP
@@ -449,6 +450,9 @@ gc =
         br =
             tr * 0.6
 
+        ballSpeed =
+            br * 0.9
+
         cell0Center =
             vecSub cri ri
 
@@ -463,6 +467,7 @@ gc =
     , cri = cri
     , targetR = tr
     , ballR = br
+    , ballSpeed = ballSpeed
     , dx = cell0Center.x
     , dy = cell0Center.y
     , topRowPS = topRowPS
@@ -548,7 +553,7 @@ initBall position angle =
     , angle = angle
     , hue = ballHue
     , radius = gc.ballR
-    , speed = gc.ballR * 0.9
+    , speed = gc.ballSpeed
     }
 
 
@@ -1279,19 +1284,22 @@ viewKillAnims now kas =
     let
         vka { start, position } =
             let
+                elapsed =
+                    now - start
+
                 progress : Float
                 progress =
-                    (now - start) / killAnimDur |> clamp 0 1
+                    elapsed / killAnimDur |> clamp 0 1
 
                 dxy =
                     vec 0 1
-                        |> vecScale (progress * 10)
+                        |> vecScale (elapsed * gc.ballSpeed)
 
                 p2 : Vec
                 p2 =
                     vecAdd position dxy
             in
-            group [ transform [ translate p2 ], fade (1 - progress) ]
+            group [ transform [ translate p2 ], fade (1 - (progress * 0.5)) ]
                 [ Svg.circle [ Px.r gc.targetR, fillH 0 ] [] ]
     in
     group [] (List.map vka kas)
