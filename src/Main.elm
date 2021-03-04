@@ -1271,7 +1271,29 @@ viewState frame pointer targets state =
             group []
                 [ viewBalls (Maybe.cons (emitterBall sim.emitter) sim.balls)
                 , viewFloorBalls frame sim.floorBalls
+                , viewKillAnims frame sim.killAnims
                 ]
+
+
+viewKillAnims now kas =
+    let
+        vka { start, position } =
+            let
+                progress : Float
+                progress =
+                    (now - start) / killAnimDur
+
+                dxy =
+                    vec 0 1
+                        |> vecScale (progress * 10)
+
+                p2 : Vec
+                p2 =
+                    vecAdd position dxy
+            in
+            Svg.circle [ Px.r gc.targetR, fillH 0, transform [ translate p2 ] ] []
+    in
+    group [] (List.map vka kas)
 
 
 viewTutorial : Float -> Float -> Svg msg
