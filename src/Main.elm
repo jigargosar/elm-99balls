@@ -1291,7 +1291,8 @@ viewKillAnims now kas =
                 p2 =
                     vecAdd position dxy
             in
-            Svg.circle [ Px.r gc.targetR, fillH 0, transform [ translate p2 ] ] []
+            group [ transform [ translate p2 ] ]
+                [ Svg.circle [ Px.r gc.targetR, fillH 0 ] [] ]
     in
     group [] (List.map vka kas)
 
