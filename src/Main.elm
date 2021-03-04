@@ -801,14 +801,14 @@ stepSim frame game sim =
         ( { bonusBallsCollected, targets, solidTargetHits, solidTargetsKilled }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
 
-        newKillCount =
+        newTotalKills =
             atMost 1 (List.length solidTargetsKilled) + sim.totalKills
     in
     ( { game
         | state =
             Sim_
                 { newSim
-                    | totalKills = newKillCount
+                    | totalKills = newTotalKills
                     , killAnims =
                         List.map (initKillAnim frame) solidTargetsKilled
                             ++ reject (isKillAnimDone frame) sim.killAnims
@@ -828,8 +828,8 @@ stepSim frame game sim =
 
           else
             Cmd.none
-        , if newKillCount > sim.totalKills then
-            playSound ("kill_" ++ String.fromInt (atMost 8 newKillCount))
+        , if newTotalKills > sim.totalKills then
+            playSound ("kill_" ++ String.fromInt (atMost 8 newTotalKills))
 
           else
             Cmd.none
