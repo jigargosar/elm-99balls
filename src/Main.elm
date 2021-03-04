@@ -161,7 +161,7 @@ type alias KillAnim =
 
 
 killAnimDur =
-    40
+    140
 
 
 initKillAnim : Float -> Vec -> KillAnim
@@ -1293,13 +1293,17 @@ viewKillAnims now kas =
 
                 dxy =
                     vec 0 1
-                        |> vecScale (progress * gc.ri.y)
+                        |> vecScale (wave (killAnimDur / 2) elapsed * -50)
 
                 p2 : Vec
                 p2 =
                     vecAdd position dxy
             in
-            group [ transform [ translate p2 ], fade (1 - (progress * 0.5)) ]
+            group
+                [ transform [ translate p2 ]
+                , fade (1 - (progress * 0.5))
+                , fade 1
+                ]
                 [ Svg.circle [ Px.r gc.targetR, fillH 0 ] [] ]
     in
     group [] (List.map vka kas)
