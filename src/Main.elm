@@ -151,7 +151,7 @@ type alias Sim =
     { emitter : Emitter
     , balls : List Ball
     , floorBalls : FloorBalls
-    , killCount : Int
+    , totalKills : Int
     , killAnims : List KillAnim
     }
 
@@ -260,7 +260,7 @@ initSim frame ballPosition angle ballCount =
     { emitter = initEmitter frame ballPosition angle ballCount
     , balls = []
     , floorBalls = emptyFloorBalls
-    , killCount = 0
+    , totalKills = 0
     , killAnims = []
     }
 
@@ -802,13 +802,13 @@ stepSim frame game sim =
             stepSimHelp frame game.targets sim
 
         newKillCount =
-            atMost 1 (List.length solidTargetsKilled) + sim.killCount
+            atMost 1 (List.length solidTargetsKilled) + sim.totalKills
     in
     ( { game
         | state =
             Sim_
                 { newSim
-                    | killCount = newKillCount
+                    | totalKills = newKillCount
                     , killAnims =
                         List.map (initKillAnim frame) solidTargetsKilled
                             ++ reject (isKillAnimDone frame) sim.killAnims
@@ -828,7 +828,7 @@ stepSim frame game sim =
 
           else
             Cmd.none
-        , if newKillCount > sim.killCount then
+        , if newKillCount > sim.totalKills then
             playSound ("kill_" ++ String.fromInt (atMost 8 newKillCount))
 
           else
