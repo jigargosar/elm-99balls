@@ -1132,12 +1132,12 @@ view (Model env game) =
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
             |> always noView
         , div [ style "position" "relative" ]
-            (viewGameContent env game)
+            (viewGame env game)
         ]
 
 
-viewGameContent : Env -> Game -> List (Html Msg)
-viewGameContent { vri, frame, pointer } g =
+viewGame : Env -> Game -> List (Html Msg)
+viewGame { vri, frame, pointer } g =
     [ viewGameLost frame g
     , Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
@@ -1147,7 +1147,7 @@ viewGameContent { vri, frame, pointer } g =
 
             -- draw order matters, when showing aim/debug points
             , viewTargets frame g.state g.targets
-            , viewStateContent frame pointer g.targets g.state
+            , viewState frame pointer g.targets g.state
             , viewDebugPointer pointer |> hideView
             , if shouldDisplayTutorial g.turn g.state then
                 viewTutorial 0 frame
@@ -1241,8 +1241,8 @@ viewFooter ballCount =
         ]
 
 
-viewStateContent : Float -> Vec -> List Target -> State -> Svg Msg
-viewStateContent frame pointer targets state =
+viewState : Float -> Vec -> List Target -> State -> Svg Msg
+viewState frame pointer targets state =
     case state of
         GameLost _ ->
             noView
