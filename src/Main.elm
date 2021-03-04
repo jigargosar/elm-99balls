@@ -1291,9 +1291,6 @@ viewKillAnims now kas =
                 progress =
                     elapsed / killAnimDur |> clamp 0 1
 
-                reverseProgress =
-                    1 - progress
-
                 s =
                     if progress < 0.2 then
                         progress * -(gc.targetR * 2)
