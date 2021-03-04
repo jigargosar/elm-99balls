@@ -814,7 +814,7 @@ stepSim frame game sim =
                             ++ reject (isKillAnimDone frame) sim.killAnims
                 }
         , targets = targets
-        , ballCount = game.ballCount + bonusBallsCollected
+        , ballCount = bonusBallsCollected + game.ballCount
       }
     , Cmd.batch
         [ cmd
