@@ -152,8 +152,26 @@ type alias Sim =
     , balls : List Ball
     , floorBalls : FloorBalls
     , killCount : Int
-    , killAnims : List { start : Float, position : Vec }
+    , killAnims : List KillAnim
     }
+
+
+type alias KillAnim =
+    { start : Float, position : Vec }
+
+
+killAnimDur =
+    60
+
+
+initKillAnim : Float -> Vec -> KillAnim
+initKillAnim now position =
+    { start = now, position = position }
+
+
+isKillAnimDone : Float -> KillAnim -> Bool
+isKillAnimDone now { start } =
+    now - start > killAnimDur
 
 
 type FloorBalls
@@ -780,14 +798,19 @@ ballPositionOnSimEnd now sim =
 stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { bonusBallsCollected, targets, solidTargetHits, solidTargetKilled }, ( newSim, cmd ) ) =
+        ( { bonusBallsCollected, targets, solidTargetHits, solidTargetsKilled }, ( newSim, cmd ) ) =
             stepSimHelp frame game.targets sim
 
         newKillCount =
-            atMost 1 (List.length solidTargetKilled) + sim.killCount
+            atMost 1 (List.length solidTargetsKilled) + sim.killCount
     in
     ( { game
-        | state = Sim_ { newSim | killCount = newKillCount }
+        | state =
+            Sim_
+                { newSim
+                    | killCount = newKillCount
+                    , killAnims = List.map (initKillAnim frame) solidTargetsKilled ++ reject (isKillAnimDone frame) sim.killAnims
+                }
         , targets = targets
         , ballCount = game.ballCount + bonusBallsCollected
       }
@@ -904,7 +927,7 @@ type alias BallUpdateAcc =
     { targets : List Target
     , bonusBallsCollected : Int
     , solidTargetHits : Int
-    , solidTargetKilled : List Vec
+    , solidTargetsKilled : List Vec
     }
 
 
@@ -913,7 +936,7 @@ initBallUpdateAcc targets =
     { targets = targets
     , bonusBallsCollected = 0
     , solidTargetHits = 0
-    , solidTargetKilled = []
+    , solidTargetsKilled = []
     }
 
 
@@ -954,7 +977,7 @@ updateBall acc ball =
                             if hp <= 1 then
                                 ( { acc
                                     | targets = remove target acc.targets
-                                    , solidTargetKilled = target.position :: acc.solidTargetKilled
+                                    , solidTargetsKilled = target.position :: acc.solidTargetsKilled
                                   }
                                 , BallMoved newBall
                                 )
