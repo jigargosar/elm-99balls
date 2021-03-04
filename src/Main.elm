@@ -1280,9 +1280,11 @@ viewState frame pointer targets state =
                 ]
 
 
-viewKillAnims now kas =
+viewKillAnims : Float -> List KillAnim -> Svg msg
+viewKillAnims now killAnimations =
     let
-        vka { start, position } =
+        viewKillAnim : KillAnim -> Svg msg
+        viewKillAnim { start, position } =
             let
                 elapsed =
                     now - start
@@ -1317,7 +1319,7 @@ viewKillAnims now kas =
                     []
                 ]
     in
-    group [] (List.map vka kas)
+    group [] (List.map viewKillAnim killAnimations)
 
 
 viewTutorial : Float -> Float -> Svg msg
