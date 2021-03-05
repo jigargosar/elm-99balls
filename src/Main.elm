@@ -212,11 +212,11 @@ settledFloorBallsPosition now fbs =
             Nothing
 
 
-addNewFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
-addNewFloorBalls now balls fbs =
+stepFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
+stepFloorBalls now newFloored fbs =
     case fbs of
         EmptyFloorBalls ->
-            case List.unconsLast balls of
+            case List.unconsLast newFloored of
                 Nothing ->
                     EmptyFloorBalls
 
@@ -224,7 +224,7 @@ addNewFloorBalls now balls fbs =
                     NonEmptyFloorBalls first.position (others |> List.map (initFloorBallAnim now))
 
         NonEmptyFloorBalls first anims ->
-            NonEmptyFloorBalls first (List.map (initFloorBallAnim now) balls ++ anims)
+            NonEmptyFloorBalls first (List.map (initFloorBallAnim now) newFloored ++ anims)
 
 
 viewFloorBalls : Float -> FloorBalls -> Svg msg
@@ -828,7 +828,7 @@ stepSim frame game sim =
             Sim_
                 { emitter = newEmitter
                 , balls = Maybe.cons emittedBall newBalls.moved
-                , floorBalls = addNewFloorBalls frame newBalls.floored sim.floorBalls
+                , floorBalls = stepFloorBalls frame newBalls.floored sim.floorBalls
                 , killSoundIdx = newKillSoundIdx
                 , killAnims = stepKillAnims frame acc.solidTargetsKilled sim.killAnims
                 }
