@@ -146,63 +146,6 @@ type alias Sim =
     }
 
 
-type Anim a
-    = Anim { start : Float, duration : Float, data : a }
-
-
-type alias Anim0 =
-    Anim ()
-
-
-initAnim : Float -> Float -> a -> Anim a
-initAnim now duration data =
-    Anim { start = now, duration = duration, data = data }
-
-
-initAnim0 : Float -> Float -> Anim0
-initAnim0 now duration =
-    initAnim now duration ()
-
-
-allAnimDone : Float -> List (Anim a) -> Bool
-allAnimDone now =
-    List.all (isAnimDone now)
-
-
-isAnimDone : Float -> Anim a -> Bool
-isAnimDone now (Anim { start, duration }) =
-    now - start >= duration
-
-
-viewAnim : Float -> (Float -> a -> b) -> Anim a -> Maybe b
-viewAnim now fn ((Anim { data }) as anim) =
-    animProgress now anim
-        |> Maybe.map (\progress -> fn progress data)
-
-
-animProgress : Float -> Anim a -> Maybe Float
-animProgress now anim =
-    let
-        progress =
-            unsafe__AnimProgress now anim
-    in
-    if progress >= 0 && progress < 1 then
-        Just progress
-
-    else
-        Nothing
-
-
-unsafe__AnimProgress : Float -> Anim a -> Float
-unsafe__AnimProgress now (Anim { start, duration }) =
-    (now - start) / duration
-
-
-clampedAnimProgress : Float -> Anim a -> Float
-clampedAnimProgress now anim =
-    unsafe__AnimProgress now anim |> clamp 0 1
-
-
 type alias KillAnim =
     Anim Vec
 
@@ -1702,3 +1645,64 @@ group =
 
 fade o =
     T.opacity (Opacity o)
+
+
+
+-- ANIM
+
+
+type Anim a
+    = Anim { start : Float, duration : Float, data : a }
+
+
+type alias Anim0 =
+    Anim ()
+
+
+initAnim : Float -> Float -> a -> Anim a
+initAnim now duration data =
+    Anim { start = now, duration = duration, data = data }
+
+
+initAnim0 : Float -> Float -> Anim0
+initAnim0 now duration =
+    initAnim now duration ()
+
+
+allAnimDone : Float -> List (Anim a) -> Bool
+allAnimDone now =
+    List.all (isAnimDone now)
+
+
+isAnimDone : Float -> Anim a -> Bool
+isAnimDone now (Anim { start, duration }) =
+    now - start >= duration
+
+
+viewAnim : Float -> (Float -> a -> b) -> Anim a -> Maybe b
+viewAnim now fn ((Anim { data }) as anim) =
+    animProgress now anim
+        |> Maybe.map (\progress -> fn progress data)
+
+
+animProgress : Float -> Anim a -> Maybe Float
+animProgress now anim =
+    let
+        progress =
+            unsafe__AnimProgress now anim
+    in
+    if progress >= 0 && progress < 1 then
+        Just progress
+
+    else
+        Nothing
+
+
+unsafe__AnimProgress : Float -> Anim a -> Float
+unsafe__AnimProgress now (Anim { start, duration }) =
+    (now - start) / duration
+
+
+clampedAnimProgress : Float -> Anim a -> Float
+clampedAnimProgress now anim =
+    unsafe__AnimProgress now anim |> clamp 0 1
