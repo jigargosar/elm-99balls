@@ -827,7 +827,7 @@ stepSim frame game sim =
         | state =
             Sim_
                 { emitter = newEmitter
-                , balls = Maybe.cons emittedBall newBalls.updated
+                , balls = Maybe.cons emittedBall newBalls.moved
                 , floorBalls = addNewFloorBalls frame newBalls.floored sim.floorBalls
                 , killSoundIdx = newKillSoundIdx
                 , killAnims = stepAndThenAddKillAnims frame acc.solidTargetsKilled sim.killAnims
@@ -864,7 +864,7 @@ playKillSound totalKills =
 
 
 type alias UpdatedBalls =
-    { floored : List Ball, updated : List Ball }
+    { floored : List Ball, moved : List Ball }
 
 
 stepSimBalls : List Target -> List Ball -> ( BallUpdateAcc, UpdatedBalls )
@@ -876,13 +876,13 @@ stepSimBalls targets =
                     (\ballUpdate ->
                         case ballUpdate of
                             BallMoved b ->
-                                { newBalls | updated = b :: newBalls.updated }
+                                { newBalls | moved = b :: newBalls.moved }
 
                             BallFloored b ->
                                 { newBalls | floored = b :: newBalls.floored }
                     )
         )
-        ( initBallUpdateAcc targets, { floored = [], updated = [] } )
+        ( initBallUpdateAcc targets, { floored = [], moved = [] } )
 
 
 validAimAngleTowards : Vec -> Vec -> Maybe Float
