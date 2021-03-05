@@ -806,38 +806,20 @@ stepSim frame game sim =
         ( acc, newBalls ) =
             stepSimBalls game.targets sim.balls
 
-        ( ( emittedBall, newEmitter ), emitBallSoundCmd ) =
+        ( emittedBall, newEmitter ) =
             case stepEmitter frame sim.emitter of
                 Just ( eb, emitter ) ->
-                    ( ( Just eb, emitter ), playSound "shoot" )
+                    ( Just eb, emitter )
 
                 Nothing ->
-                    ( ( Nothing, sim.emitter ), Cmd.none )
+                    ( Nothing, sim.emitter )
 
-        ( killSoundIdx, killSoundCmd ) =
+        newKillSoundIdx =
             if acc.solidTargetsKilled == [] then
-                ( sim.killSoundIdx, Cmd.none )
+                sim.killSoundIdx
 
             else
-                let
-                    idx =
-                        1 + sim.killSoundIdx
-                in
-                ( idx, playKillSound idx )
-
-        targetHitSoundCmd =
-            if acc.solidTargetHits > 0 then
-                playSound "hit"
-
-            else
-                Cmd.none
-
-        bonusCollectedSoundCmd =
-            if acc.bonusBallsCollected >= 1 then
-                playSound "bonus_hit"
-
-            else
-                Cmd.none
+                1 + sim.killSoundIdx
     in
     ( { game
         | state =
@@ -845,7 +827,7 @@ stepSim frame game sim =
                 { emitter = newEmitter
                 , balls = Maybe.cons emittedBall newBalls.updated
                 , floorBalls = addNewFloorBalls frame newBalls.floored sim.floorBalls
-                , killSoundIdx = killSoundIdx
+                , killSoundIdx = newKillSoundIdx
                 , killAnims =
                     List.map (initKillAnim frame) acc.solidTargetsKilled
                         ++ reject (isKillAnimDone frame) sim.killAnims
@@ -854,12 +836,20 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
       }
     , Cmd.batch
-        [ targetHitSoundCmd
-        , bonusCollectedSoundCmd
-        , killSoundCmd
-        , emitBallSoundCmd
+        [ cmdIfTrue (acc.solidTargetHits > 0) (playSound "hit")
+        , cmdIfTrue (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
+        , cmdIfTrue (newKillSoundIdx > sim.killSoundIdx) (playKillSound newKillSoundIdx)
+        , cmdIfTrue (emittedBall /= Nothing) (playSound "shoot")
         ]
     )
+
+
+cmdIfTrue bool cmd =
+    if bool then
+        cmd
+
+    else
+        Cmd.none
 
 
 playKillSound : Int -> Cmd msg
