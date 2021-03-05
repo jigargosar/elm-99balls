@@ -130,11 +130,11 @@ transitionDuration =
 
 
 type State
-    = TargetsEntering { anim : Anim (), ballPosition : Vec }
+    = TargetsEntering { anim : Anim0, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | Aiming { dragStartAt : Vec, ballPosition : Vec }
     | Simulating Sim
-    | GameLost (Anim ())
+    | GameLost Anim0
 
 
 type alias Sim =
@@ -150,27 +150,57 @@ type Anim a
     = Anim { start : Float, duration : Float, data : a }
 
 
+type alias Anim0 =
+    Anim ()
+
+
 initAnim : Float -> Float -> a -> Anim a
 initAnim now duration data =
     Anim { start = now, duration = duration, data = data }
 
 
+initAnim0 : Float -> Float -> Anim0
+initAnim0 now duration =
+    initAnim now duration ()
+
+
 allAnimDone : Float -> List (Anim a) -> Bool
 allAnimDone now =
-    List.all (\(Anim { start, duration }) -> now - start >= duration)
+    List.all (isAnimDone now)
+
+
+isAnimDone : Float -> Anim a -> Bool
+isAnimDone now (Anim { start, duration }) =
+    now - start >= duration
 
 
 viewAnim : Float -> (Float -> a -> b) -> Anim a -> Maybe b
-viewAnim now fn (Anim { start, duration, data }) =
+viewAnim now fn ((Anim { data }) as anim) =
+    animProgress now anim
+        |> Maybe.map (\progress -> fn progress data)
+
+
+animProgress : Float -> Anim a -> Maybe Float
+animProgress now anim =
     let
         progress =
-            (now - start) / duration
+            unsafeAnimProgress now anim
     in
     if progress >= 0 && progress < 1 then
-        Just (fn progress data)
+        Just progress
 
     else
         Nothing
+
+
+unsafeAnimProgress : Float -> Anim a -> Float
+unsafeAnimProgress now (Anim { start, duration }) =
+    (now - start) / duration
+
+
+clampedAnimProgress : Float -> Anim a -> Float
+clampedAnimProgress now anim =
+    unsafeAnimProgress now anim |> clamp 0 1
 
 
 type alias KillAnim =
@@ -645,11 +675,7 @@ initGame : Float -> Seed -> Game
 initGame now seed =
     { ballCount = 10
     , targets = []
-    , state =
-        TargetsEntering
-            { anim = initAnim now transitionDuration ()
-            , ballPosition = initialBallPosition
-            }
+    , state = initTargetsEnteringState now initialBallPosition
     , turn = 0
     , seed = seed
     }
@@ -728,7 +754,7 @@ initWaitingForInputState ballPosition =
 initTargetsEnteringState : Float -> Vec -> State
 initTargetsEnteringState now ballPosition =
     TargetsEntering
-        { anim = initAnim now transitionDuration ()
+        { anim = initAnim0 now transitionDuration
         , ballPosition = ballPosition
         }
 
@@ -748,7 +774,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             ( game, Cmd.none )
 
         TargetsEntering { anim, ballPosition } ->
-            ( if allAnimDone frame [ anim ] then
+            ( if isAnimDone frame anim then
                 { game | state = initWaitingForInputState ballPosition }
 
               else
@@ -791,7 +817,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 initTargetsEnteringState frame ballPosition
 
                             else
-                                GameLost (initAnim frame transitionDuration ())
+                                GameLost (initAnim0 frame transitionDuration)
                       }
                         |> incTurnThenAddTargetRow
                     , Cmd.none
@@ -1389,8 +1415,7 @@ viewGameLost : Float -> Game -> Html Msg
 viewGameLost now { state } =
     case state of
         GameLost anim ->
-            viewAnim now (\p _ -> viewGameLostHelp p) anim
-                |> Maybe.withDefault noView
+            viewGameLostHelp (clampedAnimProgress now anim)
 
         _ ->
             noView
@@ -1496,17 +1521,15 @@ viewTargets : Float -> State -> List Target -> Svg msg
 viewTargets now state targets =
     let
         progress =
-            (case state of
+            case state of
                 GameLost anim ->
-                    viewAnim now (\p _ -> p) anim
+                    clampedAnimProgress now anim
 
                 TargetsEntering { anim } ->
-                    viewAnim now (\p _ -> p) anim
+                    clampedAnimProgress now anim
 
                 _ ->
-                    Nothing
-            )
-                |> Maybe.withDefault 1
+                    1
     in
     viewTargetsHelp now progress targets
 
