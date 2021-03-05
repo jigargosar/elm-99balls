@@ -850,14 +850,6 @@ stepAndThenAddKillAnims frame killPositions killAnims =
         ++ reject (isKillAnimDone frame) killAnims
 
 
-cmdIfTrue bool cmd =
-    if bool then
-        cmd
-
-    else
-        Cmd.none
-
-
 playKillSound : Int -> Cmd msg
 playKillSound totalKills =
     playSound ("kill_" ++ String.fromInt (atMost 8 totalKills))

@@ -581,6 +581,14 @@ eq =
     (==)
 
 
+cmdIfTrue bool cmd =
+    if bool then
+        cmd
+
+    else
+        Cmd.none
+
+
 inc =
     add 1
 
