@@ -156,22 +156,39 @@ type alias Sim =
     }
 
 
+type Anim a
+    = Anim { start : Float, duration : Float, data : a }
+
+
+initAnim : Float -> Float -> a -> Anim a
+initAnim now duration data =
+    Anim { start = now, duration = duration, data = data }
+
+
+viewAnim : Float -> (Float -> a -> b) -> Anim a -> Maybe b
+viewAnim now fn (Anim { start, duration, data }) =
+    let
+        progress =
+            (now - start) / duration
+    in
+    if progress >= 0 && progress < 1 then
+        Just (fn progress data)
+
+    else
+        Nothing
+
+
 type alias KillAnim =
-    { start : Float, position : Vec }
-
-
-killAnimDur =
-    40
+    Anim Vec
 
 
 initKillAnim : Float -> Vec -> KillAnim
 initKillAnim now position =
-    { start = now, position = position }
-
-
-isKillAnimDone : Float -> KillAnim -> Bool
-isKillAnimDone now { start } =
-    now - start > killAnimDur
+    let
+        killAnimDur =
+            40
+    in
+    initAnim now killAnimDur position
 
 
 type FloorBalls
@@ -846,8 +863,7 @@ stepSim frame game sim =
 
 stepKillAnims : Float -> List Vec -> List KillAnim -> List KillAnim
 stepKillAnims frame newKillPositions killAnims =
-    List.map (initKillAnim frame) newKillPositions
-        ++ reject (isKillAnimDone frame) killAnims
+    List.map (initKillAnim frame) newKillPositions ++ killAnims
 
 
 playKillSound : Int -> Cmd msg
@@ -1225,16 +1241,9 @@ viewState frame pointer targets state =
 viewKillAnims : Float -> List KillAnim -> Svg msg
 viewKillAnims now killAnimations =
     let
-        viewKillAnim : KillAnim -> Svg msg
-        viewKillAnim { start, position } =
+        viewKillAnim : Float -> Vec -> Svg msg
+        viewKillAnim progress position =
             let
-                elapsed =
-                    now - start
-
-                progress : Float
-                progress =
-                    elapsed / killAnimDur |> clamp 0 1
-
                 s =
                     if progress < 0.2 then
                         progress * -(gc.targetR * 2)
@@ -1261,7 +1270,7 @@ viewKillAnims now killAnimations =
                     []
                 ]
     in
-    group [] (List.map viewKillAnim killAnimations)
+    group [] (List.filterMap (viewAnim now viewKillAnim) killAnimations)
 
 
 viewTutorial : Float -> Float -> Svg msg
