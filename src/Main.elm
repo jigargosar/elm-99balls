@@ -721,7 +721,11 @@ updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         GameLost _ ->
-            ( game, Cmd.none )
+            if pointerDown && not prevPointerDown then
+                ( reStartGame frame game, Cmd.none )
+
+            else
+                ( game, Cmd.none )
 
         TargetsEntering { anim, ballPosition } ->
             ( if isAnimDone frame anim then
@@ -1099,8 +1103,7 @@ view (Model env game) =
 
 viewGame : Env -> Game -> List (Html Msg)
 viewGame { vri, frame, pointer } g =
-    [ viewGameLost frame g
-    , Svg.svg (svgAttrs vri)
+    [ Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
         , group []
             [ viewHeader g.turn
@@ -1115,6 +1118,7 @@ viewGame { vri, frame, pointer } g =
 
               else
                 noView
+            , viewGameLost2 frame g
             ]
         ]
     ]
@@ -1359,6 +1363,29 @@ svgAttrs vri =
 
 viewBoxFromRI ri =
     T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
+
+
+viewGameLost2 now { state } =
+    case state of
+        GameLost anim ->
+            let
+                progress =
+                    clampedAnimProgress now anim
+            in
+            group [ onClick RestartGameClicked ]
+                [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+                , group
+                    [ fillH 0.14
+                    , fillH 0.14
+                    , fade progress
+                    ]
+                    [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
+                    , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+                    ]
+                ]
+
+        _ ->
+            noView
 
 
 viewGameLost : Float -> Game -> Html Msg
