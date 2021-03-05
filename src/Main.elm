@@ -836,10 +836,10 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
       }
     , Cmd.batch
-        [ cmdIfTrue (acc.solidTargetHits > 0) (playSound "hit")
-        , cmdIfTrue (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
-        , cmdIfTrue (newKillSoundIdx > sim.killSoundIdx) (playKillSound newKillSoundIdx)
-        , cmdIfTrue (emittedBall /= Nothing) (playSound "shoot")
+        [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
+        , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
+        , cmdIf (newKillSoundIdx > sim.killSoundIdx) (playKillSound newKillSoundIdx)
+        , cmdIf (emittedBall /= Nothing) (playSound "shoot")
         ]
     )
 

@@ -581,7 +581,7 @@ eq =
     (==)
 
 
-cmdIfTrue bool cmd =
+cmdIf bool cmd =
     if bool then
         cmd
 
