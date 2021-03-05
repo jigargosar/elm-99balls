@@ -184,7 +184,7 @@ animProgress : Float -> Anim a -> Maybe Float
 animProgress now anim =
     let
         progress =
-            unsafeAnimProgress now anim
+            unsafe__AnimProgress now anim
     in
     if progress >= 0 && progress < 1 then
         Just progress
@@ -193,14 +193,14 @@ animProgress now anim =
         Nothing
 
 
-unsafeAnimProgress : Float -> Anim a -> Float
-unsafeAnimProgress now (Anim { start, duration }) =
+unsafe__AnimProgress : Float -> Anim a -> Float
+unsafe__AnimProgress now (Anim { start, duration }) =
     (now - start) / duration
 
 
 clampedAnimProgress : Float -> Anim a -> Float
 clampedAnimProgress now anim =
-    unsafeAnimProgress now anim |> clamp 0 1
+    unsafe__AnimProgress now anim |> clamp 0 1
 
 
 type alias KillAnim =
