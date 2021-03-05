@@ -276,8 +276,8 @@ initEmitter frame ballPosition angle ballCount =
         { start = frame, remaining = ballCount - 1 }
 
 
-emitterBall : Emitter -> Maybe Ball
-emitterBall emitter =
+nextEmitterBall : Emitter -> Maybe Ball
+nextEmitterBall emitter =
     case emitter of
         Emitting ball _ ->
             Just ball
@@ -803,32 +803,38 @@ ballPositionOnSimEnd now sim =
 stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
-        ( { bonusBallsCollected, targets, solidTargetHits, solidTargetsKilled }, ( newSim, cmd ) ) =
-            stepSimHelp frame game.targets sim
+        ( acc, newBalls ) =
+            stepSimBalls game.targets sim.balls
+
+        ( emittedBall, newEmitter ) =
+            stepEmitter frame sim.emitter
+                |> Maybe.map (mapFst Just)
+                |> Maybe.withDefault ( Nothing, sim.emitter )
 
         newTotalKills =
-            atMost 1 (List.length solidTargetsKilled) + sim.totalKills
+            atMost 1 (List.length acc.solidTargetsKilled) + sim.totalKills
     in
     ( { game
         | state =
             Sim_
-                { newSim
-                    | totalKills = newTotalKills
-                    , killAnims =
-                        List.map (initKillAnim frame) solidTargetsKilled
-                            ++ reject (isKillAnimDone frame) sim.killAnims
+                { emitter = newEmitter
+                , balls = Maybe.cons emittedBall newBalls.updated
+                , floorBalls = addNewFloorBalls frame newBalls.floored sim.floorBalls
+                , totalKills = newTotalKills
+                , killAnims =
+                    List.map (initKillAnim frame) acc.solidTargetsKilled
+                        ++ reject (isKillAnimDone frame) sim.killAnims
                 }
-        , targets = targets
-        , ballCount = bonusBallsCollected + game.ballCount
+        , targets = acc.targets
+        , ballCount = acc.bonusBallsCollected + game.ballCount
       }
     , Cmd.batch
-        [ cmd
-        , if solidTargetHits >= 1 then
+        [ if acc.solidTargetHits >= 1 then
             playSound "hit"
 
           else
             Cmd.none
-        , if bonusBallsCollected >= 1 then
+        , if acc.bonusBallsCollected >= 1 then
             playSound "bonus_hit"
 
           else
@@ -838,39 +844,28 @@ stepSim frame game sim =
 
           else
             Cmd.none
+        , case emittedBall of
+            Just _ ->
+                playSound "shoot"
+
+            Nothing ->
+                Cmd.none
         ]
     )
 
 
-stepSimHelp : Float -> List Target -> Sim -> ( BallUpdateAcc, ( Sim, Cmd msg ) )
-stepSimHelp frame targets sim =
-    sim.balls
-        |> List.mapAccuml updateBall (initBallUpdateAcc targets)
-        |> mapSnd
-            (splitBallUpdates
-                >> (\{ floored, updated } ->
-                        { sim
-                            | balls = updated
-                            , floorBalls = addNewFloorBalls frame floored sim.floorBalls
-                        }
-                            |> stepSimEmitter frame
-                   )
-            )
+type alias UpdatedBalls =
+    { floored : List Ball, updated : List Ball }
 
 
-stepSimEmitter : Float -> Sim -> ( Sim, Cmd msg )
-stepSimEmitter frame sim =
-    case stepEmitter frame sim.emitter of
-        Just ( ball, emitter ) ->
-            ( { sim
-                | balls = ball :: sim.balls
-                , emitter = emitter
-              }
-            , playSound "shoot"
-            )
-
-        Nothing ->
-            ( sim, Cmd.none )
+stepSimBalls : List Target -> List Ball -> ( BallUpdateAcc, UpdatedBalls )
+stepSimBalls targets balls =
+    let
+        ( acc, bus ) =
+            balls
+                |> List.mapAccuml updateBall (initBallUpdateAcc targets)
+    in
+    ( acc, splitBallUpdates bus )
 
 
 validAimAngleTowards : Vec -> Vec -> Maybe Float
@@ -1242,7 +1237,7 @@ viewState frame pointer targets state =
 
         Sim_ sim ->
             group []
-                [ viewBalls (Maybe.cons (emitterBall sim.emitter) sim.balls)
+                [ viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
                 , viewFloorBalls frame sim.floorBalls
                 , viewKillAnims frame sim.killAnims
                 ]
