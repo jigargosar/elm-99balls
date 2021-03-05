@@ -830,7 +830,7 @@ stepSim frame game sim =
                 , balls = Maybe.cons emittedBall newBalls.moved
                 , floorBalls = addNewFloorBalls frame newBalls.floored sim.floorBalls
                 , killSoundIdx = newKillSoundIdx
-                , killAnims = stepAndThenAddKillAnims frame acc.solidTargetsKilled sim.killAnims
+                , killAnims = stepKillAnims frame acc.solidTargetsKilled sim.killAnims
                 }
         , targets = acc.targets
         , ballCount = acc.bonusBallsCollected + game.ballCount
@@ -844,8 +844,8 @@ stepSim frame game sim =
     )
 
 
-stepAndThenAddKillAnims : Float -> List Vec -> List KillAnim -> List KillAnim
-stepAndThenAddKillAnims frame killPositions killAnims =
+stepKillAnims : Float -> List Vec -> List KillAnim -> List KillAnim
+stepKillAnims frame killPositions killAnims =
     List.map (initKillAnim frame) killPositions
         ++ reject (isKillAnimDone frame) killAnims
 
