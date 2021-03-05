@@ -143,7 +143,7 @@ type State
     = TargetsEntering { start : Float, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | Aiming { dragStartAt : Vec, ballPosition : Vec }
-    | Sim_ Sim
+    | Simulating Sim
     | GameLost Float
 
 
@@ -767,7 +767,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 initWaitingForInputState ballPosition
 
                             Just angle ->
-                                Sim_ (initSim frame ballPosition angle game.ballCount)
+                                Simulating (initSim frame ballPosition angle game.ballCount)
                 }
 
               else
@@ -775,7 +775,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             , Cmd.none
             )
 
-        Sim_ sim ->
+        Simulating sim ->
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
                     ( { game
@@ -825,7 +825,7 @@ stepSim frame game sim =
     in
     ( { game
         | state =
-            Sim_
+            Simulating
                 { emitter = newEmitter
                 , balls = Maybe.cons emittedBall newBalls.moved
                 , floorBalls = stepFloorBalls frame newBalls.floored sim.floorBalls
@@ -1151,7 +1151,7 @@ shouldDisplayTutorial turn state =
             Aiming _ ->
                 True
 
-            Sim_ _ ->
+            Simulating _ ->
                 False
 
             GameLost _ ->
@@ -1214,7 +1214,7 @@ viewState frame pointer targets state =
                             ]
                 ]
 
-        Sim_ sim ->
+        Simulating sim ->
             group []
                 [ viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
                 , viewFloorBalls frame sim.floorBalls
