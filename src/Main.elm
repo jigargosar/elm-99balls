@@ -873,8 +873,8 @@ stepSimBalls targets =
         (\ball ( acc, newBalls ) ->
             updateBall acc ball
                 |> mapSnd
-                    (\bu ->
-                        case bu of
+                    (\ballUpdate ->
+                        case ballUpdate of
                             BallMoved b ->
                                 { newBalls | updated = b :: newBalls.updated }
 
