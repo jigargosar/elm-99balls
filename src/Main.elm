@@ -616,11 +616,12 @@ reStartGame frame game =
 
 initGame : Float -> Seed -> Game
 initGame now seed =
-    { ballCount = 1
+    { ballCount = 10
     , targets = []
     , state =
         initTargetsEnteringState now initialBallPosition
-            |> always (initGameLost now)
+
+    --|> always (initGameLost now)
     , turn = 0
     , seed = seed
     }
