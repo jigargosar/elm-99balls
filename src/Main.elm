@@ -129,22 +129,12 @@ transitionDuration =
     60 / 4
 
 
-transitionProgress : Float -> Float -> Float
-transitionProgress start now =
-    (now - start) / transitionDuration |> clamp 0 1
-
-
-transitionDone : Float -> Float -> Bool
-transitionDone start now =
-    transitionProgress start now >= 1
-
-
 type State
-    = TargetsEntering { start : Float, ballPosition : Vec }
+    = TargetsEntering { anim : Anim (), ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
     | Aiming { dragStartAt : Vec, ballPosition : Vec }
     | Simulating Sim
-    | GameLost Float
+    | GameLost (Anim ())
 
 
 type alias Sim =
@@ -652,10 +642,14 @@ reStartGame frame game =
 
 
 initGame : Float -> Seed -> Game
-initGame frame seed =
+initGame now seed =
     { ballCount = 10
     , targets = []
-    , state = TargetsEntering { start = frame, ballPosition = initialBallPosition }
+    , state =
+        TargetsEntering
+            { anim = initAnim now transitionDuration ()
+            , ballPosition = initialBallPosition
+            }
     , turn = 0
     , seed = seed
     }
@@ -732,9 +726,9 @@ initWaitingForInputState ballPosition =
 
 
 initTargetsEnteringState : Float -> Vec -> State
-initTargetsEnteringState start ballPosition =
+initTargetsEnteringState now ballPosition =
     TargetsEntering
-        { start = start
+        { anim = initAnim now transitionDuration ()
         , ballPosition = ballPosition
         }
 
@@ -753,8 +747,8 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
         GameLost _ ->
             ( game, Cmd.none )
 
-        TargetsEntering { start, ballPosition } ->
-            ( if transitionDone start frame then
+        TargetsEntering { anim, ballPosition } ->
+            ( if allAnimDone frame [ anim ] then
                 { game | state = initWaitingForInputState ballPosition }
 
               else
@@ -797,7 +791,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 initTargetsEnteringState frame ballPosition
 
                             else
-                                GameLost frame
+                                GameLost (initAnim frame transitionDuration ())
                       }
                         |> incTurnThenAddTargetRow
                     , Cmd.none
@@ -1394,8 +1388,9 @@ viewBoxFromRI ri =
 viewGameLost : Float -> Game -> Html Msg
 viewGameLost now { state } =
     case state of
-        GameLost start ->
-            viewGameLostHelp (transitionProgress start now)
+        GameLost anim ->
+            viewAnim now (\p _ -> viewGameLostHelp p) anim
+                |> Maybe.withDefault noView
 
         _ ->
             noView
@@ -1501,15 +1496,17 @@ viewTargets : Float -> State -> List Target -> Svg msg
 viewTargets now state targets =
     let
         progress =
-            case state of
-                GameLost start ->
-                    transitionProgress start now
+            (case state of
+                GameLost anim ->
+                    viewAnim now (\p _ -> p) anim
 
-                TargetsEntering { start } ->
-                    transitionProgress start now
+                TargetsEntering { anim } ->
+                    viewAnim now (\p _ -> p) anim
 
                 _ ->
-                    1
+                    Nothing
+            )
+                |> Maybe.withDefault 1
     in
     viewTargetsHelp now progress targets
 
