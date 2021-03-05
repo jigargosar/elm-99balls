@@ -4,7 +4,7 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import Html exposing (Attribute, Html, div, node, text)
+import Html exposing (Attribute, Html, div, node)
 import Html.Attributes as A exposing (style)
 import Html.Events as E exposing (onClick)
 import Json.Decode as JD exposing (Decoder)
