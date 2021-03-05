@@ -845,8 +845,8 @@ stepSim frame game sim =
 
 
 stepKillAnims : Float -> List Vec -> List KillAnim -> List KillAnim
-stepKillAnims frame killPositions killAnims =
-    List.map (initKillAnim frame) killPositions
+stepKillAnims frame newKillPositions killAnims =
+    List.map (initKillAnim frame) newKillPositions
         ++ reject (isKillAnimDone frame) killAnims
 
 
