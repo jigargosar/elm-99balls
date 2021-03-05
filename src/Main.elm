@@ -291,8 +291,15 @@ isEmitterDone =
     eq EmitterDone
 
 
-stepEmitter : Float -> Emitter -> Maybe ( Ball, Emitter )
+stepEmitter : Float -> Emitter -> ( Maybe Ball, Emitter )
 stepEmitter now emitter =
+    stepEmitterHelp now emitter
+        |> Maybe.map (mapFst Just)
+        |> Maybe.withDefault ( Nothing, emitter )
+
+
+stepEmitterHelp : Float -> Emitter -> Maybe ( Ball, Emitter )
+stepEmitterHelp now emitter =
     case emitter of
         Emitting ball { start, remaining } ->
             if now - start > 8 then
@@ -807,12 +814,7 @@ stepSim frame game sim =
             stepSimBalls game.targets sim.balls
 
         ( emittedBall, newEmitter ) =
-            case stepEmitter frame sim.emitter of
-                Just ( eb, emitter ) ->
-                    ( Just eb, emitter )
-
-                Nothing ->
-                    ( Nothing, sim.emitter )
+            stepEmitter frame sim.emitter
 
         newKillSoundIdx =
             if acc.solidTargetsKilled == [] then
