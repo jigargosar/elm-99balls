@@ -868,13 +868,21 @@ type alias UpdatedBalls =
 
 
 stepSimBalls : List Target -> List Ball -> ( BallUpdateAcc, UpdatedBalls )
-stepSimBalls targets balls =
-    let
-        ( acc, bus ) =
-            balls
-                |> List.mapAccuml updateBall (initBallUpdateAcc targets)
-    in
-    ( acc, splitBallUpdates bus )
+stepSimBalls targets =
+    List.foldl
+        (\ball ( acc, newBalls ) ->
+            updateBall acc ball
+                |> mapSnd
+                    (\bu ->
+                        case bu of
+                            BallMoved b ->
+                                { newBalls | updated = b :: newBalls.updated }
+
+                            BallFloored b ->
+                                { newBalls | floored = b :: newBalls.floored }
+                    )
+        )
+        ( initBallUpdateAcc targets, { floored = [], updated = [] } )
 
 
 validAimAngleTowards : Vec -> Vec -> Maybe Float
@@ -886,36 +894,6 @@ validAimAngleTowards to from =
 
     else
         Nothing
-
-
-splitBallUpdates : List BallUpdate -> { floored : List Ball, updated : List Ball }
-splitBallUpdates ballUpdates =
-    let
-        floored =
-            List.filterMap
-                (\bu ->
-                    case bu of
-                        BallFloored b ->
-                            Just b
-
-                        _ ->
-                            Nothing
-                )
-                ballUpdates
-
-        updated =
-            List.filterMap
-                (\bu ->
-                    case bu of
-                        BallMoved b ->
-                            Just b
-
-                        _ ->
-                            Nothing
-                )
-                ballUpdates
-    in
-    { floored = floored, updated = updated }
 
 
 incTurnThenAddTargetRow : Game -> Game
