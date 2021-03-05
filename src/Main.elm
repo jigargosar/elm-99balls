@@ -616,9 +616,11 @@ reStartGame frame game =
 
 initGame : Float -> Seed -> Game
 initGame now seed =
-    { ballCount = 10
+    { ballCount = 1
     , targets = []
-    , state = initTargetsEnteringState now initialBallPosition
+    , state =
+        initTargetsEnteringState now initialBallPosition
+            |> always (initGameLost now)
     , turn = 0
     , seed = seed
     }
@@ -710,6 +712,11 @@ initAimingTowardsState pointer ballPosition =
         }
 
 
+initGameLost : Float -> State
+initGameLost now =
+    GameLost (initAnim0 now transitionDuration)
+
+
 updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
@@ -760,7 +767,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 initTargetsEnteringState frame ballPosition
 
                             else
-                                GameLost (initAnim0 frame transitionDuration)
+                                initGameLost frame
                       }
                         |> incTurnThenAddTargetRow
                     , Cmd.none
