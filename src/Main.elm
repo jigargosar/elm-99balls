@@ -165,6 +165,11 @@ initAnim now duration data =
     Anim { start = now, duration = duration, data = data }
 
 
+allAnimDone : Float -> List (Anim a) -> Bool
+allAnimDone now =
+    List.all (\(Anim { start, duration }) -> now - start >= duration)
+
+
 viewAnim : Float -> (Float -> a -> b) -> Anim a -> Maybe b
 viewAnim now fn (Anim { start, duration, data }) =
     let
@@ -197,17 +202,12 @@ type FloorBalls
 
 
 type alias FloorBallAnim =
-    ( Float, Vec )
+    Anim Vec
 
 
 initFloorBallAnim : Float -> Ball -> FloorBallAnim
 initFloorBallAnim now ball =
-    ( now, ball.position )
-
-
-floorBallAnimDone : Float -> FloorBallAnim -> Bool
-floorBallAnimDone now ( start, _ ) =
-    transitionDone start now
+    initAnim now transitionDuration ball.position
 
 
 emptyFloorBalls : FloorBalls
@@ -219,7 +219,7 @@ settledFloorBallsPosition : Float -> FloorBalls -> Maybe Vec
 settledFloorBallsPosition now fbs =
     case fbs of
         NonEmptyFloorBalls first anims ->
-            if List.all (floorBallAnimDone now) anims then
+            if allAnimDone now anims then
                 Just first
 
             else
@@ -254,18 +254,14 @@ viewFloorBalls now fbs =
             group []
                 (viewBallAt first
                     :: (anims
-                            |> reject (floorBallAnimDone now)
-                            |> List.map (viewFloorBallAnim now first)
+                            |> List.filterMap (viewAnim now (viewFloorBallAnim first))
                        )
                 )
 
 
-viewFloorBallAnim : Float -> Vec -> FloorBallAnim -> Svg msg
-viewFloorBallAnim now toPosition ( start, position ) =
+viewFloorBallAnim : Vec -> Float -> Vec -> Svg msg
+viewFloorBallAnim toPosition progress position =
     let
-        progress =
-            transitionProgress start now
-
         newPosition =
             position |> vecMapX (\x -> lerp x toPosition.x progress)
     in
