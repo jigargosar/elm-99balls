@@ -1092,55 +1092,24 @@ view (Model env game) =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
             |> always noView
-        , div [ style "position" "relative" ]
-            (viewGame env game)
+        , viewGame env game
         ]
 
 
-viewGame : Env -> Game -> List (Html Msg)
+viewGame : Env -> Game -> Html Msg
 viewGame { vri, frame, pointer } g =
-    [ Svg.svg (svgAttrs vri)
+    Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
         , group []
             [ viewHeader g.turn
             , viewFooter g.ballCount
 
-            -- draw order matters, when showing aim/debug points
+            -- ^--^ draw order matters, when showing aim/debug points
             , viewTargets frame g.state g.targets
-            , viewState frame pointer g.targets g.state
+            , viewState frame pointer g.turn g.targets g.state
             , viewDebugPointer pointer |> hideView
-            , if shouldDisplayTutorial g.turn g.state then
-                viewTutorial 0 frame
-
-              else
-                noView
-            , viewGameLost frame g.state
             ]
         ]
-    ]
-
-
-shouldDisplayTutorial : Int -> State -> Bool
-shouldDisplayTutorial turn state =
-    if turn == 1 then
-        case state of
-            TargetsEntering _ ->
-                False
-
-            WaitingForInput _ ->
-                True
-
-            Aiming _ ->
-                True
-
-            Simulating _ ->
-                False
-
-            GameLost _ ->
-                False
-
-    else
-        False
 
 
 viewHeader : Int -> Svg Msg
@@ -1170,28 +1139,54 @@ viewFooter ballCount =
         ]
 
 
-viewState : Float -> Vec -> List Target -> State -> Svg Msg
-viewState frame pointer targets state =
+viewState : Float -> Vec -> Int -> List Target -> State -> Svg Msg
+viewState now pointer turn targets state =
     case state of
-        GameLost _ ->
-            noView
+        GameLost anim ->
+            let
+                progress =
+                    clampedAnimProgress now anim
+            in
+            group [ onClick RestartGameClicked ]
+                [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+                , group
+                    [ fillH 0.14
+                    , fillH 0.14
+                    , fade progress
+                    ]
+                    [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
+                    , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+                    ]
+                ]
 
         TargetsEntering { ballPosition } ->
             viewBallAt ballPosition
 
         WaitingForInput { ballPosition } ->
-            viewBallAt ballPosition
+            group []
+                [ viewBallAt ballPosition
+                , if turn == 1 then
+                    viewTutorial 0 now
+
+                  else
+                    noView
+                ]
 
         Aiming { dragStartAt, ballPosition } ->
             group []
                 [ viewBallAt ballPosition
+                , if turn == 1 then
+                    viewTutorial 0 now
+
+                  else
+                    noView
                 , case validAimAngleTowards dragStartAt pointer of
                     Nothing ->
                         noView
 
                     Just angle ->
                         group []
-                            [ viewTravelPath frame (ballTravelPath targets ballPosition angle)
+                            [ viewTravelPath now (ballTravelPath targets ballPosition angle)
                             , viewDebugPoints [ pointer, dragStartAt ]
                             ]
                 ]
@@ -1199,8 +1194,8 @@ viewState frame pointer targets state =
         Simulating sim ->
             group []
                 [ viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
-                , viewFloorBalls frame sim.floorBalls
-                , viewKillAnims frame sim.killAnims
+                , viewFloorBalls now sim.floorBalls
+                , viewKillAnims now sim.killAnims
                 ]
 
 
@@ -1359,30 +1354,6 @@ svgAttrs vri =
 
 viewBoxFromRI ri =
     T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
-
-
-viewGameLost : Float -> State -> Svg Msg
-viewGameLost now state =
-    case state of
-        GameLost anim ->
-            let
-                progress =
-                    clampedAnimProgress now anim
-            in
-            group [ onClick RestartGameClicked ]
-                [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
-                , group
-                    [ fillH 0.14
-                    , fillH 0.14
-                    , fade progress
-                    ]
-                    [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
-                    , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
-                    ]
-                ]
-
-        _ ->
-            noView
 
 
 viewDebugPointer pointer =
