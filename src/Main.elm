@@ -151,7 +151,7 @@ type alias Sim =
     { emitter : Emitter
     , balls : List Ball
     , floorBalls : FloorBalls
-    , totalKills : Int
+    , killSoundIdx : Int
     , killAnims : List KillAnim
     }
 
@@ -260,7 +260,7 @@ initSim frame ballPosition angle ballCount =
     { emitter = initEmitter frame ballPosition angle ballCount
     , balls = []
     , floorBalls = emptyFloorBalls
-    , totalKills = 0
+    , killSoundIdx = 0
     , killAnims = []
     }
 
@@ -806,13 +806,38 @@ stepSim frame game sim =
         ( acc, newBalls ) =
             stepSimBalls game.targets sim.balls
 
-        ( emittedBall, newEmitter ) =
-            stepEmitter frame sim.emitter
-                |> Maybe.map (mapFst Just)
-                |> Maybe.withDefault ( Nothing, sim.emitter )
+        ( ( emittedBall, newEmitter ), emitBallSoundCmd ) =
+            case stepEmitter frame sim.emitter of
+                Just ( eb, emitter ) ->
+                    ( ( Just eb, emitter ), playSound "shoot" )
 
-        newTotalKills =
-            atMost 1 (List.length acc.solidTargetsKilled) + sim.totalKills
+                Nothing ->
+                    ( ( Nothing, sim.emitter ), Cmd.none )
+
+        ( killSoundIdx, killSoundCmd ) =
+            if acc.solidTargetsKilled == [] then
+                ( sim.killSoundIdx, Cmd.none )
+
+            else
+                let
+                    idx =
+                        1 + sim.killSoundIdx
+                in
+                ( idx, playKillSound idx )
+
+        targetHitSoundCmd =
+            if acc.solidTargetHits > 0 then
+                playSound "hit"
+
+            else
+                Cmd.none
+
+        bonusCollectedSoundCmd =
+            if acc.bonusBallsCollected >= 1 then
+                playSound "bonus_hit"
+
+            else
+                Cmd.none
     in
     ( { game
         | state =
@@ -820,7 +845,7 @@ stepSim frame game sim =
                 { emitter = newEmitter
                 , balls = Maybe.cons emittedBall newBalls.updated
                 , floorBalls = addNewFloorBalls frame newBalls.floored sim.floorBalls
-                , totalKills = newTotalKills
+                , killSoundIdx = killSoundIdx
                 , killAnims =
                     List.map (initKillAnim frame) acc.solidTargetsKilled
                         ++ reject (isKillAnimDone frame) sim.killAnims
@@ -829,29 +854,17 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
       }
     , Cmd.batch
-        [ if acc.solidTargetHits >= 1 then
-            playSound "hit"
-
-          else
-            Cmd.none
-        , if acc.bonusBallsCollected >= 1 then
-            playSound "bonus_hit"
-
-          else
-            Cmd.none
-        , if newTotalKills > sim.totalKills then
-            playSound ("kill_" ++ String.fromInt (atMost 8 newTotalKills))
-
-          else
-            Cmd.none
-        , case emittedBall of
-            Just _ ->
-                playSound "shoot"
-
-            Nothing ->
-                Cmd.none
+        [ targetHitSoundCmd
+        , bonusCollectedSoundCmd
+        , killSoundCmd
+        , emitBallSoundCmd
         ]
     )
+
+
+playKillSound : Int -> Cmd msg
+playKillSound totalKills =
+    playSound ("kill_" ++ String.fromInt (atMost 8 totalKills))
 
 
 type alias UpdatedBalls =
