@@ -721,11 +721,7 @@ updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         GameLost _ ->
-            if pointerDown && not prevPointerDown then
-                ( reStartGame frame game, Cmd.none )
-
-            else
-                ( game, Cmd.none )
+            ( game, Cmd.none )
 
         TargetsEntering { anim, ballPosition } ->
             ( if isAnimDone frame anim then
@@ -1118,7 +1114,7 @@ viewGame { vri, frame, pointer } g =
 
               else
                 noView
-            , viewGameLost2 frame g
+            , viewGameLost frame g.state
             ]
         ]
     ]
@@ -1365,7 +1361,8 @@ viewBoxFromRI ri =
     T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
 
 
-viewGameLost2 now { state } =
+viewGameLost : Float -> State -> Svg Msg
+viewGameLost now state =
     case state of
         GameLost anim ->
             let
@@ -1386,47 +1383,6 @@ viewGameLost2 now { state } =
 
         _ ->
             noView
-
-
-viewGameLost : Float -> Game -> Html Msg
-viewGameLost now { state } =
-    case state of
-        GameLost anim ->
-            viewGameLostHelp (clampedAnimProgress now anim)
-
-        _ ->
-            noView
-
-
-viewGameLostHelp : Float -> Html Msg
-viewGameLostHelp progress =
-    div
-        [ style "position" "absolute"
-        , style "width" "100%"
-        , style "height" "100%"
-        , style "display" "flex"
-        , style "flex-direction" "column"
-        , style "align-items" "center"
-        , style "justify-content" "center"
-        , style "color" (fromHue 0.15 |> Color.toCssString)
-        , style "font-size" "2rem"
-        , style "user-select" "none"
-        , onClick RestartGameClicked
-        , style "background-color"
-            (let
-                alphaS =
-                    progress
-                        |> lerp 0 0.9
-                        |> mul 100
-                        |> round
-                        |> String.fromInt
-             in
-             "rgb(0 0 0 / " ++ alphaS ++ "%)"
-            )
-        ]
-        [ div [ style "font-size" "3rem" ] [ text "Game Over" ]
-        , div [] [ text "Tap to Continue" ]
-        ]
 
 
 viewDebugPointer pointer =
