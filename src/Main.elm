@@ -1442,7 +1442,8 @@ viewTargets now state targets =
         dy =
             (1 - progress) * -(gc.cri.y * 2)
     in
-    group [ transform [ translateXY 0 dy ] ] (List.map (viewTarget now) targets)
+    group [ transform [ translateXY 0 dy ] ]
+        (List.map (viewTarget now) targets)
 
 
 viewTarget : Float -> Target -> Svg msg
@@ -1478,6 +1479,7 @@ bonusAnimPosition now position =
     vecAdd position dxy
 
 
+viewSolidTarget : Vec -> Int -> Svg msg
 viewSolidTarget position hp =
     let
         radius =
@@ -1504,20 +1506,8 @@ viewSolidTarget position hp =
 
 
 viewBalls : List Ball -> Svg Msg
-viewBalls =
-    let
-        do balls =
-            group [] (List.map viewBall balls)
-
-        viewBall : Ball -> Svg Msg
-        viewBall ball =
-            let
-                p =
-                    vecRound ball.position
-            in
-            viewBallAt p
-    in
-    do
+viewBalls balls =
+    group [] (List.map (.position >> viewBallAt) balls)
 
 
 viewBallAt : Vec -> Svg msg
