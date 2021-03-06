@@ -32,7 +32,7 @@ port playSound : String -> Cmd msg
 
   - [x] target kill anim
 
-  - make bonus anim bit staggered.
+  - [x] make bonus anim bit staggered.
 
   - stars
 
