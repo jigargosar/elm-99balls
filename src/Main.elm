@@ -25,6 +25,9 @@ import Util exposing (..)
 port playSound : String -> Cmd msg
 
 
+port saveStars : Int -> Cmd msg
+
+
 {-|
 
 

@@ -22,6 +22,9 @@ function mapValues(fn, obj) {
         )
 }
 
+app.ports["saveStars"]["subscribe"]((function (stars) {
+    localStorage.setItem("stars", stars)
+}))
 
 app.ports["playSound"]["subscribe"]((function () {
     const soundPathMapping =
