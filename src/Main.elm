@@ -819,6 +819,9 @@ stepSim frame game sim =
 
             else
                 1 + sim.killSoundIdx
+
+        newStars =
+            game.stars + acc.starsCollected
     in
     ( { game
         | state =
@@ -831,6 +834,7 @@ stepSim frame game sim =
                 }
         , targets = acc.targets
         , ballCount = acc.bonusBallsCollected + game.ballCount
+        , stars = newStars
       }
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
@@ -838,6 +842,7 @@ stepSim frame game sim =
         , cmdIf (acc.starsCollected >= 1) (playSound "bonus_hit")
         , cmdIf (newKillSoundIdx > sim.killSoundIdx) (playKillSound newKillSoundIdx)
         , cmdIf (emittedBall /= Nothing) (playSound "shoot")
+        , cmdIf (newStars /= game.stars) (saveStars newStars)
         ]
     )
 
@@ -1123,7 +1128,7 @@ viewGame { vri, frame, pointer } g =
         [ rect wc.ri [ fillP black ]
         , group []
             [ viewHeader g.turn
-            , viewFooter g.ballCount
+            , viewFooter g.ballCount g.stars
 
             -- ^--^ draw order matters, when showing aim/debug points
             , viewTargets frame g.state g.targets
@@ -1150,13 +1155,39 @@ viewHeader turn =
         ]
 
 
-viewFooter : Int -> Svg msg
-viewFooter ballCount =
+viewFooter : Int -> Int -> Svg msg
+viewFooter ballCount stars =
+    let
+        off =
+            gc.cellR * 0.8
+
+        off2 =
+            off * 3
+    in
     group [ transform [ translate wc.footer.c ] ]
         [ rect wc.footer.ri [ fillP <| hsl 0.07 0.8 0.5 ]
-        , circle gc.ballR [ fillP white, transform [ translateXY -(gc.cellR * 1.8) 0 ] ]
-        , words (String.fromInt ballCount)
-            [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
+        , group [ transform [ translateXY -off2 0 ] ]
+            [ circle gc.ballR
+                [ fillP white
+                , transform [ translateXY -off 0 ]
+                ]
+            , words (String.fromInt ballCount)
+                [ fillP white
+                , transform [ translateXY off 0, scale 4 ]
+                , T.fontWeight FontWeightBold
+                ]
+            ]
+        , group [ transform [ translateXY off2 0 ] ]
+            [ rect (gc.cri |> vecScale 0.5)
+                [ fillP white
+                , transform [ translateXY -off 0 ]
+                ]
+            , words (String.fromInt stars)
+                [ fillP white
+                , transform [ translateXY off 0, scale 4 ]
+                , T.fontWeight FontWeightBold
+                ]
+            ]
         ]
 
 
