@@ -319,7 +319,9 @@ randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     rnd2 (List.map2 initTarget)
         (shuffle gc.topRowPS)
-        (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds)
+        (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds
+            |> rnd2 (++) (rndStarCount |> rnd1 (\n -> List.repeat n StarTarget))
+        )
 
 
 bellN : Int -> Generator Float
@@ -330,8 +332,12 @@ bellN n =
 
 rndExtraBallCount : Generator Int
 rndExtraBallCount =
-    rndNormal 0 2
-        |> rnd1 (abs >> round)
+    rndNormal 0 2 |> rnd1 (abs >> round)
+
+
+rndStarCount : Generator Int
+rndStarCount =
+    rndNormal 0 2 |> rnd1 (atLeast 0 >> round)
 
 
 rndSolidTargetCount : Generator Int
@@ -1456,7 +1462,7 @@ viewTarget now target =
             viewBallAt (bonusAnimPosition now position)
 
         StarTarget ->
-            viewSolidTarget position -1
+            viewStar (bonusAnimPosition now position)
 
 
 bonusAnimPosition : Float -> Vec -> Vec
@@ -1504,6 +1510,13 @@ viewSolidTarget position hp =
 viewBalls : List Ball -> Svg Msg
 viewBalls balls =
     group [] (List.map (.position >> viewBallAt) balls)
+
+
+viewStar : Vec -> Svg msg
+viewStar p =
+    group [ transform [ translate p ] ]
+        [ rect (gc.cri |> vecScale 0.5) [ fillH ballHue ]
+        ]
 
 
 viewBallAt : Vec -> Svg msg
