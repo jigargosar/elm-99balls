@@ -605,7 +605,11 @@ init _ =
         (initGame env.frame initialSeed
             |> applyN 4 (reStartGame 0)
         )
-    , Dom.getViewport |> Task.perform GotDomViewPort
+    , Dom.getViewport
+        |> Task.perform
+            (\{ viewport } ->
+                OnDomResize (round viewport.width) (round viewport.height)
+            )
     )
 
 
