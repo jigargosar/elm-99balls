@@ -1458,7 +1458,7 @@ viewTargetsHelp now progress targets =
                     viewSolidTarget position hp
 
                 BonusBallTarget ->
-                    viewBonusBall now position
+                    group [ transform [ translateXY 0 dy ] ] [ viewBonusBall now target.position ]
 
                 StarTarget ->
                     viewSolidTarget position -1
@@ -1470,7 +1470,7 @@ viewBonusBall : Float -> Vec -> Svg msg
 viewBonusBall now position =
     let
         staggeredNow =
-            now - fmodBy 80 position.x
+            now + vecLenSq position
 
         ( ndx, ndy ) =
             ( wave 80 staggeredNow |> normToNegNorm, zigZag 90 staggeredNow |> normToNegNorm )
