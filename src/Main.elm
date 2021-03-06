@@ -90,7 +90,7 @@ main =
 
 
 type alias Flags =
-    ()
+    { stars : Int }
 
 
 type Model
@@ -604,7 +604,7 @@ type Msg
 
 
 init : Flags -> ( Model, Cmd Msg )
-init _ =
+init { stars } =
     let
         initialSeed =
             seedFrom 4
@@ -613,7 +613,7 @@ init _ =
             initialEnvironment
     in
     ( Model env
-        (initGame env.frame initialSeed
+        (initGame env.frame stars initialSeed
             |> applyN 4 (reStartGame 0)
         )
     , Dom.getViewport
@@ -626,13 +626,13 @@ init _ =
 
 reStartGame : Float -> Game -> Game
 reStartGame frame game =
-    initGame frame game.seed
+    initGame frame game.stars game.seed
 
 
-initGame : Float -> Seed -> Game
-initGame now seed =
+initGame : Float -> Int -> Seed -> Game
+initGame now stars seed =
     { ballCount = 10
-    , stars = 0
+    , stars = stars
     , targets = []
     , state =
         initTargetsEnteringState now initialBallPosition
