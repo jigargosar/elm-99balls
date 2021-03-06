@@ -14,6 +14,7 @@ import Random exposing (Generator)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task
+import Time
 import Tuple exposing (pair)
 import TypedSvg.Attributes as T
 import TypedSvg.Attributes.InPx as Px
@@ -585,7 +586,7 @@ isBottomEdge edge =
 
 type Msg
     = OnDomResize Int Int
-    | OnTick Float
+    | OnTick
     | PointerDown Bool Vec
     | PointerMoved Vec
     | RestartGameClicked
@@ -641,7 +642,7 @@ update message (Model env game) =
             , Cmd.none
             )
 
-        OnTick _ ->
+        OnTick ->
             let
                 ( newGame, cmd ) =
                     updateGameOnTick env game
@@ -1054,7 +1055,10 @@ targetToCircle t =
 subscriptions : Model -> Sub Msg
 subscriptions _ =
     Sub.batch
-        [ Browser.Events.onAnimationFrameDelta OnTick
+        [ Browser.Events.onAnimationFrameDelta (always OnTick)
+            -- for monitors where refresh rate is >60 i.e. 144
+            -- since we are not using delta for updates.
+            |> always (Time.every (1000 / 60) (always OnTick))
         , Browser.Events.onResize OnDomResize
         ]
 
