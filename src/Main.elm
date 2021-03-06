@@ -824,6 +824,7 @@ stepSim frame game sim =
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
+        , cmdIf (acc.starsCollected >= 1) (playSound "bonus_hit")
         , cmdIf (newKillSoundIdx > sim.killSoundIdx) (playKillSound newKillSoundIdx)
         , cmdIf (emittedBall /= Nothing) (playSound "shoot")
         ]
