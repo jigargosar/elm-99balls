@@ -1445,6 +1445,7 @@ viewTargets now state targets =
     group [ transform [ translateXY 0 dy ] ] (List.map (viewTarget now) targets)
 
 
+viewTarget : Float -> Target -> Svg msg
 viewTarget now target =
     let
         position =
@@ -1475,25 +1476,6 @@ bonusAnimPosition now position =
                 |> vecScale (gc.ballR * 0.3)
     in
     vecAdd position dxy
-
-
-viewBonusBall : Float -> Vec -> Svg msg
-viewBonusBall now position =
-    let
-        staggeredNow =
-            now + vecLenSq position
-
-        ( ndx, ndy ) =
-            ( wave 80 staggeredNow |> normToNegNorm, zigZag 90 staggeredNow |> normToNegNorm )
-
-        dxy =
-            vec ndx ndy
-                |> vecScale (gc.ballR * 0.3)
-
-        p2 =
-            vecAdd position dxy
-    in
-    viewBallAt p2
 
 
 viewSolidTarget position hp =
