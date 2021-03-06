@@ -892,6 +892,7 @@ incTurnThenAddTargetRow game =
 type alias BallUpdateAcc =
     { targets : List Target
     , bonusBallsCollected : Int
+    , starsCollected : Int
     , solidTargetHits : Int
     , solidTargetsKilled : List Vec
     }
@@ -901,6 +902,7 @@ initBallUpdateAcc : List Target -> BallUpdateAcc
 initBallUpdateAcc targets =
     { targets = targets
     , bonusBallsCollected = 0
+    , starsCollected = 0
     , solidTargetHits = 0
     , solidTargetsKilled = []
     }
@@ -962,7 +964,7 @@ updateBall acc ball =
                         BonusBallTarget ->
                             ( { acc
                                 | targets = remove target acc.targets
-                                , bonusBallsCollected = acc.bonusBallsCollected + 1
+                                , bonusBallsCollected = inc acc.bonusBallsCollected
                               }
                             , BallMoved newBall
                             )
@@ -970,6 +972,7 @@ updateBall acc ball =
                         StarTarget ->
                             ( { acc
                                 | targets = remove target acc.targets
+                                , starsCollected = inc acc.starsCollected
                               }
                             , BallMoved newBall
                             )
