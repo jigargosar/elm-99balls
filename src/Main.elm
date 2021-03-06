@@ -584,8 +584,7 @@ isBottomEdge edge =
 
 
 type Msg
-    = GotDomViewPort Dom.Viewport
-    | OnDomResize Int Int
+    = OnDomResize Int Int
     | OnTick Float
     | PointerDown Bool Vec
     | PointerMoved Vec
@@ -635,12 +634,6 @@ initGame now seed =
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message (Model env game) =
     case message of
-        GotDomViewPort { viewport } ->
-            ( Model { env | vri = vec viewport.width viewport.height |> vecScale 0.5 }
-                game
-            , Cmd.none
-            )
-
         OnDomResize w h ->
             ( Model
                 { env | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }
