@@ -334,15 +334,11 @@ rndExtraBallCount =
         |> rnd1 (abs >> round)
 
 
-rndSolidTargetCount : Int -> Generator Int
-rndSolidTargetCount turns =
+rndSolidTargetCount : Generator Int
+rndSolidTargetCount =
     let
-        t =
-            toFloat turns
-
         ( mean, sd ) =
-            ( (t / 2) |> atMost (toFloat gc.w - 2), 2 )
-                |> always ( toFloat gc.w / 2, toFloat gc.w / 2 )
+            ( toFloat gc.w / 2, toFloat gc.w / 2 )
     in
     rndNormal mean sd
         |> rnd1 (abs >> round >> clamp 1 (gc.w - 1))
@@ -368,7 +364,7 @@ randomExtraBallTargetKinds =
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
 randomSolidTargetKinds turns =
-    rndSolidTargetCount turns
+    rndSolidTargetCount
         |> rndAndThen (\i -> rndList i (rndTargetHealth turns |> rnd1 SolidTarget))
 
 
