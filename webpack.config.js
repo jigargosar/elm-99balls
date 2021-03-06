@@ -8,7 +8,8 @@ module.exports = {
     devtool: 'inline-source-map',
     devServer: {
         contentBase: 'public',
-        overlay: true
+        overlay: true,
+        hot: false,
     },
     module: {
         rules: [
