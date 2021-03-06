@@ -1438,32 +1438,27 @@ viewTargets now state targets =
 
                 _ ->
                     1
-    in
-    viewTargetsHelp now progress targets
 
-
-viewTargetsHelp : Float -> Float -> List Target -> Svg msg
-viewTargetsHelp now progress targets =
-    let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
-
-        viewTarget target =
-            let
-                position =
-                    target.position |> vecMapY (add dy)
-            in
-            case target.kind of
-                SolidTarget hp ->
-                    viewSolidTarget position hp
-
-                BonusBallTarget ->
-                    group [ transform [ translateXY 0 dy ] ] [ viewBonusBall now target.position ]
-
-                StarTarget ->
-                    viewSolidTarget position -1
     in
-    group [] (List.map viewTarget targets)
+    group [ transform [ translateXY 0 dy ] ] (List.map (viewTarget now) targets)
+
+
+viewTarget now target =
+    let
+        position =
+            target.position
+    in
+    case target.kind of
+        SolidTarget hp ->
+            viewSolidTarget position hp
+
+        BonusBallTarget ->
+            viewBonusBall now position
+
+        StarTarget ->
+            viewSolidTarget position -1
 
 
 viewBonusBall : Float -> Vec -> Svg msg
