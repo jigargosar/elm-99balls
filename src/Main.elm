@@ -220,13 +220,13 @@ viewFloorBalls now fbs =
             group []
                 (viewBallAt first
                     :: (anims
-                            |> List.filterMap (viewAnim now (viewFloorBallAnim first))
+                            |> List.filterMap (viewAnim now (viewFloorBall first))
                        )
                 )
 
 
-viewFloorBallAnim : Vec -> Float -> Vec -> Svg msg
-viewFloorBallAnim toPosition progress position =
+viewFloorBall : Vec -> Float -> Vec -> Svg msg
+viewFloorBall toPosition progress position =
     let
         newPosition =
             position |> vecMapX (\x -> lerp x toPosition.x progress)
