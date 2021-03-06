@@ -34,7 +34,7 @@ port playSound : String -> Cmd msg
 
   - [x] make bonus anim bit staggered.
 
-  - stars
+  - add stars
 
   - mute btn
 
