@@ -121,6 +121,7 @@ initialEnvironment =
 type alias Game =
     { turn : Int
     , ballCount : Int
+    , stars : Int
     , targets : List Target
     , state : State
     , seed : Seed
@@ -631,6 +632,7 @@ reStartGame frame game =
 initGame : Float -> Seed -> Game
 initGame now seed =
     { ballCount = 10
+    , stars = 0
     , targets = []
     , state =
         initTargetsEnteringState now initialBallPosition
