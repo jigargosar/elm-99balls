@@ -6,7 +6,10 @@ import {Howl, Howler} from 'howler';
 
 
 const app = Elm["Main"].init({
-    node: document.getElementById('root')
+    node: document.getElementById('root'),
+    flags: {
+        stars: Number.parseInt(localStorage.getItem("stars")) || 0
+    }
 });
 
 
