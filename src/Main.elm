@@ -1466,10 +1466,14 @@ viewTargetsHelp now progress targets =
     group [] (List.map viewTarget targets)
 
 
+viewBonusBall : Float -> Vec -> Svg msg
 viewBonusBall now position =
     let
+        staggeredNow =
+            now - fmodBy 80 position.x
+
         ( ndx, ndy ) =
-            ( wave 80 now |> normToNegNorm, zigZag 90 now |> normToNegNorm )
+            ( wave 80 staggeredNow |> normToNegNorm, zigZag 90 staggeredNow |> normToNegNorm )
 
         dxy =
             vec ndx ndy
