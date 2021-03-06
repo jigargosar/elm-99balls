@@ -1455,10 +1455,26 @@ viewTarget now target =
             viewSolidTarget position hp
 
         BonusBallTarget ->
-            viewBonusBall now position
+            viewBallAt (bonusAnimPosition now position)
 
         StarTarget ->
             viewSolidTarget position -1
+
+
+bonusAnimPosition : Float -> Vec -> Vec
+bonusAnimPosition now position =
+    let
+        staggeredNow =
+            now + vecLenSq position
+
+        ( ndx, ndy ) =
+            ( wave 80 staggeredNow |> normToNegNorm, zigZag 90 staggeredNow |> normToNegNorm )
+
+        dxy =
+            vec ndx ndy
+                |> vecScale (gc.ballR * 0.3)
+    in
+    vecAdd position dxy
 
 
 viewBonusBall : Float -> Vec -> Svg msg
