@@ -385,7 +385,12 @@ rndNormal =
 
 bellNMO : Int -> Float -> Float -> Generator Float
 bellNMO n mid offset =
-    bellN n |> rnd1 (mul offset >> add mid)
+    rndBell n (mid - offset) (mid + offset)
+
+
+rndBell n lo hi =
+    rndList n (rndF lo hi)
+        |> rnd1 (List.sum >> (\total -> total / toFloat n))
 
 
 maxHP =
