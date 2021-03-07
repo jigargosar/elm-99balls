@@ -341,7 +341,7 @@ rndExtraBallCount =
 
 rndStarCount : Generator Int
 rndStarCount =
-    rndNormalBellN 6 0 2 |> rnd1 (atLeast 0 >> round)
+    bellNMO 6 0 2 |> rnd1 (atLeast 0 >> round)
 
 
 rndSolidTargetCount : Generator Int
@@ -380,11 +380,11 @@ randomSolidTargetKinds turns =
 
 rndNormal : Float -> Float -> Generator Float
 rndNormal =
-    rndNormalBellN 3
+    bellNMO 3
 
 
-rndNormalBellN : Int -> Float -> Float -> Generator Float
-rndNormalBellN n m sd =
+bellNMO : Int -> Float -> Float -> Generator Float
+bellNMO n m sd =
     bellN n |> rnd1 (mul sd >> add m)
 
 
