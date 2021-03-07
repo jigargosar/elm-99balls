@@ -3,8 +3,9 @@ module LC1 exposing (..)
 import Html
 import LineChart
 import List.Extra
-import Random
+import Random exposing (Generator)
 import Random.Float
+import Util exposing (..)
 
 
 main : Html.Html msg
@@ -25,11 +26,22 @@ chart =
         (Random.step rndPoints (Random.initialSeed 0) |> Tuple.first)
 
 
+bellN : Int -> Generator Float
+bellN n =
+    rndList n (rndF -1 1)
+        |> rnd1 (List.sum >> (\total -> total / toFloat n))
+
+
 rndPoints =
-    Random.list 1000 Random.Float.standardNormal
+    Random.list 50000
+        (Random.float -1 1
+            |> always Random.Float.standardNormal
+            |> always (bellN 4)
+            |> always (bellN 3)
+        )
         |> Random.map
             (identity
-                >> List.Extra.gatherEqualsBy (\x -> x * 10 |> round)
+                >> List.Extra.gatherEqualsBy (\x -> x * 20 |> round)
                 >> List.sortBy Tuple.first
                 >> List.map
                     (\( x, xs ) ->
