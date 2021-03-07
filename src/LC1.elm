@@ -47,11 +47,13 @@ bellChart =
     LineChart.view
         (.x >> toFloat)
         (.y >> toFloat)
-        [ LineChart.line LineChart.Colors.pink LineChart.Dots.none "Bell2" bell.b2
-        , LineChart.line LineChart.Colors.blue LineChart.Dots.none "Bell3" bell.b3
+        [ --
+          --LineChart.line LineChart.Colors.pink LineChart.Dots.none "Bell2" bell.b2
+          LineChart.line LineChart.Colors.blue LineChart.Dots.none "Bell3" bell.b3
         , LineChart.line LineChart.Colors.gold LineChart.Dots.none "Bell4" bell.b4
         , LineChart.line LineChart.Colors.black LineChart.Dots.none "Bell5" bell.b5
-        , LineChart.line LineChart.Colors.cyan LineChart.Dots.none "Normal" normal.default
+
+        --, LineChart.line LineChart.Colors.cyan LineChart.Dots.none "Normal" normal.default
         , LineChart.line LineChart.Colors.gray LineChart.Dots.none "NormalBy4" normal.by4
         ]
 
