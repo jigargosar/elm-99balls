@@ -37,7 +37,7 @@ port saveStars : Int -> Cmd msg
 
   - [x] make bonus anim bit staggered.
 
-  - add stars
+  - [x] add stars
 
   - mute btn
 
