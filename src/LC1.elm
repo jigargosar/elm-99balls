@@ -38,7 +38,8 @@ bellChart =
         (.x >> toFloat)
         (.y >> toFloat)
         [ LineChart.line LineChart.Colors.blue LineChart.Dots.none "Bell3" bellPts.b3
-        , LineChart.line LineChart.Colors.pink LineChart.Dots.none "Bell2" bellPts.b2
+
+        --, LineChart.line LineChart.Colors.pink LineChart.Dots.none "Bell2" bellPts.b2
         , LineChart.line LineChart.Colors.gold LineChart.Dots.none "Bell4" bellPts.b4
         , LineChart.line LineChart.Colors.black LineChart.Dots.none "Bell5" bellPts.b5
 
@@ -67,7 +68,7 @@ rndBellPts =
 
 rndPointsN : Int -> Generator (List Point)
 rndPointsN n =
-    Random.list 50000 (rndBellMO n 0 20 |> rnd1 round)
+    Random.list 50000 (rndBellMO n 0 26 |> rnd1 round)
         |> Random.map
             (List.Extra.gatherEquals
                 >> List.map
