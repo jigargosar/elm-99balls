@@ -12,7 +12,7 @@ import Util exposing (..)
 
 main : Html.Html msg
 main =
-    chart
+    bellChart
 
 
 type alias Point =
@@ -26,8 +26,8 @@ type alias BellPts =
     }
 
 
-chart : Html.Html msg
-chart =
+bellChart : Html.Html msg
+bellChart =
     let
         ( bellPts, _ ) =
             Random.step rndBellPts (Random.initialSeed 0)
