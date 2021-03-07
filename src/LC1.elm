@@ -30,15 +30,9 @@ chart =
 
 
 rndPoints =
-    Random.list 50000
-        (Random.float -1 1
-            |> always Random.Float.standardNormal
-            |> always (rndBell 3 -10 10 |> rnd1 round)
-        )
+    Random.list 50000 (rndBell 3 -10 10 |> rnd1 round)
         |> Random.map
-            (identity
-                >> List.Extra.gatherEquals
-                >> List.sortBy Tuple.first
+            (List.Extra.gatherEquals
                 >> List.map
                     (\( x, xs ) ->
                         Point x (List.length xs)
