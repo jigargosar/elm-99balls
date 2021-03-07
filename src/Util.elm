@@ -829,6 +829,17 @@ rndCombine =
     Random.combine
 
 
+rndBellMO : Int -> Float -> Float -> Generator Float
+rndBellMO n mid offset =
+    rndBell n (mid - offset) (mid + offset)
+
+
+rndBell : Int -> Float -> Float -> Generator Float
+rndBell n lo hi =
+    rndList n (rndF lo hi)
+        |> rnd1 (List.sum >> (\total -> total / toFloat n))
+
+
 
 -- SVG
 

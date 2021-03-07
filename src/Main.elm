@@ -341,7 +341,7 @@ rndExtraBallCount =
 
 rndStarCount : Generator Int
 rndStarCount =
-    bellNMO 6 0 2 |> rnd1 (atLeast 0 >> round)
+    rndBellMO 6 0 2 |> rnd1 (atLeast 0 >> round)
 
 
 rndSolidTargetCount : Generator Int
@@ -380,17 +380,7 @@ randomSolidTargetKinds turns =
 
 rndNormal : Float -> Float -> Generator Float
 rndNormal =
-    bellNMO 3
-
-
-bellNMO : Int -> Float -> Float -> Generator Float
-bellNMO n mid offset =
-    rndBell n (mid - offset) (mid + offset)
-
-
-rndBell n lo hi =
-    rndList n (rndF lo hi)
-        |> rnd1 (List.sum >> (\total -> total / toFloat n))
+    rndBellMO 3
 
 
 maxHP =
