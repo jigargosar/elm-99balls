@@ -23,6 +23,7 @@ type alias BellPts =
     { b2 : List Point
     , b3 : List Point
     , b4 : List Point
+    , normal : List Point
     }
 
 
@@ -43,10 +44,20 @@ bellChart =
 
 rndBellPts : Generator BellPts
 rndBellPts =
-    Random.map3 BellPts
+    Random.map4 BellPts
         (rndPointsN 2)
         (rndPointsN 3)
         (rndPointsN 4)
+        (Random.list 50000 (Random.Float.normal 0 20 |> rnd1 round)
+            |> Random.map
+                (List.Extra.gatherEquals
+                    >> List.map
+                        (\( x, xs ) ->
+                            Point x (List.length xs)
+                        )
+                    >> List.sortBy .x
+                )
+        )
 
 
 rndPointsN : Int -> Generator (List Point)
