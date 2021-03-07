@@ -1,6 +1,6 @@
 module LC1 exposing (..)
 
-import Html
+import Html exposing (div)
 import LineChart
 import LineChart.Colors
 import LineChart.Dots
@@ -12,7 +12,7 @@ import Util exposing (..)
 
 main : Html.Html msg
 main =
-    bellChart
+    div [] [ bellChart ]
 
 
 type alias Point =
