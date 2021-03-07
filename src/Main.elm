@@ -384,8 +384,8 @@ rndNormal =
 
 
 bellNMO : Int -> Float -> Float -> Generator Float
-bellNMO n m sd =
-    bellN n |> rnd1 (mul sd >> add m)
+bellNMO n mid offset =
+    bellN n |> rnd1 (mul offset >> add mid)
 
 
 maxHP =
