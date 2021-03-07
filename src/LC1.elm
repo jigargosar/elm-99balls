@@ -27,7 +27,7 @@ type alias BellPts =
 
 
 type alias NormalPts =
-    { default : List Point
+    { boxMuller : List Point
     , by4 : List Point
     }
 
