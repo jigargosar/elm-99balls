@@ -7,7 +7,6 @@ import LineChart.Dots
 import List.Extra
 import Random exposing (Generator)
 import Random.Float
-import Util exposing (..)
 
 
 main : Html.Html msg
@@ -24,51 +23,57 @@ type alias BellPts =
     , b3 : List Point
     , b4 : List Point
     , b5 : List Point
-    , normal : List Point
+    }
+
+
+type alias NormalPts =
+    { default : List Point
+    , by4 : List Point
+    }
+
+
+type alias Data =
+    { bell : BellPts
+    , normal : NormalPts
     }
 
 
 bellChart : Html.Html msg
 bellChart =
     let
-        ( bellPts, _ ) =
-            Random.step rndBellPts (Random.initialSeed 0)
+        ( { bell, normal }, _ ) =
+            Random.step rndData (Random.initialSeed 0)
     in
     LineChart.view
         (.x >> toFloat)
         (.y >> toFloat)
-        [ LineChart.line LineChart.Colors.blue LineChart.Dots.none "Bell3" bellPts.b3
-
-        --, LineChart.line LineChart.Colors.pink LineChart.Dots.none "Bell2" bellPts.b2
-        , LineChart.line LineChart.Colors.gold LineChart.Dots.none "Bell4" bellPts.b4
-        , LineChart.line LineChart.Colors.black LineChart.Dots.none "Bell5" bellPts.b5
-
-        --, LineChart.line LineChart.Colors.cyan LineChart.Dots.none "Normal" bellPts.normal
+        [ LineChart.line LineChart.Colors.pink LineChart.Dots.none "Bell2" bell.b2
+        , LineChart.line LineChart.Colors.blue LineChart.Dots.none "Bell3" bell.b3
+        , LineChart.line LineChart.Colors.gold LineChart.Dots.none "Bell4" bell.b4
+        , LineChart.line LineChart.Colors.black LineChart.Dots.none "Bell5" bell.b5
+        , LineChart.line LineChart.Colors.cyan LineChart.Dots.none "Normal" normal.default
+        , LineChart.line LineChart.Colors.gray LineChart.Dots.none "NormalBy4" normal.by4
         ]
 
 
-rndBellPts : Generator BellPts
-rndBellPts =
-    Random.map5 BellPts
-        (rndPointsN 2)
-        (rndPointsN 3)
-        (rndPointsN 4)
-        (rndPointsN 5)
-        (Random.list 50000 (Random.Float.normal 0 (20 / 4) |> rnd1 round)
-            |> Random.map
-                (List.Extra.gatherEquals
-                    >> List.map
-                        (\( x, xs ) ->
-                            Point x (List.length xs)
-                        )
-                    >> List.sortBy .x
-                )
+rndData : Generator Data
+rndData =
+    Random.map2 Data
+        (Random.map4 BellPts
+            (rndPointsBy (rndBellMO 2 0 20))
+            (rndPointsBy (rndBellMO 3 0 20))
+            (rndPointsBy (rndBellMO 4 0 20))
+            (rndPointsBy (rndBellMO 5 0 20))
+        )
+        (Random.map2 NormalPts
+            (rndPointsBy (Random.Float.normal 0 20))
+            (rndPointsBy (Random.Float.normal 0 (20 / 4)))
         )
 
 
-rndPointsN : Int -> Generator (List Point)
-rndPointsN n =
-    Random.list 50000 (rndBellMO n 0 26 |> rnd1 round)
+rndPointsBy : Generator Float -> Generator (List Point)
+rndPointsBy gen =
+    Random.list 30000 (gen |> Random.map round)
         |> Random.map
             (List.Extra.gatherEquals
                 >> List.map
@@ -77,3 +82,14 @@ rndPointsN n =
                     )
                 >> List.sortBy .x
             )
+
+
+rndBellMO : Int -> Float -> Float -> Generator Float
+rndBellMO n mid offset =
+    rndBell n (mid - offset) (mid + offset)
+
+
+rndBell : Int -> Float -> Float -> Generator Float
+rndBell n lo hi =
+    Random.list n (Random.float lo hi)
+        |> Random.map (List.sum >> (\total -> total / toFloat n))
