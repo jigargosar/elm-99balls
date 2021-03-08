@@ -8,12 +8,20 @@ module.exports = {
         filename: '[name].bundle.js',
         path: path.resolve(__dirname, 'dist'),
         clean: true,
+        pathinfo: false,
     },
-    // devtool: 'inline-source-map',
+    optimization: {
+        removeAvailableModules: false,
+        removeEmptyChunks: false,
+        splitChunks: false,
+    },
+    devtool: false,
     devServer: {
         contentBase: 'public',
         overlay: true,
         hot: false,
+        liveReload: true,
+        watchContentBase: true,
     },
     module: {
         rules: [
