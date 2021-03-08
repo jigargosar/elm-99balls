@@ -39,6 +39,8 @@ port saveStars : Int -> Cmd msg
 
   - [x] add stars
 
+  - add actual star shape svg
+
   - mute btn
 
   - test input handling on phone/touch device.
