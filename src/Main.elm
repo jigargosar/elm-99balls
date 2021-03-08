@@ -1177,7 +1177,7 @@ viewFooter ballCount stars =
         , group [ transform [ translateXY off2 0 ] ]
             [ group
                 [ fillP white
-                , transform [ translateXY -off 0, scale 0.7 ]
+                , transform [ translateXY -off 0 ]
                 ]
                 [ starSvg ]
             , words (String.fromInt stars)
@@ -1355,7 +1355,7 @@ viewTutorial start now =
 starSvg =
     Svg.path
         (S.d "m36.536 32.822c12.699-31.856 13.169-31.734 26.355-1.0603 34.15 2.198 39.384 9.6218 6.5131 23.932 19.821 46.048-0.79153 28.382-19.842 13.178-22.357 25.013-29.54 22.639-18.782-12.117-7.2813-8.5014-45.095-18.742 5.7558-23.932z"
-            :: [ transform [ translateXY -51.2 -48 ] ]
+            :: [ transform [ scale 0.7, translateXY -51.2 -48 ] ]
         )
         []
 
@@ -1566,9 +1566,7 @@ viewBalls balls =
 
 viewStar : Vec -> Svg msg
 viewStar p =
-    group [ transform [ translate p ] ]
-        [ group [ fillH ballHue, transform [ scale 0.8 ] ] [ starSvg ]
-        ]
+    group [ fillH ballHue, transform [ translate p ] ] [ starSvg ]
 
 
 viewBallAt : Vec -> Svg msg
