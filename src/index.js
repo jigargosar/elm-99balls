@@ -52,7 +52,7 @@ app.ports["playSound"]["subscribe"]((function () {
         soundPathMapping,
     )
 
-    return function (name) {
+    return function playSound(name) {
         const sound = soundMap[name]
         if (sound) {
             sound.play()
