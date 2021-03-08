@@ -39,7 +39,7 @@ port saveStars : Int -> Cmd msg
 
   - [x] add stars
 
-  - add actual star shape svg
+  - [x] add actual star shape svg
 
   - mute btn
 
