@@ -1,5 +1,9 @@
 const HtmlWebpackPlugin = require("html-webpack-plugin");
 const path = require("path");
+// noinspection JSUnusedLocalSymbols
+const cp = require("child_process")
+// noinspection JSUnusedLocalSymbols
+const fs = require("fs")
 
 module.exports = {
     mode: "development",
@@ -22,6 +26,17 @@ module.exports = {
         hot: false,
         liveReload: true,
         watchContentBase: true,
+        // before: function (app, server, compiler) {
+        //     app.get('/bundle.elm.js', function (req, res) {
+        //         cp.execSync("elm make src/Main.elm --output=tmp/bundle.elm.js")
+        //         res.setHeader('content-type', 'text/javascript');
+        //         res.write(fs.readFileSync('tmp/bundle.elm.js'));
+        //         res.end();
+        //     });
+        // },
+    },
+    externals: {
+        // './Main.elm': '{Elm}',
     },
     module: {
         rules: [
@@ -41,5 +56,4 @@ module.exports = {
             template: "public/index.html"
         }),
     ],
-
 }

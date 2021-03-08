@@ -2,14 +2,15 @@
   "name": "elm-99balls",
   "private": true,
   "scripts": {
-    "start": "webpack serve"
+    "start": "webpack serve",
+    "elm:watch": "nodemon -w src/**.elm -e \"elm\" -x cmd -- /C \"elm make src/Main.elm --output=tmp/bundle.elm.js && copy /Y tmp/bundle.elm.js public\""
   },
   "devDependencies": {
-    "cross-env": "^7.0.3",
     "css-loader": "^5.1.1",
     "elm-webpack-loader": "^7.0.1",
     "howler": "^2.2.1",
     "html-webpack-plugin": "^5.2.0",
+    "nodemon": "^2.0.7",
     "style-loader": "^2.0.0",
     "webpack": "^5.24.2",
     "webpack-cli": "^4.5.0",
