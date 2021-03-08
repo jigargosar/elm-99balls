@@ -1175,10 +1175,11 @@ viewFooter ballCount stars =
                 ]
             ]
         , group [ transform [ translateXY off2 0 ] ]
-            [ rect (gc.cri |> vecScale 0.5)
+            [ group
                 [ fillP white
-                , transform [ translateXY -off 0 ]
+                , transform [ translateXY -off 0, scale 0.7 ]
                 ]
+                [ starSvg ]
             , words (String.fromInt stars)
                 [ fillP white
                 , transform [ translateXY off 0, scale 4 ]
