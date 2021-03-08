@@ -1142,7 +1142,7 @@ viewHeader turn =
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
         , group [ transform [ translate wc.restartBtn.c ] ]
-            [ group [ transform [ scale 4 ], fillP white ] [ restartIcon ]
+            [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ]
             , rect wc.restartBtn.ri
                 [ S.pointerEvents "fill"
                 , S.cursor "pointer"
@@ -1323,7 +1323,7 @@ viewTutorial start now =
                     [ circle (gc.ballR * 0.6) []
                     , circle (gc.ballR * 0.4) []
                     ]
-                , handIcon
+                , handSvg
                     [ fillP white
                     , transform [ scale 0.25, Scale 0.8 1, translateXY -80 0 ]
                     ]
@@ -1351,7 +1351,15 @@ viewTutorial start now =
         ]
 
 
-handIcon aa =
+starSvg =
+    Svg.path
+        (S.d "m36.536 32.822c12.699-31.856 13.169-31.734 26.355-1.0603 34.15 2.198 39.384 9.6218 6.5131 23.932 19.821 46.048-0.79153 28.382-19.842 13.178-22.357 25.013-29.54 22.639-18.782-12.117-7.2813-8.5014-45.095-18.742 5.7558-23.932z"
+            :: [ transform [ translateXY -51.2 -48 ] ]
+        )
+        []
+
+
+handSvg aa =
     Svg.path
         (S.d
             """M192.231,104.082V102c0-12.407-10.094-22.5-22.5-22.5c-2.802,0-5.484,0.519-7.961,1.459
@@ -1370,7 +1378,7 @@ l0.025,32.852C177.291,169.014,158.36,188.079,135.092,188.079z
         []
 
 
-restartIcon =
+restartSvg =
     Svg.path
         (S.d
             """M12.083,1.887c-0.795-0.794-1.73-1.359-2.727-1.697v2.135c0.48,0.239,0.935,0.55,1.334,0.95
@@ -1558,7 +1566,7 @@ viewBalls balls =
 viewStar : Vec -> Svg msg
 viewStar p =
     group [ transform [ translate p ] ]
-        [ rect (gc.cri |> vecScale 0.5) [ fillH ballHue ]
+        [ group [ fillH ballHue, transform [ scale 0.8 ] ] [ starSvg ]
         ]
 
 
