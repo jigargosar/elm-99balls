@@ -678,13 +678,8 @@ update message (Model env page) =
                             ( page, Cmd.none )
 
                         GamePage game ->
-                            let
-                                ( newGame, cmd ) =
-                                    updateGameOnTick env game
-                            in
-                            ( GamePage newGame
-                            , cmd
-                            )
+                            updateGameOnTick env game
+                                |> Tuple.mapFirst GamePage
             in
             ( Model
                 { env
