@@ -678,7 +678,12 @@ update message (Model env page) =
                             ( page, Cmd.none )
 
                         GamePage game ->
-                            updateGameOnTick env game
+                            (if game.paused then
+                                ( game, Cmd.none )
+
+                             else
+                                updateGameOnTick env game
+                            )
                                 |> Tuple.mapFirst GamePage
             in
             ( Model
