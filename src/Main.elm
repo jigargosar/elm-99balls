@@ -671,24 +671,30 @@ update message (Model env page) =
             )
 
         OnTick ->
-            case page of
-                StartPage _ ->
-                    ( Model env page, Cmd.none )
+            let
+                ( newPage, pageCmd ) =
+                    case page of
+                        StartPage _ ->
+                            ( page, Cmd.none )
 
-                GamePage game ->
-                    let
-                        ( newGame, cmd ) =
-                            updateGameOnTick env game
-                    in
-                    ( Model
-                        { env
-                            | frame = inc env.frame
-                            , prevPointer = env.pointer
-                            , prevPointerDown = env.pointerDown
-                        }
-                        (GamePage newGame)
-                    , cmd
-                    )
+                        GamePage game ->
+                            let
+                                ( newGame, cmd ) =
+                                    updateGameOnTick env game
+                            in
+                            ( GamePage newGame
+                            , cmd
+                            )
+            in
+            ( Model
+                { env
+                    | frame = inc env.frame
+                    , prevPointer = env.pointer
+                    , prevPointerDown = env.pointerDown
+                }
+                newPage
+            , pageCmd
+            )
 
         PointerDown isDown pointer ->
             ( Model
