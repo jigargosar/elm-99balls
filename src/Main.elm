@@ -102,7 +102,7 @@ type alias Flags =
 
 
 type Model
-    = Model Env Game
+    = Model Env Page
 
 
 type alias Env =
@@ -127,8 +127,8 @@ initialEnvironment =
 
 
 type Page
-    = Start { stars : Int }
-    | Play { stars : Int, game : Game }
+    = StartPage { stars : Int }
+    | GamePage Game
 
 
 type alias Game =
@@ -338,15 +338,9 @@ randomTargets turns =
         )
 
 
-bellN : Int -> Generator Float
-bellN n =
-    rndList n (rndF -1 1)
-        |> rnd1 (List.sum >> (\total -> total / toFloat n))
-
-
 rndExtraBallCount : Generator Int
 rndExtraBallCount =
-    rndNormal 0 2 |> rnd1 (abs >> round)
+    rndBell_ 0 2 |> rnd1 (abs >> round)
 
 
 rndStarCount : Generator Int
@@ -360,7 +354,7 @@ rndSolidTargetCount =
         ( mean, sd ) =
             ( toFloat gc.w / 2, toFloat gc.w / 2 )
     in
-    rndNormal mean sd
+    rndBell_ mean sd
         |> rnd1 (abs >> round >> clamp 1 (gc.w - 1))
 
 
@@ -373,7 +367,7 @@ rndTargetHealth turns =
         ( mean, sd ) =
             ( t / 2 |> clamp 2 (maxHP * 0.7), 5 )
     in
-    rndNormal mean sd
+    rndBell_ mean sd
         |> rnd1 (abs >> clamp 1 (min (t + 1) maxHP) >> round)
 
 
@@ -388,8 +382,8 @@ randomSolidTargetKinds turns =
         |> rndAndThen (\i -> rndList i (rndTargetHealth turns |> rnd1 SolidTarget))
 
 
-rndNormal : Float -> Float -> Generator Float
-rndNormal =
+rndBell_ : Float -> Float -> Generator Float
+rndBell_ =
     rndBellMO 3
 
 
@@ -619,11 +613,12 @@ init { stars } =
 
         env =
             initialEnvironment
+
+        page =
+            initGame env.frame stars initialSeed
+                |> GamePage
     in
-    ( Model env
-        (initGame env.frame stars initialSeed
-            |> applyN 4 (reStartGame 0)
-        )
+    ( Model env page
     , Dom.getViewport
         |> Task.perform
             (\{ viewport } ->
@@ -653,29 +648,34 @@ initGame now stars seed =
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
-update message (Model env game) =
+update message (Model env page) =
     case message of
         OnDomResize w h ->
             ( Model
                 { env | vri = vec (toFloat w) (toFloat h) |> vecScale 0.5 }
-                game
+                page
             , Cmd.none
             )
 
         OnTick ->
-            let
-                ( newGame, cmd ) =
-                    updateGameOnTick env game
-            in
-            ( Model
-                { env
-                    | frame = inc env.frame
-                    , prevPointer = env.pointer
-                    , prevPointerDown = env.pointerDown
-                }
-                newGame
-            , cmd
-            )
+            case page of
+                StartPage _ ->
+                    ( Model env page, Cmd.none )
+
+                GamePage game ->
+                    let
+                        ( newGame, cmd ) =
+                            updateGameOnTick env game
+                    in
+                    ( Model
+                        { env
+                            | frame = inc env.frame
+                            , prevPointer = env.pointer
+                            , prevPointerDown = env.pointerDown
+                        }
+                        (GamePage newGame)
+                    , cmd
+                    )
 
         PointerDown isDown pointer ->
             ( Model
@@ -683,7 +683,7 @@ update message (Model env game) =
                     | pointerDown = isDown
                     , pointer = pointer |> pageToWorld env
                 }
-                game
+                page
             , Cmd.batch []
             )
 
@@ -692,12 +692,17 @@ update message (Model env game) =
                 { env
                     | pointer = pointer |> pageToWorld env
                 }
-                game
+                page
             , Cmd.none
             )
 
         RestartGameClicked ->
-            ( Model env (reStartGame env.frame game), Cmd.none )
+            case page of
+                StartPage _ ->
+                    ( Model env page, Cmd.none )
+
+                GamePage game ->
+                    ( Model env (GamePage (reStartGame env.frame game)), Cmd.none )
 
 
 pageToWorld : Env -> Vec -> Vec
@@ -1112,7 +1117,7 @@ svgRIFromBrowserViewportRI bri =
 
 
 view : Model -> Html Msg
-view (Model env game) =
+view (Model env page) =
     div
         [ style "display" "flex"
         , style "align-items" "center"
@@ -1123,23 +1128,28 @@ view (Model env game) =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
             |> always noView
-        , viewGame env game
+        , viewPage env page
         ]
 
 
-viewGame : Env -> Game -> Html Msg
-viewGame { vri, frame, pointer } g =
+viewPage : Env -> Page -> Html Msg
+viewPage { vri, frame, pointer } page =
     Svg.svg (svgAttrs vri)
         [ rect wc.ri [ fillP black ]
-        , group []
-            [ viewHeader g.turn
-            , viewFooter g.ballCount g.stars
+        , case page of
+            StartPage _ ->
+                noView
 
-            -- ^--^ draw order matters, when showing aim/debug points
-            , viewTargets frame g.state g.targets
-            , viewState frame pointer g.turn g.targets g.state
-            , viewDebugPointer pointer |> hideView
-            ]
+            GamePage g ->
+                group []
+                    [ viewHeader g.turn
+                    , viewFooter g.ballCount g.stars
+
+                    -- ^--^ draw order matters, when showing aim/debug points
+                    , viewTargets frame g.state g.targets
+                    , viewState frame pointer g.turn g.targets g.state
+                    , viewDebugPointer pointer |> hideView
+                    ]
         ]
 
 

@@ -708,6 +708,7 @@ atLeast =
     Basics.Extra.atLeast
 
 
+applyN : number -> (a -> a) -> a -> a
 applyN n fn x =
     if n <= 0 then
         x
