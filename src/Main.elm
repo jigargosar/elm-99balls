@@ -127,8 +127,12 @@ initialEnvironment =
 
 
 type Page
-    = StartPage { stars : Int }
+    = StartPage Start
     | GamePage Game
+
+
+type alias Start =
+    { stars : Int, seed : Seed }
 
 
 type alias Game =
@@ -603,6 +607,7 @@ type Msg
     | PointerDown Bool Vec
     | PointerMoved Vec
     | RestartGameClicked
+    | StartGameClicked
 
 
 init : Flags -> ( Model, Cmd Msg )
@@ -616,7 +621,7 @@ init { stars } =
 
         page =
             GamePage (initGame env.frame stars initialSeed)
-                |> always (StartPage { stars = stars })
+                |> always (StartPage { stars = stars, seed = initialSeed })
     in
     ( Model env page
     , Dom.getViewport
@@ -703,6 +708,14 @@ update message (Model env page) =
 
                 GamePage game ->
                     ( Model env (GamePage (reStartGame env.frame game)), Cmd.none )
+
+        StartGameClicked ->
+            case page of
+                StartPage start ->
+                    ( Model env (GamePage (initGame env.frame start.stars start.seed)), Cmd.none )
+
+                GamePage _ ->
+                    ( Model env page, Cmd.none )
 
 
 pageToWorld : Env -> Vec -> Vec
@@ -1138,7 +1151,7 @@ viewPage { vri, frame, pointer } page =
         [ rect wc.ri [ fillP black ]
         , case page of
             StartPage _ ->
-                group []
+                group [ onClick StartGameClicked ]
                     [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP footerBGC ]
                     , words "START" [ fillP white, transform [ scale 3 ] ]
                     ]
