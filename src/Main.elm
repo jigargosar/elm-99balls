@@ -126,6 +126,11 @@ initialEnvironment =
     }
 
 
+type Page
+    = Start { stars : Int }
+    | Play { stars : Int, game : Game }
+
+
 type alias Game =
     { turn : Int
     , ballCount : Int
