@@ -482,6 +482,7 @@ type alias WorldConf =
     , header : { ri : Vec, c : Vec }
     , footer : { ri : Vec, c : Vec }
     , restartBtn : { ri : Vec, c : Vec }
+    , pauseBtn : { ri : Vec, c : Vec }
     }
 
 
@@ -507,6 +508,7 @@ wc =
     , header = header
     , footer = footer
     , restartBtn = { ri = gc.cri, c = vec (-header.ri.x + gc.cellR * 2) 0 }
+    , pauseBtn = { ri = gc.cri, c = vec -(-header.ri.x + gc.cellR * 2) 0 }
     }
 
 
@@ -609,6 +611,7 @@ type Msg
     | PointerDown Bool Vec
     | PointerMoved Vec
     | RestartGameClicked
+    | PauseGameClicked
     | StartGameClicked
 
 
@@ -623,7 +626,8 @@ init { stars } =
 
         page =
             GamePage (initGame env.frame stars initialSeed)
-                |> always (StartPage { stars = stars, seed = initialSeed })
+
+        --|> always (StartPage { stars = stars, seed = initialSeed })
     in
     ( Model env page
     , Dom.getViewport
@@ -704,6 +708,16 @@ update message (Model env page) =
             )
 
         RestartGameClicked ->
+            case page of
+                StartPage _ ->
+                    ( Model env page, Cmd.none )
+
+                GamePage game ->
+                    ( Model env (GamePage (reStartGame env.frame game))
+                    , playSound "btn"
+                    )
+
+        PauseGameClicked ->
             case page of
                 StartPage _ ->
                     ( Model env page, Cmd.none )
@@ -1187,6 +1201,14 @@ viewHeader turn =
                 [ S.pointerEvents "fill"
                 , S.cursor "pointer"
                 , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
+                ]
+            ]
+        , group [ transform [ translate wc.pauseBtn.c ] ]
+            [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ]
+            , rect wc.pauseBtn.ri
+                [ S.pointerEvents "fill"
+                , S.cursor "pointer"
+                , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
                 ]
             ]
         ]
