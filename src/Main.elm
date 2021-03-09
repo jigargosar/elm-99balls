@@ -615,8 +615,8 @@ init { stars } =
             initialEnvironment
 
         page =
-            initGame env.frame stars initialSeed
-                |> GamePage
+            GamePage (initGame env.frame stars initialSeed)
+                |> always (StartPage { stars = stars })
     in
     ( Model env page
     , Dom.getViewport
@@ -1139,8 +1139,8 @@ viewPage { vri, frame, pointer } page =
         , case page of
             StartPage _ ->
                 group []
-                    [ rect (vec (gc.cellR * 3) (gc.cellR * 1.2)) [ fillP footerBGC ]
-                    , words "Play" [ fillP white ]
+                    [ rect (vec (gc.cellR * 2) (gc.cellR * 1)) [ fillP footerBGC ]
+                    , words "START" [ fillP white, transform [ scale 3 ] ]
                     ]
 
             GamePage g ->
