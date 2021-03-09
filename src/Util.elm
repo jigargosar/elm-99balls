@@ -231,6 +231,11 @@ randomOneOf xs =
                 |> Random.map Just
 
 
+isPointInRectRI : Vec -> Vec -> Bool
+isPointInRectRI ri { x, y } =
+    abs x < ri.x && abs y < ri.y
+
+
 cornersFromRadii : Vec -> { leftTop : Vec, rightTop : Vec, rightBottom : Vec, leftBottom : Vec }
 cornersFromRadii ri =
     let

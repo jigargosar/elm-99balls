@@ -613,6 +613,7 @@ type Msg
     | PointerMoved Vec
     | RestartGameClicked
     | PauseGameClicked
+    | ResumeGameClicked
     | StartGameClicked
 
 
@@ -725,6 +726,16 @@ update message (Model env page) =
                     , playSound "btn"
                     )
 
+        ResumeGameClicked ->
+            case page of
+                StartPage _ ->
+                    ( Model env page, Cmd.none )
+
+                GamePage game ->
+                    ( Model env (GamePage { game | paused = False })
+                    , playSound "btn"
+                    )
+
         PauseGameClicked ->
             case page of
                 StartPage _ ->
@@ -798,7 +809,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             )
 
         WaitingForInput { ballPosition } ->
-            ( if pointerDown && not prevPointerDown then
+            ( if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
                 { game | state = initAimingTowardsState pointer ballPosition }
 
               else
@@ -1194,7 +1205,7 @@ viewPage { vri, frame, pointer } page =
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
-                        group []
+                        group [ onClick ResumeGameClicked ]
                             [ rect wc.ri [ fillP black, fade 0.8 ]
                             ]
 
