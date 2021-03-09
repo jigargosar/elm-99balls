@@ -239,7 +239,7 @@ viewFloorBalls now fbs =
 
         NonEmptyFloorBalls first anims ->
             group []
-                (viewBallAt first
+                (viewBall first
                     :: (anims
                             |> List.filterMap (viewAnim now (viewFloorBall first))
                        )
@@ -252,7 +252,7 @@ viewFloorBall toPosition progress position =
         newPosition =
             position |> vecMapX (\x -> lerp x toPosition.x progress)
     in
-    viewBallAt newPosition
+    viewBall newPosition
 
 
 initSim : Float -> Vec -> Float -> Int -> Sim
@@ -540,7 +540,6 @@ type alias Ball =
     { position : Vec
     , angle : Float
     , speed : Float
-    , hue : Float
     , radius : Float
     }
 
@@ -549,7 +548,7 @@ initialBallPosition =
     vec 0 (gc.ri.y - gc.ballR)
 
 
-ballHue =
+bonusHue =
     0.15
 
 
@@ -557,7 +556,6 @@ initBall : Vec -> Float -> Ball
 initBall position angle =
     { position = position
     , angle = angle
-    , hue = ballHue
     , radius = gc.ballR
     , speed = gc.ballSpeed
     }
@@ -1302,11 +1300,11 @@ viewState now pointer turn targets state =
                 ]
 
         TargetsEntering { ballPosition } ->
-            viewBallAt ballPosition
+            viewBall ballPosition
 
         WaitingForInput { ballPosition } ->
             group []
-                [ viewBallAt ballPosition
+                [ viewBall ballPosition
                 , if turn == 1 then
                     viewTutorial 0 now
 
@@ -1316,7 +1314,7 @@ viewState now pointer turn targets state =
 
         Aiming { dragStartAt, ballPosition } ->
             group []
-                [ viewBallAt ballPosition
+                [ viewBall ballPosition
                 , if turn == 1 then
                     viewTutorial 0 now
 
@@ -1603,7 +1601,7 @@ viewTarget now target =
             viewSolidTarget position hp
 
         BonusBallTarget ->
-            viewBallAt (bonusAnimPosition now position)
+            viewBonusBall (bonusAnimPosition now position)
 
         StarTarget ->
             viewStar (bonusAnimPosition now position)
@@ -1653,28 +1651,49 @@ viewSolidTarget position hp =
 
 viewBalls : List Ball -> Svg Msg
 viewBalls balls =
-    group [] (List.map (.position >> viewBallAt) balls)
+    group [] (List.map (.position >> viewBall) balls)
 
 
 viewStar : Vec -> Svg msg
 viewStar p =
-    group [ fillH ballHue, transform [ translate p ] ] [ starSvg ]
+    group [ fillH bonusHue, transform [ translate p ] ] [ starSvg ]
 
 
-viewBallAt : Vec -> Svg msg
-viewBallAt p =
+viewBonusBall : Vec -> Svg msg
+viewBonusBall p =
     let
         radius =
-            gc.ballR
+            gc.targetR * 0.8
 
         strokeW =
-            radius * 0.3
+            radius * 0.4
 
         innerRadius =
             radius - strokeW / 2
     in
     group
-        [ strokeH ballHue
+        [ strokeH bonusHue
+        , transform [ translate p ]
+        , Px.strokeWidth strokeW
+        ]
+        [ Svg.circle [ Px.r innerRadius ] []
+        ]
+
+
+viewBall : Vec -> Svg msg
+viewBall p =
+    let
+        radius =
+            gc.ballR
+
+        strokeW =
+            radius * 0.4
+
+        innerRadius =
+            radius - strokeW / 2
+    in
+    group
+        [ strokeP footerBGC
         , transform [ translate p ]
         , Px.strokeWidth strokeW
         ]
