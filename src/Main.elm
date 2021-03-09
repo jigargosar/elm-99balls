@@ -44,6 +44,8 @@ port saveStars : Int -> Cmd msg
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
 
+  - pause screen
+
   - mute btn
 
   - test input handling on phone/touch device.
