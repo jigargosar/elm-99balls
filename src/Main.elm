@@ -143,6 +143,7 @@ type alias Game =
     , stars : Int
     , targets : List Target
     , state : State
+    , paused : Bool
     , seed : Seed
     }
 
@@ -653,6 +654,7 @@ initGame now stars seed =
 
     --|> always (initGameLost now)
     , turn = 0
+    , paused = True
     , seed = seed
     }
         |> applyN 8 incTurnThenAddTargetRow
