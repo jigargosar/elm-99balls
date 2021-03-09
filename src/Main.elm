@@ -1188,6 +1188,13 @@ viewPage { vri, frame, pointer } page =
                     , viewTargets frame g.state g.targets
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
+                    , if g.paused then
+                        group []
+                            [ rect wc.ri [ fillP black, fade 0.8 ]
+                            ]
+
+                      else
+                        noView
                     ]
         ]
 
