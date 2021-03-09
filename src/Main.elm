@@ -731,7 +731,7 @@ update message (Model env page) =
                     ( Model env page, Cmd.none )
 
                 GamePage game ->
-                    ( Model env (GamePage (reStartGame env.frame game))
+                    ( Model env (GamePage { game | paused = True })
                     , playSound "btn"
                     )
 
