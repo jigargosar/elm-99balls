@@ -707,7 +707,9 @@ update message (Model env page) =
                     ( Model env page, Cmd.none )
 
                 GamePage game ->
-                    ( Model env (GamePage (reStartGame env.frame game)), Cmd.none )
+                    ( Model env (GamePage (reStartGame env.frame game))
+                    , playSound "btn"
+                    )
 
         StartGameClicked ->
             case page of
