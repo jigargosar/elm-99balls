@@ -158,12 +158,6 @@ type State
     | Aiming { dragStartAt : Vec, ballPosition : Vec }
     | Simulating Sim
     | GameLost Anim0
-    | Paused Pause
-
-
-type Pause
-    = PausedWFI { ballPosition : Vec }
-    | PausedSim Sim
 
 
 type alias Sim =
@@ -839,9 +833,6 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 Nothing ->
                     stepSim frame game sim
 
-        Paused _ ->
-            ( game, Cmd.none )
-
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
 ballPositionOnSimEnd now sim =
@@ -1297,9 +1288,6 @@ viewState now pointer turn targets state =
                     noView
                 ]
 
-        Paused (PausedWFI { ballPosition }) ->
-            viewBallAt ballPosition
-
         Aiming { dragStartAt, ballPosition } ->
             group []
                 [ viewBallAt ballPosition
@@ -1320,13 +1308,6 @@ viewState now pointer turn targets state =
                 ]
 
         Simulating sim ->
-            group []
-                [ viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
-                , viewFloorBalls now sim.floorBalls
-                , viewKillAnims now sim.killAnims
-                ]
-
-        Paused (PausedSim sim) ->
             group []
                 [ viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
                 , viewFloorBalls now sim.floorBalls
