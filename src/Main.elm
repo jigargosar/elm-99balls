@@ -1138,7 +1138,10 @@ viewPage { vri, frame, pointer } page =
         [ rect wc.ri [ fillP black ]
         , case page of
             StartPage _ ->
-                noView
+                group []
+                    [ rect (vec (gc.cellR * 3) (gc.cellR * 1.2)) [ fillP footerBGC ]
+                    , words "Play" [ fillP white ]
+                    ]
 
             GamePage g ->
                 group []
@@ -1170,6 +1173,10 @@ viewHeader turn =
         ]
 
 
+footerBGC =
+    hsl 0.07 0.8 0.5
+
+
 viewFooter : Int -> Int -> Svg msg
 viewFooter ballCount stars =
     let
@@ -1180,7 +1187,7 @@ viewFooter ballCount stars =
             off * 3
     in
     group [ transform [ translate wc.footer.c ] ]
-        [ rect wc.footer.ri [ fillP <| hsl 0.07 0.8 0.5 ]
+        [ rect wc.footer.ri [ fillP footerBGC ]
         , group [ transform [ translateXY -off2 0 ] ]
             [ circle gc.ballR
                 [ fillP white
