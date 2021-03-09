@@ -27,7 +27,7 @@ app.ports["saveStars"]["subscribe"]((function (stars) {
 }))
 
 app.ports["playSound"]["subscribe"]((function () {
-    const soundPathMapping =
+    const soundNameToPathMap =
         {
             shoot: 'snd_shoot.ogg',
             hit: 'snd_hit.ogg',
@@ -49,7 +49,7 @@ app.ports["playSound"]["subscribe"]((function () {
                 volume: k.startsWith("kill_") ? 0.3 : 1
             });
         },
-        soundPathMapping,
+        soundNameToPathMap,
     )
 
     return function playSound(name) {
