@@ -41,6 +41,8 @@ port saveStars : Int -> Cmd msg
 
   - [x] add actual star shape svg
 
+  - start screen with logo/play/shop buttons.
+
   - mute btn
 
   - test input handling on phone/touch device.
