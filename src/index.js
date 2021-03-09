@@ -29,6 +29,7 @@ app.ports["saveStars"]["subscribe"]((function (stars) {
 app.ports["playSound"]["subscribe"]((function () {
     const soundNameToPathMap =
         {
+            btn: 'snd_btn.ogg',
             shoot: 'snd_shoot.ogg',
             hit: 'snd_hit.ogg',
             bonus_hit: 'snd_bonus_hit.ogg',

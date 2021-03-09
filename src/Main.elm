@@ -712,7 +712,9 @@ update message (Model env page) =
         StartGameClicked ->
             case page of
                 StartPage start ->
-                    ( Model env (GamePage (initGame env.frame start.stars start.seed)), Cmd.none )
+                    ( Model env (GamePage (initGame env.frame start.stars start.seed))
+                    , playSound "btn"
+                    )
 
                 GamePage _ ->
                     ( Model env page, Cmd.none )
