@@ -1234,7 +1234,7 @@ viewPage { vri, frame, pointer } page =
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
-                        viewPausedOverlay
+                        viewPausedDialog
 
                       else
                         noView
@@ -1261,8 +1261,8 @@ viewPage { vri, frame, pointer } page =
         ]
 
 
-viewPausedOverlay : Svg Msg
-viewPausedOverlay =
+viewPausedDialog : Svg Msg
+viewPausedDialog =
     let
         progress =
             1
