@@ -869,7 +869,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             { anim = initAnim0 frame transitionDuration
                             , score = game.turn
                             , stars = game.stars
-                            , targets = game.targets
+                            , targets = List.map moveTargetDown game.targets
                             , seed = game.seed
                             }
                         , Cmd.none
@@ -882,24 +882,28 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
 updateGameTargetOffsets : Float -> Game -> Game
 updateGameTargetOffsets now game =
-    { game | targets = updateTargetOffsets now game.targets }
-
-
-updateTargetOffsets : Float -> List Target -> List Target
-updateTargetOffsets now =
     let
-        updateTargetOffset t =
+        ( targets, seed ) =
+            updateTargetOffsets game.targets game.seed
+    in
+    { game | targets = targets, seed = seed }
+
+
+updateTargetOffsets : List Target -> Seed -> ( List Target, Seed )
+updateTargetOffsets targets seed0 =
+    let
+        updateTargetOffset t ( acc, seed ) =
             case t.kind of
                 SolidTarget _ ->
-                    t
+                    ( t :: acc, seed )
 
                 BonusBallTarget ->
-                    { t | offset = bonusAnimOffset now t.position }
+                    ( t :: acc, seed )
 
                 StarTarget ->
-                    { t | offset = bonusAnimOffset now t.position }
+                    ( t :: acc, seed )
     in
-    List.map updateTargetOffset
+    List.foldl updateTargetOffset ( [], seed0 ) targets
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
@@ -1267,7 +1271,7 @@ viewPage { vri, frame, pointer } page =
                         clampedAnimProgress frame anim
                 in
                 group []
-                    [ viewTargetsWithAnimProgress frame 1 targets
+                    [ viewTargetsWithAnimProgress progress targets
                     , group [ onClick RestartGameClicked ]
                         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
                         , group
@@ -1654,21 +1658,21 @@ viewTargets now state targets =
             (1 - progress) * -(gc.cri.y * 2)
     in
     group [ transform [ translateXY 0 dy ] ]
-        (List.map (viewTarget now) targets)
+        (List.map viewTarget targets)
 
 
-viewTargetsWithAnimProgress : Float -> Float -> List Target -> Svg msg
-viewTargetsWithAnimProgress now progress targets =
+viewTargetsWithAnimProgress : Float -> List Target -> Svg msg
+viewTargetsWithAnimProgress progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
     in
     group [ transform [ translateXY 0 dy ] ]
-        (List.map (viewTarget now) targets)
+        (List.map viewTarget targets)
 
 
-viewTarget : Float -> Target -> Svg msg
-viewTarget now target =
+viewTarget : Target -> Svg msg
+viewTarget target =
     let
         position =
             target.position
