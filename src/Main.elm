@@ -10,7 +10,7 @@ import Html.Events as E exposing (onClick)
 import Json.Decode as JD exposing (Decoder)
 import List.Extra as List
 import Maybe.Extra as Maybe
-import Random exposing (Generator)
+import Random exposing (Generator, Seed)
 import Svg exposing (Svg)
 import Svg.Attributes as S
 import Task
@@ -336,7 +336,7 @@ type TargetKind
 
 type alias Target =
     { position : Vec
-    , offset : Vec
+    , clock : Float
     , kind : TargetKind
     }
 
@@ -344,7 +344,7 @@ type alias Target =
 initTarget : GP -> TargetKind -> Target
 initTarget gp kind =
     { position = gpToWorld gp
-    , offset = vecZero
+    , clock = 0
     , kind = kind
     }
 
@@ -901,24 +901,21 @@ moveTargets targets seed0 =
                             |> vecMapLen (atMost 50)
                     )
 
+        updateTargetOffset : Target -> ( List Target, Seed ) -> ( List Target, Seed )
         updateTargetOffset t ( acc, seed ) =
             case t.kind of
                 SolidTarget _ ->
                     ( t :: acc, seed )
 
                 BonusBallTarget ->
-                    ( rndOffset t.offset
-                        |> rnd1 (\offset -> { t | offset = offset } :: acc)
+                    ( { t | clock = t.clock + 1 } :: acc
                     , seed
                     )
-                        |> rndStep
 
                 StarTarget ->
-                    ( rndOffset t.offset
-                        |> rnd1 (\offset -> { t | offset = offset } :: acc)
+                    ( { t | clock = t.clock + 1 } :: acc
                     , seed
                     )
-                        |> rndStep
     in
     List.foldr updateTargetOffset ( [], seed0 ) targets
 
@@ -1699,16 +1696,15 @@ viewTarget target =
             viewSolidTarget position hp
 
         BonusBallTarget ->
-            viewBonusBall (vecAdd position target.offset)
+            viewBonusBall (bonusAnimPosition target.clock target.position)
 
         StarTarget ->
-            viewStar (vecAdd position target.offset)
+            viewStar (bonusAnimPosition target.clock target.position)
 
 
-
---bonusAnimPosition : Float -> Vec -> Vec
---bonusAnimPosition now position =
---    vecAdd position (bonusAnimOffset now position)
+bonusAnimPosition : Float -> Vec -> Vec
+bonusAnimPosition now position =
+    vecAdd position (bonusAnimOffset now position)
 
 
 bonusAnimOffset : Float -> Vec -> Vec

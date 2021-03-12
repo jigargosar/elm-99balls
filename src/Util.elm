@@ -782,10 +782,6 @@ maximum =
 -- Random
 
 
-type alias Seed =
-    Random.Seed
-
-
 seedFrom =
     Random.initialSeed
 
