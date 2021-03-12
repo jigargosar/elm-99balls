@@ -353,8 +353,10 @@ randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     rnd2 (List.map2 initTarget)
         (shuffle gc.topRowPS)
-        (rnd2 (++) (randomSolidTargetKinds turns) (rndLenList rndBonusBallCount rndBonusBallTargetKind)
-            |> rnd2 (++) (rndLenList rndStarCount rndStarTargetKind)
+        (rnd3 (\solids balls stars -> solids ++ balls ++ stars)
+            (rndLenList rndSolidTargetCount (rndSolidTargetKind turns))
+            (rndLenList rndBonusBallCount rndBonusBallTargetKind)
+            (rndLenList rndStarCount rndStarTargetKind)
         )
 
 
@@ -399,11 +401,6 @@ rndBonusBallTargetKind =
 rndStarTargetKind : Generator TargetKind
 rndStarTargetKind =
     rndF 0 100 |> rnd1 StarTarget
-
-
-randomSolidTargetKinds : Int -> Generator (List TargetKind)
-randomSolidTargetKinds turns =
-    rndLenList rndSolidTargetCount (rndSolidTargetKind turns)
 
 
 rndSolidTargetKind : Int -> Generator TargetKind

@@ -810,6 +810,10 @@ rnd2 =
     Random.map2
 
 
+rnd3 =
+    Random.map3
+
+
 rnd1 =
     Random.map
 
