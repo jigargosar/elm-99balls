@@ -1220,7 +1220,7 @@ viewPage { vri, frame, pointer } page =
         , case page of
             StartPage _ ->
                 group [ onClick StartGameClicked ]
-                    [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP footerBGC ]
+                    [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP lightOrange ]
                     , words "START" [ fillP white, transform [ scale 3 ] ]
                     ]
 
@@ -1234,19 +1234,7 @@ viewPage { vri, frame, pointer } page =
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
-                        let
-                            progress =
-                                1
-                        in
-                        group [ onClick ResumeGameClicked ]
-                            [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
-                            , group
-                                [ fade progress
-                                ]
-                                [ words "PAUSED" [ transform [ translateXY 0 -50, scale 5 ] ]
-                                , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
-                                ]
-                            ]
+                        viewPausedOverlay
 
                       else
                         noView
@@ -1270,6 +1258,24 @@ viewPage { vri, frame, pointer } page =
                             ]
                         ]
                     ]
+        ]
+
+
+viewPausedOverlay : Svg Msg
+viewPausedOverlay =
+    let
+        progress =
+            1
+    in
+    group [ onClick ResumeGameClicked ]
+        [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+        , group
+            [ fade progress
+            , fillP lightOrange
+            ]
+            [ words "PAUSED" [ transform [ translateXY 0 -50, scale 5 ] ]
+            , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+            ]
         ]
 
 
@@ -1298,7 +1304,7 @@ viewHeader turn =
         ]
 
 
-footerBGC =
+lightOrange =
     hsl 0.07 0.8 0.5
 
 
@@ -1312,7 +1318,7 @@ viewFooter ballCount stars =
             off * 3
     in
     group [ transform [ translate wc.footer.c ] ]
-        [ rect wc.footer.ri [ fillP footerBGC ]
+        [ rect wc.footer.ri [ fillP lightOrange ]
         , group [ transform [ translateXY -off2 0 ] ]
             [ circle gc.ballR
                 [ fillP white
@@ -1763,7 +1769,7 @@ viewBall p =
             radius - strokeW / 2
     in
     group
-        [ strokeP footerBGC
+        [ strokeP lightOrange
         , transform [ translate p ]
         , Px.strokeWidth strokeW
         ]
