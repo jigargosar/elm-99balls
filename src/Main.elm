@@ -834,7 +834,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                else
                 game
               )
-                |> stepTargetAnimClock
+                |> stepTargets
                 |> GamePage
             , Cmd.none
             )
@@ -851,7 +851,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 Just angle ->
                                     Simulating (initSim frame ballPosition angle game.ballCount)
                     }
-                        |> stepTargetAnimClock
+                        |> stepTargets
 
                 else
                     game
@@ -888,9 +888,24 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> Tuple.mapFirst GamePage
 
 
-stepTargetAnimClock : Game -> Game
-stepTargetAnimClock game =
-    { game | targetAnimClock = inc game.targetAnimClock }
+stepTargets : Game -> Game
+stepTargets game =
+    let
+        stepTarget t =
+            case t.kind of
+                SolidTarget _ ->
+                    t
+
+                BonusBallTarget c ->
+                    { t | kind = BonusBallTarget (inc c) }
+
+                StarTarget c ->
+                    { t | kind = StarTarget (inc c) }
+    in
+    { game
+        | targetAnimClock = inc game.targetAnimClock
+        , targets = List.map stepTarget game.targets
+    }
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
@@ -938,7 +953,7 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
         , stars = newStars
       }
-        |> stepTargetAnimClock
+        |> stepTargets
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
