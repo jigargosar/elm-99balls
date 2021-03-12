@@ -827,7 +827,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                else
                 game
               )
-                |> updateGameTargetOffsets
+                |> moveGameTargets
                 |> GamePage
             , Cmd.none
             )
@@ -844,7 +844,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 Just angle ->
                                     Simulating (initSim frame ballPosition angle game.ballCount)
                     }
-                        |> updateGameTargetOffsets
+                        |> moveGameTargets
 
                 else
                     game
@@ -880,17 +880,17 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> Tuple.mapFirst GamePage
 
 
-updateGameTargetOffsets : Game -> Game
-updateGameTargetOffsets game =
+moveGameTargets : Game -> Game
+moveGameTargets game =
     let
         ( targets, seed ) =
-            updateTargetOffsets game.targets game.seed
+            moveTargets game.targets game.seed
     in
     { game | targets = targets, seed = seed }
 
 
-updateTargetOffsets : List Target -> Seed -> ( List Target, Seed )
-updateTargetOffsets targets seed0 =
+moveTargets : List Target -> Seed -> ( List Target, Seed )
+moveTargets targets seed0 =
     let
         updateTargetOffset t ( acc, seed ) =
             case t.kind of
@@ -951,7 +951,7 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
         , stars = newStars
       }
-        |> updateGameTargetOffsets
+        |> moveGameTargets
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
