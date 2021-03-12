@@ -1674,7 +1674,7 @@ viewTargetsWithAnimProgress progress clock targets =
 
 
 viewTarget : Float -> Target -> Svg msg
-viewTarget clock target =
+viewTarget _ target =
     let
         position =
             target.position
@@ -1683,10 +1683,10 @@ viewTarget clock target =
         SolidTarget hp ->
             viewSolidTarget position hp
 
-        BonusBallTarget _ ->
+        BonusBallTarget clock ->
             viewBonusBall (bonusAnimPosition clock position)
 
-        StarTarget _ ->
+        StarTarget clock ->
             viewStar (bonusAnimPosition clock position)
 
 
