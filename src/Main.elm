@@ -336,6 +336,12 @@ type TargetKind
     | StarTarget
 
 
+type Target2
+    = SolidTarget2 Vec Int
+    | BonusBallTarget2 Vec Float
+    | StarTarget2 Vec Float
+
+
 type alias Target =
     { position : Vec
     , kind : TargetKind
