@@ -893,12 +893,12 @@ moveTargets : List Target -> Seed -> ( List Target, Seed )
 moveTargets targets seed0 =
     let
         rndOffset prevOffset =
-            rndUnitVec
+            rndF -(degrees 150) (degrees 150)
                 |> rnd1
-                    (\u ->
+                    (\a ->
                         prevOffset
-                            |> vecAdd (vecScale 1 u)
-                            |> vecMapLen (atMost 5)
+                            |> vecAdd (vecFromRTheta 0.4 (vecAngle prevOffset + a))
+                            |> vecMapLen (atMost 50)
                     )
 
         updateTargetOffset t ( acc, seed ) =
