@@ -878,8 +878,20 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
 
 updateTargetOffsets : Float -> List Target -> List Target
-updateTargetOffsets now targets =
-    targets
+updateTargetOffsets now =
+    let
+        updateTargetOffset t =
+            case t.kind of
+                SolidTarget _ ->
+                    t
+
+                BonusBallTarget ->
+                    { t | offset = bonusAnimOffset now t.position }
+
+                StarTarget ->
+                    { t | offset = bonusAnimOffset now t.position }
+    in
+    List.map updateTargetOffset
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
