@@ -332,14 +332,8 @@ stepEmitterHelp now emitter =
 
 type TargetKind
     = SolidTarget Int
-    | BonusBallTarget
-    | StarTarget
-
-
-type Target2
-    = SolidTarget2 Vec Int
-    | BonusBallTarget2 Vec Float
-    | StarTarget2 Vec Float
+    | BonusBallTarget Float
+    | StarTarget Float
 
 
 type alias Target =
@@ -359,13 +353,13 @@ randomTargets : Int -> Generator (List Target)
 randomTargets turns =
     rnd2 (List.map2 initTarget)
         (shuffle gc.topRowPS)
-        (rnd2 (++) (randomSolidTargetKinds turns) randomExtraBallTargetKinds
-            |> rnd2 (++) (rndStarCount |> rnd1 (\n -> List.repeat n StarTarget))
+        (rnd2 (++) (randomSolidTargetKinds turns) (rndLenList rndBonusBallCount rndBonusBallTargetKind)
+            |> rnd2 (++) (rndLenList rndStarCount rndStarTargetKind)
         )
 
 
-rndExtraBallCount : Generator Int
-rndExtraBallCount =
+rndBonusBallCount : Generator Int
+rndBonusBallCount =
     rndBell_ 0 2 |> rnd1 (abs >> round)
 
 
@@ -397,9 +391,14 @@ rndTargetHealth turns =
         |> rnd1 (abs >> clamp 1 (min (t + 1) maxHP) >> round)
 
 
-randomExtraBallTargetKinds : Generator (List TargetKind)
-randomExtraBallTargetKinds =
-    rndExtraBallCount |> rnd1 (\i -> List.repeat i BonusBallTarget)
+rndBonusBallTargetKind : Generator TargetKind
+rndBonusBallTargetKind =
+    rndF 0 100 |> rnd1 BonusBallTarget
+
+
+rndStarTargetKind : Generator TargetKind
+rndStarTargetKind =
+    rndF 0 100 |> rnd1 StarTarget
 
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
@@ -1081,7 +1080,7 @@ updateBall acc ball =
                                 , BallMoved newBall
                                 )
 
-                        BonusBallTarget ->
+                        BonusBallTarget _ ->
                             ( { acc
                                 | targets = remove target acc.targets
                                 , bonusBallsCollected = inc acc.bonusBallsCollected
@@ -1089,7 +1088,7 @@ updateBall acc ball =
                             , BallMoved newBall
                             )
 
-                        StarTarget ->
+                        StarTarget _ ->
                             ( { acc
                                 | targets = remove target acc.targets
                                 , starsCollected = inc acc.starsCollected
@@ -1111,10 +1110,10 @@ resolveBallCollision collision ballCollision velocity ball =
                         SolidTarget _ ->
                             True
 
-                        BonusBallTarget ->
+                        BonusBallTarget _ ->
                             False
 
-                        StarTarget ->
+                        StarTarget _ ->
                             False
 
         newPosition =
@@ -1171,10 +1170,10 @@ targetToCircle t =
         SolidTarget _ ->
             gc.targetR
 
-        BonusBallTarget ->
+        BonusBallTarget _ ->
             gc.ballR
 
-        StarTarget ->
+        StarTarget _ ->
             gc.ballR
     )
 
@@ -1668,10 +1667,10 @@ viewTarget clock target =
         SolidTarget hp ->
             viewSolidTarget position hp
 
-        BonusBallTarget ->
+        BonusBallTarget _ ->
             viewBonusBall (bonusAnimPosition clock position)
 
-        StarTarget ->
+        StarTarget _ ->
             viewStar (bonusAnimPosition clock position)
 
 

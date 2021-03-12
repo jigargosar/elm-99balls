@@ -790,6 +790,10 @@ rndStep ( g, s ) =
     Random.step g s
 
 
+rndLenList lenGen gen =
+    rndAndThen (\i -> rndList i gen) lenGen
+
+
 rndPair =
     Random.pair
 
