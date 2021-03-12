@@ -861,16 +861,26 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
-                    ( { game
-                        | state =
-                            if canTargetsSafelyMoveDown game.targets then
+                    ( if canTargetsSafelyMoveDown game.targets then
+                        { game
+                            | state =
                                 initTargetsEnteringState frame ballPosition
+                        }
+                            |> incTurnThenAddTargetRow
+                            |> GamePage
 
-                            else
-                                initGameLost frame
-                      }
-                        |> incTurnThenAddTargetRow
-                        |> GamePage
+                      else
+                        let
+                            { targets, seed, stars } =
+                                incTurnThenAddTargetRow game
+                        in
+                        OverPage
+                            { anim = initAnim0 frame transitionDuration
+                            , score = game.turn
+                            , stars = stars
+                            , targets = targets
+                            , seed = seed
+                            }
                     , Cmd.none
                     )
 
