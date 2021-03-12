@@ -677,13 +677,11 @@ update message (Model env page) =
                             ( page, Cmd.none )
 
                         GamePage game ->
-                            (if game.paused then
-                                ( game, Cmd.none )
+                            if game.paused then
+                                ( GamePage game, Cmd.none )
 
-                             else
+                            else
                                 updateGameOnTick env game
-                            )
-                                |> Tuple.mapFirst GamePage
             in
             ( Model
                 { env
@@ -791,44 +789,47 @@ initGameLost now =
     GameLost (initAnim0 now transitionDuration)
 
 
-updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
+updateGameOnTick : Env -> Game -> ( Page, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         GameLost _ ->
-            ( game, Cmd.none )
+            ( GamePage game, Cmd.none )
 
         TargetsEntering { anim, ballPosition } ->
-            ( if isAnimDone frame anim then
-                { game | state = initWaitingForInputState ballPosition }
+            ( GamePage <|
+                if isAnimDone frame anim then
+                    { game | state = initWaitingForInputState ballPosition }
 
-              else
-                game
+                else
+                    game
             , Cmd.none
             )
 
         WaitingForInput { ballPosition } ->
-            ( if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
-                { game | state = initAimingTowardsState pointer ballPosition }
+            ( GamePage <|
+                if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
+                    { game | state = initAimingTowardsState pointer ballPosition }
 
-              else
-                game
+                else
+                    game
             , Cmd.none
             )
 
         Aiming { dragStartAt, ballPosition } ->
-            ( if not pointerDown then
-                { game
-                    | state =
-                        case validAimAngleTowards dragStartAt pointer of
-                            Nothing ->
-                                initWaitingForInputState ballPosition
+            ( GamePage <|
+                if not pointerDown then
+                    { game
+                        | state =
+                            case validAimAngleTowards dragStartAt pointer of
+                                Nothing ->
+                                    initWaitingForInputState ballPosition
 
-                            Just angle ->
-                                Simulating (initSim frame ballPosition angle game.ballCount)
-                }
+                                Just angle ->
+                                    Simulating (initSim frame ballPosition angle game.ballCount)
+                    }
 
-              else
-                game
+                else
+                    game
             , Cmd.none
             )
 
@@ -844,11 +845,13 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 initGameLost frame
                       }
                         |> incTurnThenAddTargetRow
+                        |> GamePage
                     , Cmd.none
                     )
 
                 Nothing ->
                     stepSim frame game sim
+                        |> Tuple.mapFirst GamePage
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
