@@ -171,6 +171,11 @@ vecAdd =
     vecMap2 add
 
 
+vecMapLen : (Float -> Float) -> Vec -> Vec
+vecMapLen fn =
+    vecToPolar >> mapFst fn >> vecFromPolar
+
+
 vecSub : Vec -> Vec -> Vec
 vecSub =
     vecMap2 sub

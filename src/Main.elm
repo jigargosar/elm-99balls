@@ -894,7 +894,12 @@ moveTargets targets seed0 =
     let
         rndOffset prevOffset =
             rndUnitVec
-                |> rnd1 (\u -> vecAdd (vecScale 0.0001 u) prevOffset)
+                |> rnd1
+                    (\u ->
+                        prevOffset
+                            |> vecAdd (vecScale 0.5 u)
+                            |> vecMapLen (atMost 5)
+                    )
 
         updateTargetOffset t ( acc, seed ) =
             case t.kind of
@@ -915,7 +920,7 @@ moveTargets targets seed0 =
                     )
                         |> rndStep
     in
-    List.foldl updateTargetOffset ( [], seed0 ) targets
+    List.foldr updateTargetOffset ( [], seed0 ) targets
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
