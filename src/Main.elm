@@ -897,7 +897,7 @@ moveTargets targets seed0 =
                 |> rnd1
                     (\u ->
                         prevOffset
-                            |> vecAdd (vecScale 0.5 u)
+                            |> vecAdd (vecScale 1 u)
                             |> vecMapLen (atMost 5)
                     )
 
