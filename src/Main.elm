@@ -1257,7 +1257,7 @@ viewPage { vri, frame, pointer } page =
                     , viewFooter g.ballCount g.stars
 
                     -- ^--^ draw order matters, when showing aim/debug points
-                    , viewTargets frame g.targetAnimClock g.state g.targets
+                    , viewTargets frame g.state g.targets
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
@@ -1267,13 +1267,13 @@ viewPage { vri, frame, pointer } page =
                         noView
                     ]
 
-            OverPage { anim, targets, targetAnimClock } ->
+            OverPage { anim, targets } ->
                 let
                     progress =
                         clampedAnimProgress frame anim
                 in
                 group []
-                    [ viewTargetsWithAnimProgress progress targetAnimClock targets
+                    [ viewTargetsWithAnimProgress progress targets
                     , group [ onClick RestartGameClicked ]
                         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
                         , group
@@ -1645,8 +1645,8 @@ ballTravelPathHelp acc ball pathLen path =
             path
 
 
-viewTargets : Float -> Float -> State -> List Target -> Svg msg
-viewTargets now clock state targets =
+viewTargets : Float -> State -> List Target -> Svg msg
+viewTargets now state targets =
     let
         progress =
             case state of
@@ -1660,21 +1660,21 @@ viewTargets now clock state targets =
             (1 - progress) * -(gc.cri.y * 2)
     in
     group [ transform [ translateXY 0 dy ] ]
-        (List.map (viewTarget clock) targets)
+        (List.map viewTarget targets)
 
 
-viewTargetsWithAnimProgress : Float -> Float -> List Target -> Svg msg
-viewTargetsWithAnimProgress progress clock targets =
+viewTargetsWithAnimProgress : Float -> List Target -> Svg msg
+viewTargetsWithAnimProgress progress targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
     in
     group [ transform [ translateXY 0 dy ] ]
-        (List.map (viewTarget clock) targets)
+        (List.map viewTarget targets)
 
 
-viewTarget : Float -> Target -> Svg msg
-viewTarget _ target =
+viewTarget : Target -> Svg msg
+viewTarget target =
     let
         position =
             target.position
