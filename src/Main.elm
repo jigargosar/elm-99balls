@@ -143,7 +143,6 @@ type alias Over =
     , score : Int
     , stars : Int
     , targets : List Target
-    , targetAnimClock : Float
     , seed : Seed
     }
 
@@ -153,7 +152,6 @@ type alias Game =
     , ballCount : Int
     , stars : Int
     , targets : List Target
-    , targetAnimClock : Float
     , state : State
     , paused : Bool
     , seed : Seed
@@ -662,7 +660,6 @@ initGame now stars seed =
     { ballCount = 1
     , stars = stars
     , targets = []
-    , targetAnimClock = 0
     , state =
         initTargetsEnteringState now initialBallPosition
 
@@ -877,7 +874,6 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             , score = game.turn
                             , stars = game.stars
                             , targets = List.map moveTargetDown game.targets
-                            , targetAnimClock = game.targetAnimClock
                             , seed = game.seed
                             }
                         , Cmd.none
@@ -902,10 +898,7 @@ stepTargets game =
                 StarTarget c ->
                     { t | kind = StarTarget (inc c) }
     in
-    { game
-        | targetAnimClock = inc game.targetAnimClock
-        , targets = List.map stepTarget game.targets
-    }
+    { game | targets = List.map stepTarget game.targets }
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
