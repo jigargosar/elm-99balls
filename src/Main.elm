@@ -403,8 +403,12 @@ rndStarTargetKind =
 
 randomSolidTargetKinds : Int -> Generator (List TargetKind)
 randomSolidTargetKinds turns =
-    rndSolidTargetCount
-        |> rndAndThen (\i -> rndList i (rndTargetHealth turns |> rnd1 SolidTarget))
+    rndLenList rndSolidTargetCount (rndSolidTargetKind turns)
+
+
+rndSolidTargetKind : Int -> Generator TargetKind
+rndSolidTargetKind turns =
+    rndTargetHealth turns |> rnd1 SolidTarget
 
 
 rndBell_ : Float -> Float -> Generator Float
