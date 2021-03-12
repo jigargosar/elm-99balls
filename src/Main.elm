@@ -336,13 +336,17 @@ type TargetKind
 
 type alias Target =
     { position : Vec
+    , offset : Vec
     , kind : TargetKind
     }
 
 
 initTarget : GP -> TargetKind -> Target
 initTarget gp kind =
-    Target (gpToWorld gp) kind
+    { position = gpToWorld gp
+    , offset = vecZero
+    , kind = kind
+    }
 
 
 randomTargets : Int -> Generator (List Target)
