@@ -168,7 +168,6 @@ type State
     | WaitingForInput { ballPosition : Vec }
     | Aiming { dragStartAt : Vec, ballPosition : Vec }
     | Simulating Sim
-    | GameLost Anim0
 
 
 type alias Sim =
@@ -804,17 +803,9 @@ initAimingTowardsState pointer ballPosition =
         }
 
 
-initGameLost : Float -> State
-initGameLost now =
-    GameLost (initAnim0 now transitionDuration)
-
-
 updateGameOnTick : Env -> Game -> ( Page, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        GameLost _ ->
-            ( GamePage game, Cmd.none )
-
         TargetsEntering { anim, ballPosition } ->
             ( GamePage <|
                 if isAnimDone frame anim then
@@ -1348,23 +1339,6 @@ viewFooter ballCount stars =
 viewState : Float -> Vec -> Int -> List Target -> State -> Svg Msg
 viewState now pointer turn targets state =
     case state of
-        GameLost anim ->
-            let
-                progress =
-                    clampedAnimProgress now anim
-            in
-            group [ onClick RestartGameClicked ]
-                [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
-                , group
-                    [ fillH 0.14
-                    , fillH 0.14
-                    , fade progress
-                    ]
-                    [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
-                    , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
-                    ]
-                ]
-
         TargetsEntering { ballPosition } ->
             viewBall ballPosition
 
@@ -1640,9 +1614,6 @@ viewTargets now state targets =
     let
         progress =
             case state of
-                GameLost anim ->
-                    clampedAnimProgress now anim
-
                 TargetsEntering { anim } ->
                     clampedAnimProgress now anim
 
