@@ -131,10 +131,20 @@ initialEnvironment =
 type Page
     = StartPage Start
     | GamePage Game
+    | OverPage Over
 
 
 type alias Start =
     { stars : Int, seed : Seed }
+
+
+type alias Over =
+    { anim : Anim0
+    , score : Int
+    , stars : Int
+    , targets : List Target
+    , seed : Seed
+    }
 
 
 type alias Game =
@@ -682,6 +692,9 @@ update message (Model env page) =
 
                             else
                                 updateGameOnTick env game
+
+                        OverPage _ ->
+                            ( page, Cmd.none )
             in
             ( Model
                 { env
@@ -722,6 +735,9 @@ update message (Model env page) =
                     , playSound "btn"
                     )
 
+                OverPage _ ->
+                    ( Model env page, Cmd.none )
+
         ResumeGameClicked ->
             case page of
                 StartPage _ ->
@@ -731,6 +747,9 @@ update message (Model env page) =
                     ( Model env (GamePage { game | paused = False })
                     , playSound "btn"
                     )
+
+                OverPage _ ->
+                    ( Model env page, Cmd.none )
 
         PauseGameClicked ->
             case page of
@@ -742,6 +761,9 @@ update message (Model env page) =
                     , playSound "btn"
                     )
 
+                OverPage _ ->
+                    ( Model env page, Cmd.none )
+
         StartGameClicked ->
             case page of
                 StartPage start ->
@@ -750,6 +772,9 @@ update message (Model env page) =
                     )
 
                 GamePage _ ->
+                    ( Model env page, Cmd.none )
+
+                OverPage _ ->
                     ( Model env page, Cmd.none )
 
 
@@ -1206,12 +1231,44 @@ viewPage { vri, frame, pointer } page =
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
+                        let
+                            progress =
+                                1
+                        in
                         group [ onClick ResumeGameClicked ]
-                            [ rect wc.ri [ fillP black, fade 0.8 ]
+                            [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+                            , group
+                                [ fillH 0.14
+                                , fillH 0.14
+                                , fade progress
+                                ]
+                                [ words "PAUSED" [ transform [ translateXY 0 -50, scale 5 ] ]
+                                , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+                                ]
                             ]
 
                       else
                         noView
+                    ]
+
+            OverPage { anim, targets } ->
+                let
+                    progress =
+                        clampedAnimProgress frame anim
+                in
+                group []
+                    [ viewTargetsWithAnimProgress frame 1 targets
+                    , group [ onClick RestartGameClicked ]
+                        [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+                        , group
+                            [ fillH 0.14
+                            , fillH 0.14
+                            , fade progress
+                            ]
+                            [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
+                            , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+                            ]
+                        ]
                     ]
         ]
 
@@ -1586,6 +1643,16 @@ viewTargets now state targets =
                 _ ->
                     1
 
+        dy =
+            (1 - progress) * -(gc.cri.y * 2)
+    in
+    group [ transform [ translateXY 0 dy ] ]
+        (List.map (viewTarget now) targets)
+
+
+viewTargetsWithAnimProgress : Float -> Float -> List Target -> Svg msg
+viewTargetsWithAnimProgress now progress targets =
+    let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
     in
