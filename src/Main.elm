@@ -821,14 +821,14 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             )
 
         WaitingForInput { ballPosition } ->
-            ( GamePage <|
-                (if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
-                    { game | state = initAimingTowardsState pointer ballPosition }
+            ( (if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
+                { game | state = initAimingTowardsState pointer ballPosition }
 
-                 else
-                    game
-                )
-                    |> updateGameTargetOffsets frame
+               else
+                game
+              )
+                |> updateGameTargetOffsets frame
+                |> GamePage
             , Cmd.none
             )
 
@@ -1678,15 +1678,16 @@ viewTarget now target =
             viewSolidTarget position hp
 
         BonusBallTarget ->
-            viewBonusBall (bonusAnimPosition now position)
+            viewBonusBall (vecAdd position target.offset)
 
         StarTarget ->
-            viewStar (bonusAnimPosition now position)
+            viewStar (vecAdd position target.offset)
 
 
-bonusAnimPosition : Float -> Vec -> Vec
-bonusAnimPosition now position =
-    vecAdd position (bonusAnimOffset now position)
+
+--bonusAnimPosition : Float -> Vec -> Vec
+--bonusAnimPosition now position =
+--    vecAdd position (bonusAnimOffset now position)
 
 
 bonusAnimOffset : Float -> Vec -> Vec
