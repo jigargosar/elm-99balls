@@ -203,25 +203,35 @@ vecAlong directionVec v =
     vecScale mag n
 
 
-randomVec : Float -> Float -> Float -> Float -> Generator Vec
-randomVec a b c d =
+rndVec : Float -> Float -> Float -> Float -> Generator Vec
+rndVec a b c d =
     Random.map2 vec (Random.float a b) (Random.float c d)
 
 
-randomVecInRadii : Vec -> Generator Vec
-randomVecInRadii ri =
-    randomVec -ri.x ri.x -ri.y ri.y
+rndUnitVec : Generator Vec
+rndUnitVec =
+    rndAngle |> rnd1 vecFromAngle
 
 
-randomPtOnSeg : ( Vec, Vec ) -> Generator Vec
-randomPtOnSeg ( a, b ) =
+rndAngle : Generator Float
+rndAngle =
+    Random.float 0 1 |> rnd1 turns
+
+
+rndVecInRadii : Vec -> Generator Vec
+rndVecInRadii ri =
+    rndVec -ri.x ri.x -ri.y ri.y
+
+
+rndPtOnSeg : ( Vec, Vec ) -> Generator Vec
+rndPtOnSeg ( a, b ) =
     Random.map2 vec
         (Random.float (min a.x b.x) (max a.x b.x))
         (Random.float (min a.y b.y) (max a.y b.y))
 
 
-randomOneOf : List (Generator a) -> Generator (Maybe a)
-randomOneOf xs =
+rndOneOf : List (Generator a) -> Generator (Maybe a)
+rndOneOf xs =
     case xs of
         [] ->
             Random.constant Nothing

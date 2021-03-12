@@ -892,16 +892,28 @@ moveGameTargets game =
 moveTargets : List Target -> Seed -> ( List Target, Seed )
 moveTargets targets seed0 =
     let
+        rndOffset prevOffset =
+            rndUnitVec
+                |> rnd1 (\u -> vecAdd (vecScale 0.0001 u) prevOffset)
+
         updateTargetOffset t ( acc, seed ) =
             case t.kind of
                 SolidTarget _ ->
                     ( t :: acc, seed )
 
                 BonusBallTarget ->
-                    ( t :: acc, seed )
+                    ( rndOffset t.offset
+                        |> rnd1 (\offset -> { t | offset = offset } :: acc)
+                    , seed
+                    )
+                        |> rndStep
 
                 StarTarget ->
-                    ( t :: acc, seed )
+                    ( rndOffset t.offset
+                        |> rnd1 (\offset -> { t | offset = offset } :: acc)
+                    , seed
+                    )
+                        |> rndStep
     in
     List.foldl updateTargetOffset ( [], seed0 ) targets
 
