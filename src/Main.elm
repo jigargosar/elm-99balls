@@ -143,6 +143,7 @@ type alias Over =
     , score : Int
     , stars : Int
     , targets : List Target
+    , targetAnimClock : Float
     , seed : Seed
     }
 
@@ -152,6 +153,7 @@ type alias Game =
     , ballCount : Int
     , stars : Int
     , targets : List Target
+    , targetAnimClock : Float
     , state : State
     , paused : Bool
     , seed : Seed
@@ -336,7 +338,6 @@ type TargetKind
 
 type alias Target =
     { position : Vec
-    , clock : Float
     , kind : TargetKind
     }
 
@@ -344,7 +345,6 @@ type alias Target =
 initTarget : GP -> TargetKind -> Target
 initTarget gp kind =
     { position = gpToWorld gp
-    , clock = 0
     , kind = kind
     }
 
@@ -656,6 +656,7 @@ initGame now stars seed =
     { ballCount = 1
     , stars = stars
     , targets = []
+    , targetAnimClock = 0
     , state =
         initTargetsEnteringState now initialBallPosition
 
@@ -827,7 +828,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                else
                 game
               )
-                |> moveGameTargets
+                |> stepTargetAnimClock
                 |> GamePage
             , Cmd.none
             )
@@ -844,7 +845,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 Just angle ->
                                     Simulating (initSim frame ballPosition angle game.ballCount)
                     }
-                        |> moveGameTargets
+                        |> stepTargetAnimClock
 
                 else
                     game
@@ -870,6 +871,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             , score = game.turn
                             , stars = game.stars
                             , targets = List.map moveTargetDown game.targets
+                            , targetAnimClock = game.targetAnimClock
                             , seed = game.seed
                             }
                         , Cmd.none
@@ -880,44 +882,9 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> Tuple.mapFirst GamePage
 
 
-moveGameTargets : Game -> Game
-moveGameTargets game =
-    let
-        ( targets, seed ) =
-            moveTargets game.targets game.seed
-    in
-    { game | targets = targets, seed = seed }
-
-
-moveTargets : List Target -> Seed -> ( List Target, Seed )
-moveTargets targets seed0 =
-    let
-        rndOffset prevOffset =
-            rndF -(degrees 150) (degrees 150)
-                |> rnd1
-                    (\a ->
-                        prevOffset
-                            |> vecAdd (vecFromRTheta 0.4 (vecAngle prevOffset + a))
-                            |> vecMapLen (atMost 50)
-                    )
-
-        updateTargetOffset : Target -> ( List Target, Seed ) -> ( List Target, Seed )
-        updateTargetOffset t ( acc, seed ) =
-            case t.kind of
-                SolidTarget _ ->
-                    ( t :: acc, seed )
-
-                BonusBallTarget ->
-                    ( { t | clock = t.clock + 1 } :: acc
-                    , seed
-                    )
-
-                StarTarget ->
-                    ( { t | clock = t.clock + 1 } :: acc
-                    , seed
-                    )
-    in
-    List.foldr updateTargetOffset ( [], seed0 ) targets
+stepTargetAnimClock : Game -> Game
+stepTargetAnimClock game =
+    { game | targetAnimClock = inc game.targetAnimClock }
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
@@ -965,7 +932,7 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
         , stars = newStars
       }
-        |> moveGameTargets
+        |> stepTargetAnimClock
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
@@ -1269,7 +1236,7 @@ viewPage { vri, frame, pointer } page =
                     , viewFooter g.ballCount g.stars
 
                     -- ^--^ draw order matters, when showing aim/debug points
-                    , viewTargets frame g.state g.targets
+                    , viewTargets frame g.targetAnimClock g.state g.targets
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
@@ -1279,13 +1246,13 @@ viewPage { vri, frame, pointer } page =
                         noView
                     ]
 
-            OverPage { anim, targets } ->
+            OverPage { anim, targets, targetAnimClock } ->
                 let
                     progress =
                         clampedAnimProgress frame anim
                 in
                 group []
-                    [ viewTargetsWithAnimProgress progress targets
+                    [ viewTargetsWithAnimProgress progress targetAnimClock targets
                     , group [ onClick RestartGameClicked ]
                         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
                         , group
@@ -1657,8 +1624,8 @@ ballTravelPathHelp acc ball pathLen path =
             path
 
 
-viewTargets : Float -> State -> List Target -> Svg msg
-viewTargets now state targets =
+viewTargets : Float -> Float -> State -> List Target -> Svg msg
+viewTargets now clock state targets =
     let
         progress =
             case state of
@@ -1672,21 +1639,21 @@ viewTargets now state targets =
             (1 - progress) * -(gc.cri.y * 2)
     in
     group [ transform [ translateXY 0 dy ] ]
-        (List.map viewTarget targets)
+        (List.map (viewTarget clock) targets)
 
 
-viewTargetsWithAnimProgress : Float -> List Target -> Svg msg
-viewTargetsWithAnimProgress progress targets =
+viewTargetsWithAnimProgress : Float -> Float -> List Target -> Svg msg
+viewTargetsWithAnimProgress progress clock targets =
     let
         dy =
             (1 - progress) * -(gc.cri.y * 2)
     in
     group [ transform [ translateXY 0 dy ] ]
-        (List.map viewTarget targets)
+        (List.map (viewTarget clock) targets)
 
 
-viewTarget : Target -> Svg msg
-viewTarget target =
+viewTarget : Float -> Target -> Svg msg
+viewTarget clock target =
     let
         position =
             target.position
@@ -1696,10 +1663,10 @@ viewTarget target =
             viewSolidTarget position hp
 
         BonusBallTarget ->
-            viewBonusBall (bonusAnimPosition target.clock target.position)
+            viewBonusBall (bonusAnimPosition clock position)
 
         StarTarget ->
-            viewStar (bonusAnimPosition target.clock target.position)
+            viewStar (bonusAnimPosition clock position)
 
 
 bonusAnimPosition : Float -> Vec -> Vec
