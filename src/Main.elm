@@ -648,14 +648,9 @@ init { stars } =
     )
 
 
-reStartGame : Float -> Game -> Game
-reStartGame frame game =
-    initGame frame game.stars game.seed
-
-
 initGame : Float -> Int -> Seed -> Game
 initGame now stars seed =
-    { ballCount = 10
+    { ballCount = 1
     , stars = stars
     , targets = []
     , state =
@@ -663,7 +658,7 @@ initGame now stars seed =
 
     --|> always (initGameLost now)
     , turn = 0
-    , paused = True
+    , paused = False
     , seed = seed
     }
         |> applyN 8 incTurnThenAddTargetRow
@@ -731,12 +726,12 @@ update message (Model env page) =
                     ( Model env page, Cmd.none )
 
                 GamePage game ->
-                    ( Model env (GamePage (reStartGame env.frame game))
+                    ( Model env (GamePage (initGame env.frame game.stars game.seed))
                     , playSound "btn"
                     )
 
-                OverPage _ ->
-                    ( Model env page, Cmd.none )
+                OverPage over ->
+                    ( Model env (GamePage (initGame env.frame over.stars over.seed)), Cmd.none )
 
         ResumeGameClicked ->
             case page of
