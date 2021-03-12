@@ -1238,9 +1238,7 @@ viewPage { vri, frame, pointer } page =
                         group [ onClick ResumeGameClicked ]
                             [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
                             , group
-                                [ fillH 0.14
-                                , fillH 0.14
-                                , fade progress
+                                [ fade progress
                                 ]
                                 [ words "PAUSED" [ transform [ translateXY 0 -50, scale 5 ] ]
                                 , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
@@ -1262,7 +1260,6 @@ viewPage { vri, frame, pointer } page =
                         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
                         , group
                             [ fillH 0.14
-                            , fillH 0.14
                             , fade progress
                             ]
                             [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
