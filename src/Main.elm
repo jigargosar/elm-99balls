@@ -822,11 +822,13 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
         WaitingForInput { ballPosition } ->
             ( GamePage <|
-                if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
+                (if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
                     { game | state = initAimingTowardsState pointer ballPosition }
 
-                else
+                 else
                     game
+                )
+                    |> updateGameTargetOffsets frame
             , Cmd.none
             )
 
@@ -842,6 +844,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                 Just angle ->
                                     Simulating (initSim frame ballPosition angle game.ballCount)
                     }
+                        |> updateGameTargetOffsets frame
 
                 else
                     game
@@ -875,6 +878,11 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 Nothing ->
                     stepSim frame game sim
                         |> Tuple.mapFirst GamePage
+
+
+updateGameTargetOffsets : Float -> Game -> Game
+updateGameTargetOffsets now game =
+    { game | targets = updateTargetOffsets now game.targets }
 
 
 updateTargetOffsets : Float -> List Target -> List Target
@@ -939,6 +947,7 @@ stepSim frame game sim =
         , ballCount = acc.bonusBallsCollected + game.ballCount
         , stars = newStars
       }
+        |> updateGameTargetOffsets frame
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
