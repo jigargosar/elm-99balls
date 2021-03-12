@@ -877,6 +877,11 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> Tuple.mapFirst GamePage
 
 
+updateTargetOffsets : Float -> List Target -> List Target
+updateTargetOffsets now targets =
+    targets
+
+
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
 ballPositionOnSimEnd now sim =
     let
@@ -1660,18 +1665,20 @@ viewTarget now target =
 
 bonusAnimPosition : Float -> Vec -> Vec
 bonusAnimPosition now position =
+    vecAdd position (bonusAnimOffset now position)
+
+
+bonusAnimOffset : Float -> Vec -> Vec
+bonusAnimOffset now position =
     let
         staggeredNow =
             now + vecLenSq position
 
         ( ndx, ndy ) =
             ( wave 80 staggeredNow |> normToNegNorm, zigZag 90 staggeredNow |> normToNegNorm )
-
-        dxy =
-            vec ndx ndy
-                |> vecScale (gc.ballR * 0.3)
     in
-    vecAdd position dxy
+    vec ndx ndy
+        |> vecScale (gc.ballR * 0.3)
 
 
 viewSolidTarget : Vec -> Int -> Svg msg
