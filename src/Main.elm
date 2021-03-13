@@ -259,9 +259,9 @@ viewFloorBall toPosition progress position =
     viewBall newPosition
 
 
-initSim : Float -> List Target -> Vec -> Float -> Int -> Sim
-initSim frame targets ballPosition angle ballCount =
-    { emitter = initEmitter frame ballPosition angle ballCount
+initSim : List Target -> Emitter -> Sim
+initSim targets emitter =
+    { emitter = emitter
     , balls = []
     , floorBalls = emptyFloorBalls
     , targets = targets
@@ -275,10 +275,9 @@ type Emitter
     | EmitterDone
 
 
-initEmitter : Float -> Vec -> Float -> Int -> Emitter
-initEmitter frame ballPosition angle ballCount =
-    Emitting (initBall ballPosition angle)
-        { start = frame, remaining = ballCount - 1 }
+initEmitter : Float -> Ball -> Int -> Emitter
+initEmitter frame ball ballCount =
+    Emitting ball { start = frame, remaining = ballCount - 1 }
 
 
 nextEmitterBall : Emitter -> Maybe Ball
@@ -855,11 +854,17 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                     WaitingForInput newTargets ballPosition
 
                                 Just angle ->
-                                    Simulating (initSim frame newTargets ballPosition angle game.ballCount)
+                                    Simulating
+                                        (initSim newTargets
+                                            (initEmitter frame
+                                                (initBall ballPosition angle)
+                                                game.ballCount
+                                            )
+                                        )
                     }
 
                 else
-                    game
+                    { game | state = Aiming dragStartAt newTargets ballPosition }
             , Cmd.none
             )
 
