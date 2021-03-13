@@ -153,9 +153,15 @@ type alias Game =
     , ballCount : Int
     , stars : Int
     , state : State
-    , paused : Bool
+    , overlay : Overlay
     , seed : Seed
     }
+
+
+type Overlay
+    = PauseOverlay
+    | OverOverlay Anim0
+    | NoOverlay
 
 
 type State
@@ -656,7 +662,7 @@ initGame : Float -> Int -> Seed -> Game
 initGame now stars seed0 =
     let
         { targets, turn, seed } =
-            applyN 1 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
+            applyN 8 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
     in
     { ballCount = 1
     , targets = targets
@@ -665,7 +671,7 @@ initGame now stars seed0 =
 
     --|> always (initGameLost now)
     , turn = turn
-    , paused = False
+    , overlay = NoOverlay
     , seed = seed
     }
 
@@ -700,11 +706,15 @@ update message (Model env page) =
                             ( page, Cmd.none )
 
                         GamePage game ->
-                            if game.paused then
-                                ( GamePage game, Cmd.none )
+                            case game.overlay of
+                                PauseOverlay ->
+                                    ( page, Cmd.none )
 
-                            else
-                                updateGameOnTick env game
+                                OverOverlay _ ->
+                                    ( page, Cmd.none )
+
+                                NoOverlay ->
+                                    updateGameOnTick env game
 
                         OverPage _ ->
                             ( page, Cmd.none )
@@ -753,28 +763,32 @@ update message (Model env page) =
 
         ResumeGameClicked ->
             case page of
-                StartPage _ ->
-                    ( Model env page, Cmd.none )
-
                 GamePage game ->
-                    ( Model env (GamePage { game | paused = False })
-                    , playSound "btn"
-                    )
+                    case game.overlay of
+                        PauseOverlay ->
+                            ( Model env (GamePage { game | overlay = NoOverlay })
+                            , playSound "btn"
+                            )
 
-                OverPage _ ->
+                        _ ->
+                            ( Model env page, Cmd.none )
+
+                _ ->
                     ( Model env page, Cmd.none )
 
         PauseGameClicked ->
             case page of
-                StartPage _ ->
-                    ( Model env page, Cmd.none )
-
                 GamePage game ->
-                    ( Model env (GamePage { game | paused = True })
-                    , playSound "btn"
-                    )
+                    case game.overlay of
+                        NoOverlay ->
+                            ( Model env (GamePage { game | overlay = PauseOverlay })
+                            , playSound "btn"
+                            )
 
-                OverPage _ ->
+                        _ ->
+                            ( Model env page, Cmd.none )
+
+                _ ->
                     ( Model env page, Cmd.none )
 
         StartGameClicked ->
@@ -884,26 +898,34 @@ updateGameOnSimEnd frame ballPosition game =
         ( newTargets, newSeed ) =
             moveTargetsDownAndAddNewRow newTurn game.targets game.seed
     in
-    if canTargetsSafelyMoveDown game.targets then
-        { game
-            | state = initTargetsEnteringState frame ballPosition
-            , turn = newTurn
-            , targets = newTargets
-            , seed = newSeed
-        }
-            |> stepGameTargets
-            |> GamePage
-            |> withoutCmd
+    --if canTargetsSafelyMoveDown game.targets then
+    { game
+        | state = initTargetsEnteringState frame ballPosition
+        , turn = newTurn
+        , targets = newTargets
+        , seed = newSeed
+        , overlay =
+            if canTargetsSafelyMoveDown game.targets then
+                game.overlay
 
-    else
-        OverPage
-            { anim = initAnim0 frame transitionDuration
-            , score = currentScore
-            , stars = game.stars
-            , targets = newTargets
-            , seed = newSeed
-            }
-            |> withoutCmd
+            else
+                OverOverlay (initAnim0 frame transitionDuration)
+    }
+        |> stepGameTargets
+        |> GamePage
+        |> withoutCmd
+
+
+
+--else
+--    OverPage
+--        { anim = initAnim0 frame transitionDuration
+--        , score = currentScore
+--        , stars = game.stars
+--        , targets = newTargets
+--        , seed = newSeed
+--        }
+--        |> withoutCmd
 
 
 moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( List Target, Seed )
@@ -1272,11 +1294,28 @@ viewPage { vri, frame, pointer } page =
                     -- ^--^ draw order matters, when showing aim/debug points
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
-                    , if g.paused then
-                        viewPausedDialog
+                    , case g.overlay of
+                        PauseOverlay ->
+                            viewPausedDialog
 
-                      else
-                        noView
+                        OverOverlay anim ->
+                            let
+                                progress =
+                                    clampedAnimProgress frame anim
+                            in
+                            group [ onClick RestartGameClicked ]
+                                [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+                                , group
+                                    [ fillH 0.14
+                                    , fade progress
+                                    ]
+                                    [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
+                                    , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+                                    ]
+                                ]
+
+                        NoOverlay ->
+                            noView
                     ]
 
             OverPage { anim, targets } ->
