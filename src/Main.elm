@@ -1056,6 +1056,7 @@ updateBall acc ball =
     let
         velocity =
             ballVelocity ball
+                -- apply gravity
                 |> vecMapY (add 0.01)
     in
     case detectBallCollision acc.targets velocity ball of
