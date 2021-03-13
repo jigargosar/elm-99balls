@@ -854,13 +854,14 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             let
                 _ =
                     case simState frame game sim of
-                        SimTurnEnded ballPosition ->
-                            { game
-                                | state =
-                                    initTargetsEnteringState frame ballPosition
-                            }
-                                |> incTurnThenAddTargetRow
-                                |> GamePage
+                        SimTurnEnded { ballPosition, turn, targets, seed } ->
+                            GamePage
+                                { game
+                                    | state = initTargetsEnteringState frame ballPosition
+                                    , turn = turn
+                                    , targets = targets
+                                    , seed = seed
+                                }
                                 |> withoutCmd
 
                         SimOver { score, stars, targets, seed } ->
@@ -909,7 +910,19 @@ simState frame game sim =
     case ballPositionOnSimEnd frame sim of
         Just ballPosition ->
             if canTargetsSafelyMoveDown game.targets then
-                SimTurnEnded ballPosition
+                let
+                    turn =
+                        game.turn + 1
+
+                    ( targets, seed ) =
+                        rndStep ( randomTopRowTargets turn, game.seed )
+                in
+                SimTurnEnded
+                    { ballPosition = ballPosition
+                    , targets = targets ++ List.map moveTargetDown game.targets
+                    , turn = turn
+                    , seed = seed
+                    }
 
             else
                 SimOver
@@ -924,7 +937,7 @@ simState frame game sim =
 
 
 type SimState
-    = SimTurnEnded Vec
+    = SimTurnEnded { ballPosition : Vec, turn : Int, targets : List Target, seed : Seed }
     | SimOver { score : Int, stars : Int, targets : List Target, seed : Seed }
     | SimRunnable
 
