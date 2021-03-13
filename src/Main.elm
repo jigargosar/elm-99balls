@@ -845,26 +845,26 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 newTargets =
                     stepTargets targets
             in
-            ( GamePage <|
-                if not pointerDown then
-                    { game
-                        | state =
-                            case validAimAngleTowards dragStartAt pointer of
-                                Nothing ->
-                                    WaitingForInput newTargets ballPosition
+            ( { game
+                | state =
+                    if not pointerDown then
+                        case validAimAngleTowards dragStartAt pointer of
+                            Nothing ->
+                                WaitingForInput newTargets ballPosition
 
-                                Just angle ->
-                                    Simulating
-                                        (initSim newTargets
-                                            (initEmitter frame
-                                                (initBall ballPosition angle)
-                                                game.ballCount
-                                            )
+                            Just angle ->
+                                Simulating
+                                    (initSim newTargets
+                                        (initEmitter frame
+                                            (initBall ballPosition angle)
+                                            game.ballCount
                                         )
-                    }
+                                    )
 
-                else
-                    { game | state = Aiming dragStartAt newTargets ballPosition }
+                    else
+                        Aiming dragStartAt newTargets ballPosition
+              }
+                |> GamePage
             , Cmd.none
             )
 
