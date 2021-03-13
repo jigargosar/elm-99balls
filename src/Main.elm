@@ -873,6 +873,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> Tuple.mapFirst GamePage
 
 
+initNextTurn : Float -> Vec -> Game -> Maybe Game
 initNextTurn frame ballPosition game =
     if canTargetsSafelyMoveDown game.targets then
         { game
