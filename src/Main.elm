@@ -655,7 +655,7 @@ initGame : Float -> Int -> Seed -> Game
 initGame now stars seed0 =
     let
         { targets, turn, seed } =
-            applyN 8 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
+            applyN 1 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
     in
     { ballCount = 1
     , stars = stars
