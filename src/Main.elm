@@ -739,13 +739,13 @@ update message (Model env page) =
 
         RestartGameClicked ->
             case page of
-                StartPage _ ->
-                    ( Model env page, Cmd.none )
-
                 GamePage _ game ->
                     ( Model env (GamePage NoOverlay (initGame env.frame game.stars game.seed))
                     , playSound "btn"
                     )
+
+                _ ->
+                    ( Model env page, Cmd.none )
 
         ResumeGameClicked ->
             case page of
@@ -774,7 +774,7 @@ update message (Model env page) =
                     , playSound "btn"
                     )
 
-                GamePage _ _ ->
+                _ ->
                     ( Model env page, Cmd.none )
 
 
