@@ -851,6 +851,32 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             )
 
         Simulating sim ->
+            let
+                _ =
+                    case simState frame game sim of
+                        SimTurnEnded ballPosition ->
+                            { game
+                                | state =
+                                    initTargetsEnteringState frame ballPosition
+                            }
+                                |> incTurnThenAddTargetRow
+                                |> GamePage
+                                |> withoutCmd
+
+                        SimOver { score, stars, targets, seed } ->
+                            OverPage
+                                { anim = initAnim0 frame transitionDuration
+                                , score = score
+                                , stars = stars
+                                , targets = targets
+                                , seed = seed
+                                }
+                                |> withoutCmd
+
+                        SimRunnable ->
+                            stepSim frame game sim
+                                |> Tuple.mapFirst GamePage
+            in
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
                     case initNextTurn frame ballPosition game of
@@ -871,6 +897,36 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                 Nothing ->
                     stepSim frame game sim
                         |> Tuple.mapFirst GamePage
+
+
+withoutCmd : a -> ( a, Cmd msg )
+withoutCmd a =
+    ( a, Cmd.none )
+
+
+simState : Float -> Game -> Sim -> SimState
+simState frame game sim =
+    case ballPositionOnSimEnd frame sim of
+        Just ballPosition ->
+            if canTargetsSafelyMoveDown game.targets then
+                SimTurnEnded ballPosition
+
+            else
+                SimOver
+                    { score = game.turn
+                    , stars = game.stars
+                    , targets = game.targets
+                    , seed = game.seed
+                    }
+
+        Nothing ->
+            SimRunnable
+
+
+type SimState
+    = SimTurnEnded Vec
+    | SimOver { score : Int, stars : Int, targets : List Target, seed : Seed }
+    | SimRunnable
 
 
 initNextTurn : Float -> Vec -> Game -> Maybe Game
