@@ -440,6 +440,7 @@ type alias GridConf =
     , targetR : Float
     , ballR : Float
     , ballSpeed : Float
+    , gravity : Vec
     , dx : Float
     , dy : Float
     , topRowPS : List GP
@@ -485,6 +486,7 @@ gc =
     , targetR = tr
     , ballR = br
     , ballSpeed = ballSpeed
+    , gravity = vec 0 0.01
     , dx = cell0Center.x
     , dy = cell0Center.y
     , topRowPS = topRowPS
@@ -552,7 +554,6 @@ gpFromWorld { x, y } =
 type alias Ball =
     { position : Vec
     , angle : Float
-    , speed : Float
     }
 
 
@@ -573,13 +574,12 @@ initBall : Vec -> Float -> Ball
 initBall position angle =
     { position = position
     , angle = angle
-    , speed = gc.ballSpeed
     }
 
 
 ballVelocity : Ball -> Vec
 ballVelocity ball =
-    vecFromRTheta ball.speed ball.angle
+    vecFromRTheta gc.ballSpeed ball.angle
 
 
 setBallPositionAndVelocity : Vec -> Vec -> Ball -> Ball
@@ -594,7 +594,7 @@ setBallVelocityAndUpdatePosition rawVelocity ball =
             vecAngle rawVelocity
 
         velocity =
-            vecFromRTheta ball.speed angle
+            vecFromRTheta gc.ballSpeed angle
     in
     { ball
         | position = vecAdd ball.position velocity
@@ -1056,8 +1056,7 @@ updateBall acc ball =
     let
         velocity =
             ballVelocity ball
-                -- apply gravity
-                |> vecMapY (add 0.01)
+                |> vecAdd gc.gravity
     in
     case detectBallCollision acc.targets velocity ball of
         Nothing ->
