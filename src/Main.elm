@@ -815,15 +815,15 @@ updateGameOnTick : Env -> Game -> ( Page, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         TargetsEntering anim ballPosition ->
-            ( (if isAnimDone frame anim then
-                { game | state = WaitingForInput ballPosition }
+            let
+                newState =
+                    if isAnimDone frame anim then
+                        WaitingForInput ballPosition
 
-               else
-                game
-              )
-                |> GamePage
-            , Cmd.none
-            )
+                    else
+                        game.state
+            in
+            ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
 
         WaitingForInput ballPosition ->
             let
@@ -836,7 +836,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         initAimingState pointer ballPosition
 
                     else
-                        WaitingForInput ballPosition
+                        game.state
             in
             ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
 
@@ -858,7 +858,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                     )
 
                     else
-                        Aiming dragStartAt ballPosition
+                        game.state
             in
             ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
 
@@ -885,13 +885,14 @@ updateGameOnSimEnd frame ballPosition game =
             moveTargetsDownAndAddNewRow newTurn game.targets game.seed
     in
     if canTargetsSafelyMoveDown game.targets then
-        GamePage
-            { game
-                | state = initTargetsEnteringState frame ballPosition
-                , turn = newTurn
-                , targets = newTargets
-                , seed = newSeed
-            }
+        { game
+            | state = initTargetsEnteringState frame ballPosition
+            , turn = newTurn
+            , targets = newTargets
+            , seed = newSeed
+        }
+            |> stepGameTargets
+            |> GamePage
             |> withoutCmd
 
     else
