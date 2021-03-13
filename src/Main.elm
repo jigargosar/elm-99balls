@@ -220,8 +220,8 @@ settledFloorBallsPosition now fbs =
             Nothing
 
 
-stepFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
-stepFloorBalls now newFloored fbs =
+addFloorBalls : Float -> List Ball -> FloorBalls -> FloorBalls
+addFloorBalls now newFloored fbs =
     case fbs of
         EmptyFloorBalls ->
             case List.unconsLast newFloored of
@@ -553,8 +553,12 @@ type alias Ball =
     { position : Vec
     , angle : Float
     , speed : Float
-    , radius : Float
     }
+
+
+ballToCircle : Ball -> Circle
+ballToCircle { position } =
+    ( position, gc.ballR )
 
 
 initialBallPosition =
@@ -569,7 +573,6 @@ initBall : Vec -> Float -> Ball
 initBall position angle =
     { position = position
     , angle = angle
-    , radius = gc.ballR
     , speed = gc.ballSpeed
     }
 
@@ -962,10 +965,10 @@ stepSim frame game sim =
             Simulating
                 { emitter = newEmitter
                 , balls = Maybe.cons emittedBall newBalls.moved
-                , floorBalls = stepFloorBalls frame newBalls.floored sim.floorBalls
+                , floorBalls = addFloorBalls frame newBalls.floored sim.floorBalls
                 , targets = stepTargets acc.targets
                 , killSoundIdx = newKillSoundIdx
-                , killAnims = stepKillAnims frame acc.solidTargetsKilled sim.killAnims
+                , killAnims = addKillAnims frame acc.solidTargetsKilled sim.killAnims
                 }
         , ballCount = acc.bonusBallsCollected + game.ballCount
         , stars = newStars
@@ -981,8 +984,8 @@ stepSim frame game sim =
     )
 
 
-stepKillAnims : Float -> List Vec -> List KillAnim -> List KillAnim
-stepKillAnims frame newKillPositions killAnims =
+addKillAnims : Float -> List Vec -> List KillAnim -> List KillAnim
+addKillAnims frame newKillPositions killAnims =
     List.map (initKillAnim frame) newKillPositions ++ killAnims
 
 
@@ -1155,7 +1158,7 @@ detectBallCollision targets velocity ball =
     let
         mc : MovingCircle
         mc =
-            ( ( ball.position, ball.radius ), velocity )
+            ( ballToCircle ball, velocity )
 
         c1 : List ( Collision, BallCollision )
         c1 =
