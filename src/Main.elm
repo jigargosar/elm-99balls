@@ -702,7 +702,7 @@ update message (Model env page) =
                                     (\( mbOver, newGame ) ->
                                         GamePage
                                             (Maybe.unwrap NoOverlay OverOverlay mbOver)
-                                            newGame
+                                            (stepGameTargets_ newGame)
                                     )
 
                         _ ->
@@ -810,7 +810,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( ( Nothing, { game | state = newState } |> stepGameTargets ), Cmd.none )
+            ( ( Nothing, { game | state = newState } ), Cmd.none )
 
         WaitingForInput ballPosition ->
             let
@@ -825,7 +825,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( ( Nothing, { game | state = newState } |> stepGameTargets ), Cmd.none )
+            ( ( Nothing, { game | state = newState } ), Cmd.none )
 
         Aiming dragStartAt ballPosition ->
             let
@@ -847,7 +847,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( ( Nothing, { game | state = newState } |> stepGameTargets ), Cmd.none )
+            ( ( Nothing, { game | state = newState } ), Cmd.none )
 
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
@@ -883,7 +883,6 @@ updateGameOnSimEnd frame ballPosition game =
         , targets = newTargets
         , seed = newSeed
       }
-        |> stepGameTargets
     )
         |> withoutCmd
 
@@ -897,8 +896,8 @@ moveTargetsDownAndAddNewRow forTurn targets seed =
     ( newTopRowTargets ++ List.map moveTargetDown targets, newSeed )
 
 
-stepGameTargets : Game -> Game
-stepGameTargets game =
+stepGameTargets_ : Game -> Game
+stepGameTargets_ game =
     let
         stepTargets : List Target -> List Target
         stepTargets =
@@ -964,7 +963,6 @@ stepSim frame game sim =
         , stars = newStars
         , targets = acc.targets
       }
-        |> stepGameTargets
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
