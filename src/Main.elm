@@ -829,24 +829,22 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             let
                 newTargets =
                     stepTargets targets
-            in
-            ( (if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
-                { game | state = initAimingState pointer newTargets ballPosition }
 
-               else
-                { game | state = WaitingForInput newTargets ballPosition }
-              )
-                |> GamePage
-            , Cmd.none
-            )
+                newState =
+                    if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
+                        initAimingState pointer newTargets ballPosition
+
+                    else
+                        WaitingForInput newTargets ballPosition
+            in
+            ( GamePage { game | state = newState }, Cmd.none )
 
         Aiming dragStartAt targets ballPosition ->
             let
                 newTargets =
                     stepTargets targets
-            in
-            ( { game
-                | state =
+
+                newState =
                     if not pointerDown then
                         case validAimAngleTowards dragStartAt pointer of
                             Nothing ->
@@ -863,10 +861,8 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
                     else
                         Aiming dragStartAt newTargets ballPosition
-              }
-                |> GamePage
-            , Cmd.none
-            )
+            in
+            ( GamePage { game | state = newState }, Cmd.none )
 
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
