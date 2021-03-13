@@ -149,6 +149,7 @@ type alias Over =
 
 type alias Game =
     { turn : Int
+    , targets : List Target
     , ballCount : Int
     , stars : Int
     , state : State
@@ -158,9 +159,9 @@ type alias Game =
 
 
 type State
-    = TargetsEntering Anim0 (List Target) Vec
-    | WaitingForInput (List Target) Vec
-    | Aiming Vec (List Target) Vec
+    = TargetsEntering Anim0 Vec
+    | WaitingForInput Vec
+    | Aiming Vec Vec
     | Simulating Sim
 
 
@@ -168,7 +169,6 @@ type alias Sim =
     { emitter : Emitter
     , balls : List Ball
     , floorBalls : FloorBalls
-    , targets : List Target
     , killSoundIdx : Int
     , killAnims : List KillAnim
     }
@@ -259,12 +259,11 @@ viewFloorBall toPosition progress position =
     viewBall newPosition
 
 
-initSim : List Target -> Emitter -> Sim
-initSim targets emitter =
+initSim : Emitter -> Sim
+initSim emitter =
     { emitter = emitter
     , balls = []
     , floorBalls = emptyFloorBalls
-    , targets = targets
     , killSoundIdx = 0
     , killAnims = []
     }
@@ -660,9 +659,9 @@ initGame now stars seed0 =
             applyN 1 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
     in
     { ballCount = 1
+    , targets = targets
     , stars = stars
-    , state =
-        initTargetsEnteringState now targets initialBallPosition
+    , state = initTargetsEnteringState now initialBallPosition
 
     --|> always (initGameLost now)
     , turn = turn
@@ -802,12 +801,12 @@ pageToWorld env pageCord =
         |> vecScale svgScale
 
 
-initTargetsEnteringState : Float -> List Target -> Vec -> State
+initTargetsEnteringState : Float -> Vec -> State
 initTargetsEnteringState now =
     TargetsEntering (initAnim0 now transitionDuration)
 
 
-initAimingState : Vec -> List Target -> Vec -> State
+initAimingState : Vec -> Vec -> State
 initAimingState pointer =
     Aiming (pointer |> vecMapY (atMost 0))
 
@@ -815,48 +814,43 @@ initAimingState pointer =
 updateGameOnTick : Env -> Game -> ( Page, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        TargetsEntering anim targets ballPosition ->
-            ( GamePage <|
-                if isAnimDone frame anim then
-                    { game | state = WaitingForInput targets ballPosition }
+        TargetsEntering anim ballPosition ->
+            ( (if isAnimDone frame anim then
+                { game | state = WaitingForInput ballPosition }
 
-                else
-                    game
+               else
+                game
+              )
+                |> GamePage
             , Cmd.none
             )
 
-        WaitingForInput targets ballPosition ->
+        WaitingForInput ballPosition ->
             let
-                newTargets =
-                    stepTargets targets
-
                 newState =
                     if
                         pointerDown
                             && not prevPointerDown
                             && isPointInRectRI gc.ri pointer
                     then
-                        initAimingState pointer newTargets ballPosition
+                        initAimingState pointer ballPosition
 
                     else
-                        WaitingForInput newTargets ballPosition
+                        WaitingForInput ballPosition
             in
-            ( GamePage { game | state = newState }, Cmd.none )
+            ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
 
-        Aiming dragStartAt targets ballPosition ->
+        Aiming dragStartAt ballPosition ->
             let
-                newTargets =
-                    stepTargets targets
-
                 newState =
                     if not pointerDown then
                         case validAimAngleTowards dragStartAt pointer of
                             Nothing ->
-                                WaitingForInput newTargets ballPosition
+                                WaitingForInput ballPosition
 
                             Just angle ->
                                 Simulating
-                                    (initSim newTargets
+                                    (initSim
                                         (initEmitter frame
                                             (initBall ballPosition angle)
                                             game.ballCount
@@ -864,34 +858,35 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                                     )
 
                     else
-                        Aiming dragStartAt newTargets ballPosition
+                        Aiming dragStartAt ballPosition
             in
-            ( GamePage { game | state = newState }, Cmd.none )
+            ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
 
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
-                    updateGameOnSimEnd frame sim.targets ballPosition game
+                    updateGameOnSimEnd frame ballPosition game
 
                 Nothing ->
                     stepSim frame game sim
                         |> Tuple.mapFirst GamePage
 
 
-updateGameOnSimEnd : Float -> List Target -> Vec -> Game -> ( Page, Cmd msg )
-updateGameOnSimEnd frame targets ballPosition game =
+updateGameOnSimEnd : Float -> Vec -> Game -> ( Page, Cmd msg )
+updateGameOnSimEnd frame ballPosition game =
     let
         newTurn =
             game.turn + 1
 
         ( newTargets, newSeed ) =
-            moveTargetsDownAndAddNewRow newTurn targets game.seed
+            moveTargetsDownAndAddNewRow newTurn game.targets game.seed
     in
-    if canTargetsSafelyMoveDown targets then
+    if canTargetsSafelyMoveDown game.targets then
         GamePage
             { game
-                | state = initTargetsEnteringState frame newTargets ballPosition
+                | state = initTargetsEnteringState frame ballPosition
                 , turn = newTurn
+                , targets = newTargets
                 , seed = newSeed
             }
             |> withoutCmd
@@ -916,21 +911,26 @@ moveTargetsDownAndAddNewRow forTurn targets seed =
     ( newTopRowTargets ++ List.map moveTargetDown targets, newSeed )
 
 
-stepTargets : List Target -> List Target
-stepTargets =
+stepGameTargets : Game -> Game
+stepGameTargets game =
     let
-        stepTarget t =
-            case t.kind of
-                SolidTarget _ ->
-                    t
+        stepTargets : List Target -> List Target
+        stepTargets =
+            let
+                stepTarget t =
+                    case t.kind of
+                        SolidTarget _ ->
+                            t
 
-                BonusBallTarget c ->
-                    { t | kind = BonusBallTarget (inc c) }
+                        BonusBallTarget c ->
+                            { t | kind = BonusBallTarget (inc c) }
 
-                StarTarget c ->
-                    { t | kind = StarTarget (inc c) }
+                        StarTarget c ->
+                            { t | kind = StarTarget (inc c) }
+            in
+            List.map stepTarget
     in
-    List.map stepTarget
+    { game | targets = stepTargets game.targets }
 
 
 ballPositionOnSimEnd : Float -> Sim -> Maybe Vec
@@ -950,7 +950,7 @@ stepSim : Float -> Game -> Sim -> ( Game, Cmd msg )
 stepSim frame game sim =
     let
         ( acc, newBalls ) =
-            stepSimBalls sim.targets sim.balls
+            stepSimBalls game.targets sim.balls
 
         ( emittedBall, newEmitter ) =
             stepEmitter frame sim.emitter
@@ -971,13 +971,14 @@ stepSim frame game sim =
                 { emitter = newEmitter
                 , balls = Maybe.cons emittedBall newBalls.moved
                 , floorBalls = addFloorBalls frame newBalls.floored sim.floorBalls
-                , targets = stepTargets acc.targets
                 , killSoundIdx = newKillSoundIdx
                 , killAnims = addKillAnims frame acc.solidTargetsKilled sim.killAnims
                 }
         , ballCount = acc.bonusBallsCollected + game.ballCount
         , stars = newStars
+        , targets = acc.targets
       }
+        |> stepGameTargets
     , Cmd.batch
         [ cmdIf (acc.solidTargetHits > 0) (playSound "hit")
         , cmdIf (acc.bonusBallsCollected >= 1) (playSound "bonus_hit")
@@ -1265,7 +1266,7 @@ viewPage { vri, frame, pointer } page =
                     , viewFooter g.ballCount g.stars
 
                     -- ^--^ draw order matters, when showing aim/debug points
-                    , viewState frame pointer g.turn g.state
+                    , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
                     , if g.paused then
                         viewPausedDialog
@@ -1379,16 +1380,16 @@ viewFooter ballCount stars =
         ]
 
 
-viewState : Float -> Vec -> Int -> State -> Svg Msg
-viewState now pointer turn state =
+viewState : Float -> Vec -> Int -> List Target -> State -> Svg Msg
+viewState now pointer turn targets state =
     case state of
-        TargetsEntering anim targets ballPosition ->
+        TargetsEntering anim ballPosition ->
             group []
                 [ viewTargetsWithAnim now anim targets
                 , viewBall ballPosition
                 ]
 
-        WaitingForInput targets ballPosition ->
+        WaitingForInput ballPosition ->
             group []
                 [ viewTargets targets
                 , viewBall ballPosition
@@ -1399,7 +1400,7 @@ viewState now pointer turn state =
                     noView
                 ]
 
-        Aiming dragStartAt targets ballPosition ->
+        Aiming dragStartAt ballPosition ->
             group []
                 [ viewTargets targets
                 , viewBall ballPosition
@@ -1421,7 +1422,7 @@ viewState now pointer turn state =
 
         Simulating sim ->
             group []
-                [ viewTargets sim.targets
+                [ viewTargets targets
                 , viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
                 , viewFloorBalls now sim.floorBalls
                 , viewKillAnims now sim.killAnims
