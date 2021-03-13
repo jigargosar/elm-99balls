@@ -342,8 +342,8 @@ initTarget gp kind =
     }
 
 
-randomTargets : Int -> Generator (List Target)
-randomTargets turns =
+randomTopRowTargets : Int -> Generator (List Target)
+randomTopRowTargets turns =
     rnd2 (List.map2 initTarget)
         (shuffle gc.topRowPS)
         (rnd3 (\solids balls stars -> solids ++ balls ++ stars)
@@ -1003,7 +1003,7 @@ incTurnThenAddTargetRow game =
             game.turn + 1
 
         ( targets, seed ) =
-            rndStep ( randomTargets turn, game.seed )
+            rndStep ( randomTopRowTargets turn, game.seed )
     in
     { game
         | targets = targets ++ List.map moveTargetDown game.targets
