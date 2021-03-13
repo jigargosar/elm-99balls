@@ -862,11 +862,8 @@ updateSimOnTick frame sim game =
                 newTurn =
                     game.turn + 1
 
-                ( newTopRowTargets, newSeed ) =
-                    rndStep ( randomTopRowTargets newTurn, game.seed )
-
-                newTargets =
-                    newTopRowTargets ++ List.map moveTargetDown game.targets
+                ( newTargets, newSeed ) =
+                    moveTargetsDownAndAddNewRow newTurn game.targets game.seed
             in
             if canTargetsSafelyMoveDown game.targets then
                 GamePage
@@ -891,6 +888,15 @@ updateSimOnTick frame sim game =
         Nothing ->
             stepSim frame game sim
                 |> Tuple.mapFirst GamePage
+
+
+moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( List Target, Seed )
+moveTargetsDownAndAddNewRow forTurn targets seed =
+    let
+        ( newTopRowTargets, newSeed ) =
+            rndStep ( randomTopRowTargets forTurn, seed )
+    in
+    ( newTopRowTargets ++ List.map moveTargetDown targets, newSeed )
 
 
 stepTargets : Game -> Game
