@@ -159,9 +159,9 @@ type alias Game =
 
 
 type State
-    = TargetsEntering { anim : Anim0, ballPosition : Vec }
-    | WaitingForInput { ballPosition : Vec }
-    | Aiming { dragStartAt : Vec, ballPosition : Vec }
+    = TargetsEntering Anim0 Vec
+    | WaitingForInput Vec
+    | Aiming Vec Vec
     | Simulating Sim
 
 
@@ -797,43 +797,32 @@ pageToWorld env pageCord =
         |> vecScale svgScale
 
 
-initWaitingForInputState : Vec -> State
-initWaitingForInputState ballPosition =
-    WaitingForInput { ballPosition = ballPosition }
-
-
 initTargetsEnteringState : Float -> Vec -> State
 initTargetsEnteringState now ballPosition =
-    TargetsEntering
-        { anim = initAnim0 now transitionDuration
-        , ballPosition = ballPosition
-        }
+    TargetsEntering (initAnim0 now transitionDuration) ballPosition
 
 
-initAimingTowardsState : Vec -> Vec -> State
-initAimingTowardsState pointer ballPosition =
-    Aiming
-        { dragStartAt = pointer |> vecMapY (atMost 0)
-        , ballPosition = ballPosition
-        }
+initAimingState : Vec -> Vec -> State
+initAimingState pointer =
+    Aiming (pointer |> vecMapY (atMost 0))
 
 
 updateGameOnTick : Env -> Game -> ( Page, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        TargetsEntering { anim, ballPosition } ->
+        TargetsEntering anim ballPosition ->
             ( GamePage <|
                 if isAnimDone frame anim then
-                    { game | state = initWaitingForInputState ballPosition }
+                    { game | state = WaitingForInput ballPosition }
 
                 else
                     game
             , Cmd.none
             )
 
-        WaitingForInput { ballPosition } ->
+        WaitingForInput ballPosition ->
             ( (if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
-                { game | state = initAimingTowardsState pointer ballPosition }
+                { game | state = initAimingState pointer ballPosition }
 
                else
                 game
@@ -843,14 +832,14 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             , Cmd.none
             )
 
-        Aiming { dragStartAt, ballPosition } ->
+        Aiming dragStartAt ballPosition ->
             ( GamePage <|
                 if not pointerDown then
                     { game
                         | state =
                             case validAimAngleTowards dragStartAt pointer of
                                 Nothing ->
-                                    initWaitingForInputState ballPosition
+                                    WaitingForInput ballPosition
 
                                 Just angle ->
                                     Simulating (initSim frame ballPosition angle game.ballCount)
@@ -1379,10 +1368,10 @@ viewFooter ballCount stars =
 viewState : Float -> Vec -> Int -> List Target -> State -> Svg Msg
 viewState now pointer turn targets state =
     case state of
-        TargetsEntering { ballPosition } ->
+        TargetsEntering _ ballPosition ->
             viewBall ballPosition
 
-        WaitingForInput { ballPosition } ->
+        WaitingForInput ballPosition ->
             group []
                 [ viewBall ballPosition
                 , if turn == 1 then
@@ -1392,7 +1381,7 @@ viewState now pointer turn targets state =
                     noView
                 ]
 
-        Aiming { dragStartAt, ballPosition } ->
+        Aiming dragStartAt ballPosition ->
             group []
                 [ viewBall ballPosition
                 , if turn == 1 then
@@ -1654,7 +1643,7 @@ viewTargets now state targets =
     let
         progress =
             case state of
-                TargetsEntering { anim } ->
+                TargetsEntering anim _ ->
                     clampedAnimProgress now anim
 
                 _ ->
