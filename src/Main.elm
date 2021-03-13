@@ -149,8 +149,14 @@ type alias Game =
 
 type Overlay
     = PauseOverlay
-    | OverOverlay Anim0
+    | OverOverlay Over
     | NoOverlay
+
+
+type alias Over =
+    { anim : Anim0
+    , score : Int
+    }
 
 
 type State
@@ -690,23 +696,17 @@ update message (Model env page) =
             let
                 ( newPage, pageCmd ) =
                     case page of
-                        StartPage _ ->
+                        GamePage NoOverlay game ->
+                            updateGameOnTick env game
+                                |> mapFst
+                                    (\( mbOver, newGame ) ->
+                                        GamePage
+                                            (Maybe.unwrap NoOverlay OverOverlay mbOver)
+                                            newGame
+                                    )
+
+                        _ ->
                             ( page, Cmd.none )
-
-                        GamePage overlay game ->
-                            case overlay of
-                                PauseOverlay ->
-                                    ( page, Cmd.none )
-
-                                OverOverlay _ ->
-                                    ( page, Cmd.none )
-
-                                NoOverlay ->
-                                    updateGameOnTick env game
-                                        |> mapFst
-                                            (\( mbOverlay, newGame ) ->
-                                                GamePage (mbOverlay |> Maybe.withDefault overlay) newGame
-                                            )
             in
             ( Model
                 { env
@@ -798,7 +798,7 @@ initAimingState pointer =
     Aiming (pointer |> vecMapY (atMost 0))
 
 
-updateGameOnTick : Env -> Game -> ( ( Maybe Overlay, Game ), Cmd msg )
+updateGameOnTick : Env -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         TargetsEntering anim ballPosition ->
@@ -859,9 +859,12 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                         |> mapFst (pair Nothing)
 
 
-updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Overlay, Game ), Cmd msg )
+updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnSimEnd frame ballPosition game =
     let
+        currentScore =
+            game.turn
+
         newTurn =
             game.turn + 1
 
@@ -872,7 +875,7 @@ updateGameOnSimEnd frame ballPosition game =
         Nothing
 
       else
-        OverOverlay (initAnim0 frame transitionDuration)
+        Over (initAnim0 frame transitionDuration) currentScore
             |> Just
     , { game
         | state = initTargetsEnteringState frame ballPosition
@@ -1255,7 +1258,7 @@ viewPage { vri, frame, pointer } page =
                         PauseOverlay ->
                             viewPausedDialog
 
-                        OverOverlay anim ->
+                        OverOverlay { anim } ->
                             let
                                 progress =
                                     clampedAnimProgress frame anim
