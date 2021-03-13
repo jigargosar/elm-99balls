@@ -131,20 +131,10 @@ initialEnvironment =
 type Page
     = StartPage Start
     | GamePage Game
-    | OverPage Over
 
 
 type alias Start =
     { stars : Int, seed : Seed }
-
-
-type alias Over =
-    { anim : Anim0
-    , score : Int
-    , stars : Int
-    , targets : List Target
-    , seed : Seed
-    }
 
 
 type alias Game =
@@ -715,9 +705,7 @@ update message (Model env page) =
 
                                 NoOverlay ->
                                     updateGameOnTick env game
-
-                        OverPage _ ->
-                            ( page, Cmd.none )
+                                        |> mapFst GamePage
             in
             ( Model
                 { env
@@ -757,9 +745,6 @@ update message (Model env page) =
                     ( Model env (GamePage (initGame env.frame game.stars game.seed))
                     , playSound "btn"
                     )
-
-                OverPage over ->
-                    ( Model env (GamePage (initGame env.frame over.stars over.seed)), Cmd.none )
 
         ResumeGameClicked ->
             case page of
@@ -801,9 +786,6 @@ update message (Model env page) =
                 GamePage _ ->
                     ( Model env page, Cmd.none )
 
-                OverPage _ ->
-                    ( Model env page, Cmd.none )
-
 
 pageToWorld : Env -> Vec -> Vec
 pageToWorld env pageCord =
@@ -825,7 +807,7 @@ initAimingState pointer =
     Aiming (pointer |> vecMapY (atMost 0))
 
 
-updateGameOnTick : Env -> Game -> ( Page, Cmd msg )
+updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         TargetsEntering anim ballPosition ->
@@ -837,7 +819,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
+            ( { game | state = newState } |> stepGameTargets, Cmd.none )
 
         WaitingForInput ballPosition ->
             let
@@ -852,7 +834,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
+            ( { game | state = newState } |> stepGameTargets, Cmd.none )
 
         Aiming dragStartAt ballPosition ->
             let
@@ -874,7 +856,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( { game | state = newState } |> stepGameTargets |> GamePage, Cmd.none )
+            ( { game | state = newState } |> stepGameTargets, Cmd.none )
 
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
@@ -883,22 +865,17 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
                 Nothing ->
                     stepSim frame game sim
-                        |> Tuple.mapFirst GamePage
 
 
-updateGameOnSimEnd : Float -> Vec -> Game -> ( Page, Cmd msg )
+updateGameOnSimEnd : Float -> Vec -> Game -> ( Game, Cmd msg )
 updateGameOnSimEnd frame ballPosition game =
     let
-        currentScore =
-            game.turn
-
         newTurn =
             game.turn + 1
 
         ( newTargets, newSeed ) =
             moveTargetsDownAndAddNewRow newTurn game.targets game.seed
     in
-    --if canTargetsSafelyMoveDown game.targets then
     { game
         | state = initTargetsEnteringState frame ballPosition
         , turn = newTurn
@@ -912,20 +889,7 @@ updateGameOnSimEnd frame ballPosition game =
                 OverOverlay (initAnim0 frame transitionDuration)
     }
         |> stepGameTargets
-        |> GamePage
         |> withoutCmd
-
-
-
---else
---    OverPage
---        { anim = initAnim0 frame transitionDuration
---        , score = currentScore
---        , stars = game.stars
---        , targets = newTargets
---        , seed = newSeed
---        }
---        |> withoutCmd
 
 
 moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( List Target, Seed )
@@ -1316,25 +1280,6 @@ viewPage { vri, frame, pointer } page =
 
                         NoOverlay ->
                             noView
-                    ]
-
-            OverPage { anim, targets } ->
-                let
-                    progress =
-                        clampedAnimProgress frame anim
-                in
-                group []
-                    [ viewTargetsWithAnimProgress progress targets
-                    , group [ onClick RestartGameClicked ]
-                        [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
-                        , group
-                            [ fillH 0.14
-                            , fade progress
-                            ]
-                            [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
-                            , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
-                            ]
-                        ]
                     ]
         ]
 
