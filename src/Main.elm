@@ -1251,22 +1251,27 @@ viewPage { vri, frame, pointer } page =
 
                     -- ^--^ draw order matters, when showing aim/debug points
                     , viewState frame pointer g.turn g.targets g.state
-                    , case overlay of
-                        PauseOverlay ->
-                            viewPausedDialog
-
-                        OverOverlay over ->
-                            viewOverDialog frame over
-
-                        NoOverlay ->
-                            noView
+                    , viewOverlay frame overlay
                     , viewDebugPointer pointer |> hideView
                     ]
         ]
 
 
-viewOverDialog : Float -> Over -> Svg Msg
-viewOverDialog frame { anim } =
+viewOverlay : Float -> Overlay -> Svg Msg
+viewOverlay frame overlay =
+    case overlay of
+        PauseOverlay ->
+            viewPauseOverlay
+
+        OverOverlay over ->
+            viewOverOverlay frame over
+
+        NoOverlay ->
+            noView
+
+
+viewOverOverlay : Float -> Over -> Svg Msg
+viewOverOverlay frame { anim } =
     let
         progress =
             clampedAnimProgress frame anim
@@ -1274,8 +1279,8 @@ viewOverDialog frame { anim } =
     group [ onClick RestartGameClicked ]
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
         , group
-            [ fillH 0.14
-            , fade progress
+            [ fade progress
+            , fillP lightOrange
             ]
             [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
             , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
@@ -1283,8 +1288,8 @@ viewOverDialog frame { anim } =
         ]
 
 
-viewPausedDialog : Svg Msg
-viewPausedDialog =
+viewPauseOverlay : Svg Msg
+viewPauseOverlay =
     let
         progress =
             1
