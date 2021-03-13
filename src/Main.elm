@@ -1251,7 +1251,6 @@ viewPage { vri, frame, pointer } page =
 
                     -- ^--^ draw order matters, when showing aim/debug points
                     , viewState frame pointer g.turn g.targets g.state
-                    , viewDebugPointer pointer |> hideView
                     , case overlay of
                         PauseOverlay ->
                             viewPausedDialog
@@ -1261,6 +1260,7 @@ viewPage { vri, frame, pointer } page =
 
                         NoOverlay ->
                             noView
+                    , viewDebugPointer pointer |> hideView
                     ]
         ]
 
