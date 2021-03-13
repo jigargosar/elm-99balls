@@ -871,15 +871,15 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
-                    updateGameOnSimTurnEnd frame sim.targets ballPosition game
+                    updateGameOnSimEnd frame sim.targets ballPosition game
 
                 Nothing ->
                     stepSim frame game sim
                         |> Tuple.mapFirst GamePage
 
 
-updateGameOnSimTurnEnd : Float -> List Target -> Vec -> Game -> ( Page, Cmd msg )
-updateGameOnSimTurnEnd frame targets ballPosition game =
+updateGameOnSimEnd : Float -> List Target -> Vec -> Game -> ( Page, Cmd msg )
+updateGameOnSimEnd frame targets ballPosition game =
     let
         newTurn =
             game.turn + 1
