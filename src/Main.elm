@@ -853,30 +853,37 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
-                    if canTargetsSafelyMoveDown game.targets then
-                        ( { game
-                            | state =
-                                initTargetsEnteringState frame ballPosition
-                          }
-                            |> incTurnThenAddTargetRow
-                            |> GamePage
-                        , Cmd.none
-                        )
+                    case initNextTurn frame ballPosition game of
+                        Just newGame ->
+                            ( GamePage newGame, Cmd.none )
 
-                    else
-                        ( OverPage
-                            { anim = initAnim0 frame transitionDuration
-                            , score = game.turn
-                            , stars = game.stars
-                            , targets = List.map moveTargetDown game.targets
-                            , seed = game.seed
-                            }
-                        , Cmd.none
-                        )
+                        Nothing ->
+                            ( OverPage
+                                { anim = initAnim0 frame transitionDuration
+                                , score = game.turn
+                                , stars = game.stars
+                                , targets = List.map moveTargetDown game.targets
+                                , seed = game.seed
+                                }
+                            , Cmd.none
+                            )
 
                 Nothing ->
                     stepSim frame game sim
                         |> Tuple.mapFirst GamePage
+
+
+initNextTurn frame ballPosition game =
+    if canTargetsSafelyMoveDown game.targets then
+        { game
+            | state =
+                initTargetsEnteringState frame ballPosition
+        }
+            |> incTurnThenAddTargetRow
+            |> Just
+
+    else
+        Nothing
 
 
 stepTargets : Game -> Game
