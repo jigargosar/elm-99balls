@@ -915,7 +915,7 @@ simState frame game sim =
                 SimOver
                     { score = game.turn
                     , stars = game.stars
-                    , targets = game.targets
+                    , targets = List.map moveTargetDown game.targets
                     , seed = game.seed
                     }
 
