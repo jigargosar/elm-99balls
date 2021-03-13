@@ -862,8 +862,11 @@ updateSimOnTick frame sim game =
                 newTurn =
                     game.turn + 1
 
-                ( newTargets, newSeed ) =
+                ( newTopRowTargets, newSeed ) =
                     rndStep ( randomTopRowTargets newTurn, game.seed )
+
+                newTargets =
+                    newTopRowTargets ++ List.map moveTargetDown game.targets
             in
             if canTargetsSafelyMoveDown game.targets then
                 GamePage
