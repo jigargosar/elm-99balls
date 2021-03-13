@@ -948,3 +948,8 @@ noView =
 
 hideView =
     always noView
+
+
+withoutCmd : a -> ( a, Cmd msg )
+withoutCmd a =
+    ( a, Cmd.none )

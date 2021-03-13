@@ -851,109 +851,43 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             )
 
         Simulating sim ->
-            let
-                _ =
-                    case simState frame game sim of
-                        SimTurnEnded { ballPosition, turn, targets, seed } ->
-                            GamePage
-                                { game
-                                    | state = initTargetsEnteringState frame ballPosition
-                                    , turn = turn
-                                    , targets = targets
-                                    , seed = seed
-                                }
-                                |> withoutCmd
-
-                        SimOver { score, stars, targets, seed } ->
-                            OverPage
-                                { anim = initAnim0 frame transitionDuration
-                                , score = score
-                                , stars = stars
-                                , targets = targets
-                                , seed = seed
-                                }
-                                |> withoutCmd
-
-                        SimRunnable ->
-                            stepSim frame game sim
-                                |> Tuple.mapFirst GamePage
-            in
-            case ballPositionOnSimEnd frame sim of
-                Just ballPosition ->
-                    case initNextTurn frame ballPosition game of
-                        Just newGame ->
-                            ( GamePage newGame, Cmd.none )
-
-                        Nothing ->
-                            ( OverPage
-                                { anim = initAnim0 frame transitionDuration
-                                , score = game.turn
-                                , stars = game.stars
-                                , targets = List.map moveTargetDown game.targets
-                                , seed = game.seed
-                                }
-                            , Cmd.none
-                            )
-
-                Nothing ->
-                    stepSim frame game sim
-                        |> Tuple.mapFirst GamePage
+            updateSimOnTick frame sim game
 
 
-withoutCmd : a -> ( a, Cmd msg )
-withoutCmd a =
-    ( a, Cmd.none )
-
-
-simState : Float -> Game -> Sim -> SimState
-simState frame game sim =
+updateSimOnTick : Float -> Sim -> Game -> ( Page, Cmd msg )
+updateSimOnTick frame sim game =
     case ballPositionOnSimEnd frame sim of
         Just ballPosition ->
-            if canTargetsSafelyMoveDown game.targets then
-                let
-                    turn =
-                        game.turn + 1
+            let
+                newTurn =
+                    game.turn + 1
 
-                    ( targets, seed ) =
-                        rndStep ( randomTopRowTargets turn, game.seed )
-                in
-                SimTurnEnded
-                    { ballPosition = ballPosition
-                    , targets = targets ++ List.map moveTargetDown game.targets
-                    , turn = turn
-                    , seed = seed
+                ( newTargets, newSeed ) =
+                    rndStep ( randomTopRowTargets newTurn, game.seed )
+            in
+            if canTargetsSafelyMoveDown game.targets then
+                GamePage
+                    { game
+                        | state = initTargetsEnteringState frame ballPosition
+                        , turn = newTurn
+                        , targets = newTargets
+                        , seed = newSeed
                     }
+                    |> withoutCmd
 
             else
-                SimOver
-                    { score = game.turn
+                OverPage
+                    { anim = initAnim0 frame transitionDuration
+                    , score = game.turn
                     , stars = game.stars
-                    , targets = List.map moveTargetDown game.targets
-                    , seed = game.seed
+                    , targets = newTargets
+                    , seed = newSeed
                     }
+                    |> withoutCmd
 
         Nothing ->
-            SimRunnable
-
-
-type SimState
-    = SimTurnEnded { ballPosition : Vec, turn : Int, targets : List Target, seed : Seed }
-    | SimOver { score : Int, stars : Int, targets : List Target, seed : Seed }
-    | SimRunnable
-
-
-initNextTurn : Float -> Vec -> Game -> Maybe Game
-initNextTurn frame ballPosition game =
-    if canTargetsSafelyMoveDown game.targets then
-        { game
-            | state =
-                initTargetsEnteringState frame ballPosition
-        }
-            |> incTurnThenAddTargetRow
-            |> Just
-
-    else
-        Nothing
+            stepSim frame game sim
+                |> Tuple.mapFirst GamePage
 
 
 stepTargets : Game -> Game
