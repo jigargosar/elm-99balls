@@ -831,7 +831,11 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     stepTargets targets
 
                 newState =
-                    if pointerDown && not prevPointerDown && isPointInRectRI gc.ri pointer then
+                    if
+                        pointerDown
+                            && not prevPointerDown
+                            && isPointInRectRI gc.ri pointer
+                    then
                         initAimingState pointer newTargets ballPosition
 
                     else
