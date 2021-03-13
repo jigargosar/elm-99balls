@@ -666,6 +666,18 @@ initGame now stars seed =
         |> applyN 8 incTurnThenAddTargetRow
 
 
+incTurnThenAddTargetRow : Game -> Game
+incTurnThenAddTargetRow game =
+    let
+        newTurn =
+            game.turn + 1
+
+        ( newTargets, newSeed ) =
+            moveTargetsDownAndAddNewRow newTurn game.targets game.seed
+    in
+    { game | turn = newTurn, targets = newTargets, seed = newSeed }
+
+
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message (Model env page) =
     case message of
@@ -1014,22 +1026,6 @@ validAimAngleTowards to from =
 
     else
         Nothing
-
-
-incTurnThenAddTargetRow : Game -> Game
-incTurnThenAddTargetRow game =
-    let
-        turn =
-            game.turn + 1
-
-        ( targets, seed ) =
-            rndStep ( randomTopRowTargets turn, game.seed )
-    in
-    { game
-        | targets = targets ++ List.map moveTargetDown game.targets
-        , turn = turn
-        , seed = seed
-    }
 
 
 type alias BallUpdateAcc =
