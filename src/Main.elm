@@ -852,43 +852,43 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
             )
 
         Simulating sim ->
-            updateSimOnTick frame sim game
+            case ballPositionOnSimEnd frame sim of
+                Just ballPosition ->
+                    updateGameOnSimTurnEnd frame ballPosition game
+
+                Nothing ->
+                    stepSim frame game sim
+                        |> Tuple.mapFirst GamePage
 
 
-updateSimOnTick : Float -> Sim -> Game -> ( Page, Cmd msg )
-updateSimOnTick frame sim game =
-    case ballPositionOnSimEnd frame sim of
-        Just ballPosition ->
-            let
-                newTurn =
-                    game.turn + 1
+updateGameOnSimTurnEnd : Float -> Vec -> Game -> ( Page, Cmd msg )
+updateGameOnSimTurnEnd frame ballPosition game =
+    let
+        newTurn =
+            game.turn + 1
 
-                ( newTargets, newSeed ) =
-                    moveTargetsDownAndAddNewRow newTurn game.targets game.seed
-            in
-            if canTargetsSafelyMoveDown game.targets then
-                GamePage
-                    { game
-                        | state = initTargetsEnteringState frame ballPosition
-                        , turn = newTurn
-                        , targets = newTargets
-                        , seed = newSeed
-                    }
-                    |> withoutCmd
+        ( newTargets, newSeed ) =
+            moveTargetsDownAndAddNewRow newTurn game.targets game.seed
+    in
+    if canTargetsSafelyMoveDown game.targets then
+        GamePage
+            { game
+                | state = initTargetsEnteringState frame ballPosition
+                , turn = newTurn
+                , targets = newTargets
+                , seed = newSeed
+            }
+            |> withoutCmd
 
-            else
-                OverPage
-                    { anim = initAnim0 frame transitionDuration
-                    , score = game.turn
-                    , stars = game.stars
-                    , targets = newTargets
-                    , seed = newSeed
-                    }
-                    |> withoutCmd
-
-        Nothing ->
-            stepSim frame game sim
-                |> Tuple.mapFirst GamePage
+    else
+        OverPage
+            { anim = initAnim0 frame transitionDuration
+            , score = game.turn
+            , stars = game.stars
+            , targets = newTargets
+            , seed = newSeed
+            }
+            |> withoutCmd
 
 
 moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( List Target, Seed )
