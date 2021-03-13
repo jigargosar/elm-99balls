@@ -875,6 +875,9 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 updateGameOnSimEnd : Float -> Vec -> Game -> ( Page, Cmd msg )
 updateGameOnSimEnd frame ballPosition game =
     let
+        currentScore =
+            game.turn
+
         newTurn =
             game.turn + 1
 
@@ -894,7 +897,7 @@ updateGameOnSimEnd frame ballPosition game =
     else
         OverPage
             { anim = initAnim0 frame transitionDuration
-            , score = game.turn
+            , score = currentScore
             , stars = game.stars
             , targets = newTargets
             , seed = newSeed
