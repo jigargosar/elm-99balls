@@ -1393,7 +1393,8 @@ viewState now pointer turn state =
 
         Aiming dragStartAt targets ballPosition ->
             group []
-                [ viewBall ballPosition
+                [ viewTargets targets
+                , viewBall ballPosition
                 , if turn == 1 then
                     viewTutorial 0 now
 
@@ -1412,7 +1413,8 @@ viewState now pointer turn state =
 
         Simulating sim ->
             group []
-                [ viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
+                [ viewTargets sim.targets
+                , viewBalls (Maybe.cons (nextEmitterBall sim.emitter) sim.balls)
                 , viewFloorBalls now sim.floorBalls
                 , viewKillAnims now sim.killAnims
                 ]
