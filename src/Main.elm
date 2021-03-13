@@ -1256,25 +1256,30 @@ viewPage { vri, frame, pointer } page =
                         PauseOverlay ->
                             viewPausedDialog
 
-                        OverOverlay { anim } ->
-                            let
-                                progress =
-                                    clampedAnimProgress frame anim
-                            in
-                            group [ onClick RestartGameClicked ]
-                                [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
-                                , group
-                                    [ fillH 0.14
-                                    , fade progress
-                                    ]
-                                    [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
-                                    , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
-                                    ]
-                                ]
+                        OverOverlay over ->
+                            viewOverDialog frame over
 
                         NoOverlay ->
                             noView
                     ]
+        ]
+
+
+viewOverDialog : Float -> Over -> Svg Msg
+viewOverDialog frame { anim } =
+    let
+        progress =
+            clampedAnimProgress frame anim
+    in
+    group [ onClick RestartGameClicked ]
+        [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+        , group
+            [ fillH 0.14
+            , fade progress
+            ]
+            [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
+            , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+            ]
         ]
 
 
