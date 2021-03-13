@@ -130,7 +130,7 @@ initialEnvironment =
 
 type Page
     = StartPage Start
-    | GamePage Game
+    | GamePage Overlay Game
 
 
 type alias Start =
@@ -143,7 +143,6 @@ type alias Game =
     , ballCount : Int
     , stars : Int
     , state : State
-    , overlay : Overlay
     , seed : Seed
     }
 
@@ -635,7 +634,7 @@ init { stars } =
             initialEnvironment
 
         page =
-            GamePage (initGame env.frame stars initialSeed)
+            GamePage NoOverlay (initGame env.frame stars initialSeed)
 
         --|> always (StartPage { stars = stars, seed = initialSeed })
     in
@@ -661,7 +660,6 @@ initGame now stars seed0 =
 
     --|> always (initGameLost now)
     , turn = turn
-    , overlay = NoOverlay
     , seed = seed
     }
 
@@ -695,8 +693,8 @@ update message (Model env page) =
                         StartPage _ ->
                             ( page, Cmd.none )
 
-                        GamePage game ->
-                            case game.overlay of
+                        GamePage overlay game ->
+                            case overlay of
                                 PauseOverlay ->
                                     ( page, Cmd.none )
 
@@ -705,7 +703,10 @@ update message (Model env page) =
 
                                 NoOverlay ->
                                     updateGameOnTick env game
-                                        |> mapFst GamePage
+                                        |> mapFst
+                                            (\( mbOverlay, newGame ) ->
+                                                GamePage (mbOverlay |> Maybe.withDefault overlay) newGame
+                                            )
             in
             ( Model
                 { env
@@ -741,37 +742,27 @@ update message (Model env page) =
                 StartPage _ ->
                     ( Model env page, Cmd.none )
 
-                GamePage game ->
-                    ( Model env (GamePage (initGame env.frame game.stars game.seed))
+                GamePage _ game ->
+                    ( Model env (GamePage NoOverlay (initGame env.frame game.stars game.seed))
                     , playSound "btn"
                     )
 
         ResumeGameClicked ->
             case page of
-                GamePage game ->
-                    case game.overlay of
-                        PauseOverlay ->
-                            ( Model env (GamePage { game | overlay = NoOverlay })
-                            , playSound "btn"
-                            )
-
-                        _ ->
-                            ( Model env page, Cmd.none )
+                GamePage PauseOverlay game ->
+                    ( Model env (GamePage NoOverlay game)
+                    , playSound "btn"
+                    )
 
                 _ ->
                     ( Model env page, Cmd.none )
 
         PauseGameClicked ->
             case page of
-                GamePage game ->
-                    case game.overlay of
-                        NoOverlay ->
-                            ( Model env (GamePage { game | overlay = PauseOverlay })
-                            , playSound "btn"
-                            )
-
-                        _ ->
-                            ( Model env page, Cmd.none )
+                GamePage NoOverlay game ->
+                    ( Model env (GamePage PauseOverlay game)
+                    , playSound "btn"
+                    )
 
                 _ ->
                     ( Model env page, Cmd.none )
@@ -779,11 +770,11 @@ update message (Model env page) =
         StartGameClicked ->
             case page of
                 StartPage start ->
-                    ( Model env (GamePage (initGame env.frame start.stars start.seed))
+                    ( Model env (GamePage NoOverlay (initGame env.frame start.stars start.seed))
                     , playSound "btn"
                     )
 
-                GamePage _ ->
+                GamePage _ _ ->
                     ( Model env page, Cmd.none )
 
 
@@ -807,7 +798,7 @@ initAimingState pointer =
     Aiming (pointer |> vecMapY (atMost 0))
 
 
-updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
+updateGameOnTick : Env -> Game -> ( ( Maybe Overlay, Game ), Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
         TargetsEntering anim ballPosition ->
@@ -819,7 +810,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( { game | state = newState } |> stepGameTargets, Cmd.none )
+            ( ( Nothing, { game | state = newState } |> stepGameTargets ), Cmd.none )
 
         WaitingForInput ballPosition ->
             let
@@ -834,7 +825,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( { game | state = newState } |> stepGameTargets, Cmd.none )
+            ( ( Nothing, { game | state = newState } |> stepGameTargets ), Cmd.none )
 
         Aiming dragStartAt ballPosition ->
             let
@@ -856,7 +847,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                     else
                         game.state
             in
-            ( { game | state = newState } |> stepGameTargets, Cmd.none )
+            ( ( Nothing, { game | state = newState } |> stepGameTargets ), Cmd.none )
 
         Simulating sim ->
             case ballPositionOnSimEnd frame sim of
@@ -865,9 +856,10 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
                 Nothing ->
                     stepSim frame game sim
+                        |> mapFst (pair Nothing)
 
 
-updateGameOnSimEnd : Float -> Vec -> Game -> ( Game, Cmd msg )
+updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Overlay, Game ), Cmd msg )
 updateGameOnSimEnd frame ballPosition game =
     let
         newTurn =
@@ -876,19 +868,20 @@ updateGameOnSimEnd frame ballPosition game =
         ( newTargets, newSeed ) =
             moveTargetsDownAndAddNewRow newTurn game.targets game.seed
     in
-    { game
+    ( if canTargetsSafelyMoveDown game.targets then
+        Nothing
+
+      else
+        OverOverlay (initAnim0 frame transitionDuration)
+            |> Just
+    , { game
         | state = initTargetsEnteringState frame ballPosition
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
-        , overlay =
-            if canTargetsSafelyMoveDown game.targets then
-                game.overlay
-
-            else
-                OverOverlay (initAnim0 frame transitionDuration)
-    }
+      }
         |> stepGameTargets
+    )
         |> withoutCmd
 
 
@@ -1250,7 +1243,7 @@ viewPage { vri, frame, pointer } page =
                     , words "START" [ fillP white, transform [ scale 3 ] ]
                     ]
 
-            GamePage g ->
+            GamePage overlay g ->
                 group []
                     [ viewHeader g.turn
                     , viewFooter g.ballCount g.stars
@@ -1258,7 +1251,7 @@ viewPage { vri, frame, pointer } page =
                     -- ^--^ draw order matters, when showing aim/debug points
                     , viewState frame pointer g.turn g.targets g.state
                     , viewDebugPointer pointer |> hideView
-                    , case g.overlay of
+                    , case overlay of
                         PauseOverlay ->
                             viewPausedDialog
 
