@@ -158,11 +158,6 @@ type alias Game =
     }
 
 
-transitionDuration : Float
-transitionDuration =
-    60 / 4
-
-
 type State
     = TargetsEntering { anim : Anim0, ballPosition : Vec }
     | WaitingForInput { ballPosition : Vec }
@@ -1853,6 +1848,11 @@ fade o =
 
 type Anim a
     = Anim { start : Float, duration : Float, data : a }
+
+
+transitionDuration : Float
+transitionDuration =
+    60 / 4
 
 
 type alias Anim0 =
