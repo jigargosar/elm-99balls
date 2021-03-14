@@ -688,9 +688,6 @@ initGame now stars seed0 =
 
         ( targets, seed ) =
             initTopRowTargets turn seed0
-
-        --{ targets, turn, seed } =
-        --    applyN 8 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
     in
     { ballCount = 1
     , targets = targets
