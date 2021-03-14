@@ -427,8 +427,8 @@ type TargetsMoved
     | TargetsMovedToLastRow (List Target)
 
 
-canTargetsSafelyMoveDown__ : List Target -> Bool
-canTargetsSafelyMoveDown__ targets =
+canTargetsSafelyMoveDown : List Target -> Bool
+canTargetsSafelyMoveDown targets =
     let
         maxGY =
             maximumBy (.position >> .y) targets
@@ -896,7 +896,7 @@ updateGameOnSimEnd now ballPosition game =
                 |> mapFst ((++) (List.map moveTargetDown game.targets))
 
         mbOver =
-            if canTargetsSafelyMoveDown__ game.targets then
+            if canTargetsSafelyMoveDown game.targets then
                 Nothing
 
             else
