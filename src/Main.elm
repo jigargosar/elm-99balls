@@ -434,6 +434,8 @@ type alias GP =
 
 type alias GridConf =
     { ri : Vec
+    , edges : List Seg
+    , bottomEdge : Seg
     , w : Int
     , h : Int
     , cellR : Float
@@ -478,8 +480,13 @@ gc =
         topRowPS =
             List.range 0 (w - 1)
                 |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
+
+        { top, right, bottom, left } =
+            boundingSegFromRadii ri
     in
     { ri = ri
+    , edges = [ top, right, bottom, left ]
+    , bottomEdge = bottom
     , w = w
     , h = h
     , cellR = cr
@@ -606,25 +613,6 @@ setBallVelocityAndUpdatePosition rawVelocity ball =
     }
 
 
-screenSegments : { top : Seg, right : Seg, bottom : Seg, left : Seg }
-screenSegments =
-    boundingSegFromRadii gc.ri
-
-
-edges : List Seg
-edges =
-    let
-        { top, right, bottom, left } =
-            screenSegments
-    in
-    [ top, right, bottom, left ]
-
-
-isBottomEdge : Seg -> Bool
-isBottomEdge edge =
-    edge == screenSegments.bottom
-
-
 type Msg
     = OnDomResize Int Int
     | OnTick
@@ -676,7 +664,9 @@ initGame now stars seed0 =
     }
 
 
-incTurnThenAddTargetRow : { a | turn : Int, targets : List Target, seed : Seed } -> { a | turn : Int, targets : List Target, seed : Seed }
+incTurnThenAddTargetRow :
+    { a | turn : Int, targets : List Target, seed : Seed }
+    -> { a | turn : Int, targets : List Target, seed : Seed }
 incTurnThenAddTargetRow a =
     let
         newTurn =
@@ -1067,7 +1057,7 @@ updateBall acc ball =
             in
             case ballCollision of
                 BallEdgeCollision e ->
-                    if isBottomEdge e then
+                    if gc.bottomEdge == e then
                         ( acc, BallFloored newBall )
 
                     else
@@ -1158,7 +1148,7 @@ detectBallCollision targets velocity ball =
 
         c1 : List ( Collision, BallCollision )
         c1 =
-            edges
+            gc.edges
                 |> List.filterMap
                     (\e ->
                         detectMovingCircleAndSegCollision mc e
