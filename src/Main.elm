@@ -790,7 +790,7 @@ pageToWorld env pageCord =
 
 initTargetsEnteringState : Float -> Vec -> State
 initTargetsEnteringState now =
-    TargetsEntering (initAnim0 now transitionDuration)
+    TargetsEntering (initDefaultTransition now)
 
 
 initAimingState : Vec -> Vec -> State
@@ -860,7 +860,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
 
 updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Over, Game ), Cmd msg )
-updateGameOnSimEnd frame ballPosition game =
+updateGameOnSimEnd now ballPosition game =
     let
         currentScore =
             game.turn
@@ -875,10 +875,9 @@ updateGameOnSimEnd frame ballPosition game =
         Nothing
 
       else
-        Over (initAnim0 frame transitionDuration) currentScore
-            |> Just
+        Over (initDefaultTransition now) currentScore |> Just
     , { game
-        | state = initTargetsEnteringState frame ballPosition
+        | state = initTargetsEnteringState now ballPosition
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
@@ -1908,6 +1907,11 @@ initAnim now duration data =
 initAnim0 : Float -> Float -> Anim0
 initAnim0 now duration =
     initAnim now duration ()
+
+
+initDefaultTransition : Float -> Anim0
+initDefaultTransition now =
+    initAnim0 now transitionDuration
 
 
 allAnimDone : Float -> List (Anim a) -> Bool
