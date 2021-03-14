@@ -90,6 +90,7 @@ port saveStars : Int -> Cmd msg
       - carpel tunnel pain: try tap rather than drag, perhaps only for mouse
 
 -}
+main : Program Flags Model Msg
 main =
     Browser.element
         { init = init
@@ -406,6 +407,7 @@ rndBell_ =
     rndBellMO 3
 
 
+maxHP : number
 maxHP =
     50
 
@@ -527,6 +529,7 @@ wc =
     }
 
 
+aspectRatioFromRI : Vec -> Float
 aspectRatioFromRI =
     vecApply fdiv
 
@@ -561,10 +564,12 @@ ballToCircle { position } =
     ( position, gc.ballR )
 
 
+initialBallPosition : Vec
 initialBallPosition =
     vec 0 (gc.ri.y - gc.ballR)
 
 
+bonusHue : Float
 bonusHue =
     0.15
 
@@ -601,6 +606,7 @@ setBallVelocityAndUpdatePosition rawVelocity ball =
     }
 
 
+screenSegments : { top : Seg, right : Seg, bottom : Seg, left : Seg }
 screenSegments =
     boundingSegFromRadii gc.ri
 
@@ -1331,6 +1337,7 @@ viewHeader turn =
         ]
 
 
+lightOrange : Color
 lightOrange =
     hsl 0.07 0.8 0.5
 
@@ -1524,6 +1531,7 @@ viewTutorial start now =
         ]
 
 
+starSvg : Svg msg
 starSvg =
     Svg.path
         (S.d "m36.536 32.822c12.699-31.856 13.169-31.734 26.355-1.0603 34.15 2.198 39.384 9.6218 6.5131 23.932 19.821 46.048-0.79153 28.382-19.842 13.178-22.357 25.013-29.54 22.639-18.782-12.117-7.2813-8.5014-45.095-18.742 5.7558-23.932z"
@@ -1532,6 +1540,7 @@ starSvg =
         []
 
 
+handSvg : List (Svg.Attribute msg) -> Svg msg
 handSvg aa =
     Svg.path
         (S.d
@@ -1551,6 +1560,7 @@ l0.025,32.852C177.291,169.014,158.36,188.079,135.092,188.079z
         []
 
 
+restartSvg : Svg msg
 restartSvg =
     Svg.path
         (S.d
@@ -1582,10 +1592,12 @@ svgAttrs vri =
     ]
 
 
+viewBoxFromRI : { a | x : Float, y : Float } -> Attribute b
 viewBoxFromRI ri =
     T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
 
 
+viewDebugPointer : Vec -> Svg msg
 viewDebugPointer pointer =
     group []
         [ circle (gc.ballR * 0.5) [ fillH 0.4, transform [ translate pointer ] ]
@@ -1629,6 +1641,7 @@ ballTravelPath targets ballPosition angle =
         [ ball.position ]
 
 
+maxPathLen : Float
 maxPathLen =
     gc.ri.y * 2.2
 
@@ -1792,22 +1805,27 @@ viewBall p =
         ]
 
 
+polyline : List Vec -> List (Attribute msg) -> Svg msg
 polyline pts aa =
     Svg.polyline (points pts :: aa) []
 
 
+polySeg : ( Vec, Vec ) -> List (Attribute msg) -> Svg msg
 polySeg ( a, b ) =
     polyline [ a, b ]
 
 
+circle : Float -> List (Attribute msg) -> Svg msg
 circle r aa =
     Svg.circle (Px.r r :: aa) []
 
 
+rect : Vec -> List (Attribute msg) -> Svg msg
 rect ri =
     vecApply rectWH (vecScale 2 ri)
 
 
+rectWH : Float -> Float -> List (Attribute msg) -> Svg msg
 rectWH w h aa =
     Svg.rect
         (Px.x (-w / 2)
@@ -1819,6 +1837,7 @@ rectWH w h aa =
         []
 
 
+words : String -> List (Attribute msg) -> Svg msg
 words txt aa =
     Svg.text_
         (T.alignmentBaseline AlignmentCentral
@@ -1828,26 +1847,32 @@ words txt aa =
         [ Svg.text txt ]
 
 
+points : List Vec -> Attribute msg
 points =
     List.map vecToTuple >> T.points
 
 
+fromHue : Float -> Color
 fromHue hue =
     hsl hue 0.8 0.6
 
 
+paintHue : Float -> Paint
 paintHue =
     fromHue >> Paint
 
 
+strokeH : Float -> Attribute msg
 strokeH =
     paintHue >> T.stroke
 
 
+fillH : Float -> Attribute msg
 fillH =
     paintHue >> T.fill
 
 
+group : List (Svg.Attribute msg) -> List (Svg msg) -> Svg msg
 group =
     Svg.g
 
@@ -1856,6 +1881,7 @@ group =
 --noinspection ElmUnusedSymbol
 
 
+fade : Float -> Attribute msg
 fade o =
     T.opacity (Opacity o)
 

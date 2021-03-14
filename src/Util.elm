@@ -14,6 +14,8 @@ import Random.Float
 import Random.List
 import TypedSvg.Attributes as T
 import TypedSvg.Types exposing (..)
+import Color exposing (Color)
+import Html exposing (Attribute)
 
 
 type alias Vec =
@@ -99,6 +101,7 @@ vecAngle { x, y } =
     atan2 y x
 
 
+angleABC : Vec -> Vec -> Vec -> Float
 angleABC a b c =
     vecAngleFromTo b c - vecAngleFromTo b a
 
@@ -108,10 +111,12 @@ vecLenSqFromTo a b =
     vecFromTo a b |> vecLenSq
 
 
+vecLenFromTo : Vec -> Vec -> Float
 vecLenFromTo a b =
     vecFromTo a b |> vecLen
 
 
+vecLen : Vec -> Float
 vecLen =
     vecLenSq >> sqrt
 
@@ -550,6 +555,7 @@ intersectRaySphere ( p, d ) ( sc, sr ) =
                 |> Just
 
 
+fullyElasticCollisionResponseVelocity : { a | normal : Vec } -> Vec -> Vec
 fullyElasticCollisionResponseVelocity collision velocity =
     vecSub velocity (vecScale 2 (vecAlong collision.normal velocity))
 
@@ -569,38 +575,47 @@ movingCircleCollisionResponse ( ( position, _ ), velocity ) { t, normal } =
 -- Basics
 
 
+add : number -> number -> number
 add =
     (+)
 
 
+sub : number -> number -> number
 sub =
     (-)
 
 
+mul : number -> number -> number
 mul =
     (*)
 
 
+inv : Float -> Float
 inv n =
     1 / n
 
 
+fdiv : Float -> Float -> Float
 fdiv =
     (/)
 
 
+idiv : Int -> Int -> Int
 idiv =
     (//)
 
 
+fmodBy : Float -> Float -> Float
 fmodBy =
     Basics.Extra.fractionalModBy
 
 
+eq : a -> a -> Bool
 eq =
     (==)
 
 
+cmdIf : Bool -> Cmd msg -> Cmd msg
 cmdIf bool cmd =
     if bool then
         cmd
@@ -609,30 +624,37 @@ cmdIf bool cmd =
         Cmd.none
 
 
+inc : number -> number
 inc =
     add 1
 
 
+round2 : (Float, Float) -> (Int, Int)
 round2 =
     mapEach round
 
 
+toFloat2 : (Int, Int) -> (Float, Float)
 toFloat2 =
     mapEach toFloat
 
 
+roundFloat : Float -> Float
 roundFloat =
     round >> toFloat
 
 
+roundFloat2 : (Float, Float) -> (Float, Float)
 roundFloat2 =
     mapEach roundFloat
 
 
+norm : Float -> Float -> Float -> Float
 norm lo hi val =
     val - lo / hi - lo
 
 
+toFrac : Float -> Float -> Float
 toFrac duration elapsed =
     fmodBy duration elapsed / duration
 
@@ -647,10 +669,12 @@ wave duration elapsed =
     (1 + cos (turns (toFrac (duration * 2) elapsed))) / 2
 
 
+normToNegNorm : number -> number
 normToNegNorm n =
     1 - n * 2
 
 
+clampMO : number -> number -> number -> number
 clampMO midA offA =
     if offA < 0 then
         clampMO midA -offA
@@ -676,34 +700,42 @@ mapEach fn =
     Tuple.mapBoth fn fn
 
 
+pairTo : a -> b -> (b, a)
 pairTo b a =
     ( a, b )
 
 
+fst : (a, b) -> a
 fst =
     Tuple.first
 
 
+snd : (a, b) -> b
 snd =
     Tuple.second
 
 
+mapFst : (a -> x) -> (a, b) -> (x, b)
 mapFst =
     Tuple.mapFirst
 
 
+mapSnd : (b -> y) -> (a, b) -> (a, y)
 mapSnd =
     Tuple.mapSecond
 
 
+eqByAtLeast : number -> number -> number -> Bool
 eqByAtLeast tol a b =
     abs (a - b) < tol
 
 
+lerp : Float -> Float -> Float -> Float
 lerp =
     Float.Extra.interpolateFrom
 
 
+when : (c -> Bool) -> (c -> c) -> c -> c
 when pred fn x =
     if pred x then
         fn x
@@ -712,18 +744,22 @@ when pred fn x =
         x
 
 
+propEmpty : (c -> List a) -> c -> Bool
 propEmpty fn =
     propEq fn []
 
 
+propEq : (c -> b) -> b -> c -> Bool
 propEq fn v x =
     fn x == v
 
 
+atMost : comparable -> comparable -> comparable
 atMost =
     Basics.Extra.atMost
 
 
+atLeast : comparable -> comparable -> comparable
 atLeast =
     Basics.Extra.atLeast
 
@@ -741,18 +777,22 @@ applyN n fn x =
 -- List
 
 
+mapWhen : (a -> Bool) -> (a -> a) -> List a -> List a
 mapWhen =
     List.updateIf
 
 
+mapWhenEq : a -> (a -> a) -> List a -> List a
 mapWhenEq v =
     mapWhen (eq v)
 
 
+keepWhen : (a -> Bool) -> List a -> List a
 keepWhen =
     List.filter
 
 
+reject : (a -> Bool) -> List a -> List a
 reject =
     List.filterNot
 
@@ -762,18 +802,22 @@ remove x =
     reject (eq x)
 
 
+replace : b -> b -> List b -> List b
 replace x y =
     List.setIf (eq x) y
 
 
+minimumBy : (a -> comparable) -> List a -> Maybe a
 minimumBy =
     List.minimumBy
 
 
+maximumBy : (a -> comparable) -> List a -> Maybe a
 maximumBy =
     List.maximumBy
 
 
+maximum : List comparable -> Maybe comparable
 maximum =
     List.maximum
 
@@ -782,74 +826,92 @@ maximum =
 -- Random
 
 
+seedFrom : Int -> Random.Seed
 seedFrom =
     Random.initialSeed
 
 
+rndStep : (Generator a, Random.Seed) -> (a, Random.Seed)
 rndStep ( g, s ) =
     Random.step g s
 
 
+rndLenList : Generator Int -> Generator a -> Generator (List a)
 rndLenList lenGen gen =
     rndAndThen (\i -> rndList i gen) lenGen
 
 
+rndPair : Generator a -> Generator b -> Generator (a, b)
 rndPair =
     Random.pair
 
 
+rnd5 : (a -> b -> c -> d -> e -> f) -> Generator a -> Generator b -> Generator c -> Generator d -> Generator e -> Generator f
 rnd5 =
     Random.map5
 
 
+rnd4 : (a -> b -> c -> d -> e) -> Generator a -> Generator b -> Generator c -> Generator d -> Generator e
 rnd4 =
     Random.map4
 
 
+rnd2 : (a -> b -> c) -> Generator a -> Generator b -> Generator c
 rnd2 =
     Random.map2
 
 
+rnd3 : (a -> b -> c -> d) -> Generator a -> Generator b -> Generator c -> Generator d
 rnd3 =
     Random.map3
 
 
+rnd1 : (a -> b) -> Generator a -> Generator b
 rnd1 =
     Random.map
 
 
+rndList : Int -> Generator a -> Generator (List a)
 rndList =
     Random.list
 
 
+shuffle : List a -> Generator (List a)
 shuffle =
     Random.List.shuffle
 
 
+rndConstant : a -> Generator a
 rndConstant =
     Random.constant
 
 
+rndAndThen : (a -> Generator b) -> Generator a -> Generator b
 rndAndThen =
     Random.andThen
 
 
+rndAndThen2 : (a -> b -> Generator c) -> Generator a -> Generator b -> Generator c
 rndAndThen2 =
     Random.andThen2
 
 
+rndShuffle : List a -> Generator (List a)
 rndShuffle =
     Random.List.shuffle
 
 
+rndInt : Int -> Int -> Generator Int
 rndInt =
     Random.int
 
 
+rndF : Float -> Float -> Generator Float
 rndF =
     Random.float
 
 
+rndCombine : List (Generator a) -> Generator (List a)
 rndCombine =
     Random.combine
 
@@ -869,18 +931,22 @@ rndBell n lo hi =
 -- SVG
 
 
+strokeP : Color -> Attribute msg
 strokeP =
     Paint >> T.stroke
 
 
+fillP : Color -> Attribute msg
 fillP =
     Paint >> T.fill
 
 
+scale : Float -> Transform
 scale s =
     Scale s s
 
 
+transform : List Transform -> Attribute msg
 transform =
     T.transform
 
@@ -890,6 +956,7 @@ translate =
     vecApply Translate
 
 
+translateXY : Float -> Float -> Transform
 translateXY =
     Translate
 
@@ -942,10 +1009,12 @@ noAttr =
     style "" ""
 
 
+noView : Html.Html msg
 noView =
     text ""
 
 
+hideView : b -> Html.Html msg
 hideView =
     always noView
 
