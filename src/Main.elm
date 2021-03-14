@@ -660,10 +660,15 @@ initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
     let
         ( overlay, game ) =
-            ( NoOverlay, initGame now stars seed )
-                |> spoofTurns 7
+            ( NoOverlay, initGame now stars seed |> spoofBallCountBy 5 )
+                |> spoofTurns 5
     in
     GamePage overlay game
+
+
+spoofBallCountBy : Int -> Game -> Game
+spoofBallCountBy count game =
+    { game | ballCount = game.ballCount + count |> atLeast 1 }
 
 
 spoofTurns : Int -> ( Overlay, Game ) -> ( Overlay, Game )
