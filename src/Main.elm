@@ -693,8 +693,6 @@ initGame now stars seed0 =
     , targets = targets
     , stars = stars
     , state = initTargetsEnteringState now initialBallPosition
-
-    --|> always (initGameLost now)
     , turn = turn
     , seed = seed
     }
