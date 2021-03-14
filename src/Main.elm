@@ -441,6 +441,7 @@ type alias GridConf =
     , cellR : Float
     , cri : Vec
     , targetR : Float
+    , bonusR : Float
     , ballR : Float
     , ballSpeed : Float
     , gravity : Vec
@@ -468,6 +469,9 @@ gc =
         targetR =
             cr * 0.8
 
+        bonusR =
+            targetR * 0.8
+
         ballR =
             targetR * 0.6
 
@@ -492,6 +496,7 @@ gc =
     , cellR = cr
     , cri = cri
     , targetR = targetR
+    , bonusR = bonusR
     , ballR = ballR
     , ballSpeed = ballSpeed
     , gravity = vec 0 0.01
@@ -1760,7 +1765,7 @@ viewBonusBall : Vec -> Svg msg
 viewBonusBall p =
     let
         radius =
-            gc.targetR * 0.8
+            gc.bonusR
 
         strokeW =
             radius * 0.4
