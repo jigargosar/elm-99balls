@@ -679,7 +679,26 @@ init { stars } =
 
 initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
-    GamePage NoOverlay (initGame now stars seed)
+    let
+        ( overlay, game ) =
+            ( NoOverlay, initGame now stars seed )
+                |> spoofTurns 100
+    in
+    GamePage overlay game
+
+
+spoofTurns : number -> ( Overlay, Game ) -> ( Overlay, Game )
+spoofTurns n ( overlay, game1 ) =
+    if n <= 0 then
+        ( overlay, game1 )
+
+    else
+        case updateGameOnSimEnd 0 initialBallPosition game1 of
+            ( ( Nothing, game2 ), _ ) ->
+                spoofTurns (n - 1) ( overlay, game2 )
+
+            ( ( Just over, game2 ), _ ) ->
+                ( OverOverlay over, game2 )
 
 
 initGame : Float -> Int -> Seed -> Game
