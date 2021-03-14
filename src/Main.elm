@@ -664,7 +664,7 @@ init { stars } =
             initialEnvironment
 
         page =
-            GamePage NoOverlay (initGame env.frame stars initialSeed)
+            initGamePage env.frame stars initialSeed
 
         --|> always (StartPage { stars = stars, seed = initialSeed })
     in
@@ -677,11 +677,22 @@ init { stars } =
     )
 
 
-initGame : Float -> Int -> Seed -> Game
-initGame now stars seed0 =
+initGamePage : Float -> Int -> Seed -> Page
+initGamePage now stars seed =
+    GamePage NoOverlay (initGame_ now stars seed)
+
+
+initGame_ : Float -> Int -> Seed -> Game
+initGame_ now stars seed0 =
     let
-        { targets, turn, seed } =
-            applyN 8 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
+        turn =
+            1
+
+        ( targets, seed ) =
+            rndStep ( randomTopRowTargets turn, seed0 )
+
+        --{ targets, turn, seed } =
+        --    applyN 8 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
     in
     { ballCount = 1
     , targets = targets
@@ -774,7 +785,7 @@ update message (Model env page) =
         RestartGameClicked ->
             case page of
                 GamePage _ game ->
-                    ( Model env (GamePage NoOverlay (initGame env.frame game.stars game.seed))
+                    ( Model env (initGamePage env.frame game.stars game.seed)
                     , playSound "btn"
                     )
 
@@ -804,7 +815,7 @@ update message (Model env page) =
         StartGameClicked ->
             case page of
                 StartPage start ->
-                    ( Model env (GamePage NoOverlay (initGame env.frame start.stars start.seed))
+                    ( Model env (initGamePage env.frame start.stars start.seed)
                     , playSound "btn"
                     )
 
