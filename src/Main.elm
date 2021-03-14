@@ -465,14 +465,14 @@ gc =
         ri =
             vec (toFloat w * cri.x) (toFloat h * cri.y)
 
-        tr =
+        targetR =
             cr * 0.8
 
-        br =
-            tr * 0.6
+        ballR =
+            targetR * 0.6
 
         ballSpeed =
-            br * 0.9
+            ballR * 0.9
 
         cell0Center =
             vecSub cri ri
@@ -491,8 +491,8 @@ gc =
     , h = h
     , cellR = cr
     , cri = cri
-    , targetR = tr
-    , ballR = br
+    , targetR = targetR
+    , ballR = ballR
     , ballSpeed = ballSpeed
     , gravity = vec 0 0.01
     , dx = cell0Center.x
