@@ -679,11 +679,11 @@ init { stars } =
 
 initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
-    GamePage NoOverlay (initGame_ now stars seed)
+    GamePage NoOverlay (initGame now stars seed)
 
 
-initGame_ : Float -> Int -> Seed -> Game
-initGame_ now stars seed0 =
+initGame : Float -> Int -> Seed -> Game
+initGame now stars seed0 =
     let
         turn =
             1
