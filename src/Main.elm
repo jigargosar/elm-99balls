@@ -724,28 +724,6 @@ initGame now stars seed0 =
     }
 
 
-incTurnThenAddTargetRow :
-    { a | turn : Int, targets : List Target, seed : Seed }
-    -> { a | turn : Int, targets : List Target, seed : Seed }
-incTurnThenAddTargetRow a =
-    let
-        newTurn =
-            a.turn + 1
-
-        ( targetsMoved, newSeed ) =
-            moveTargetsDownAndAddNewRow newTurn a.targets a.seed
-
-        newTargets =
-            case targetsMoved of
-                TargetsMovedDown ts ->
-                    ts
-
-                TargetsMovedToLastRow ts ->
-                    ts
-    in
-    { a | turn = newTurn, targets = newTargets, seed = newSeed }
-
-
 update : Msg -> Model -> ( Model, Cmd Msg )
 update message (Model env page) =
     case message of
