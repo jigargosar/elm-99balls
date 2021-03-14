@@ -478,7 +478,7 @@ gc =
         ballSpeed =
             ballR * 0.9
 
-        cell0Center =
+        leftTopCellCenter =
             vecSub cri ri
 
         topRowPS =
@@ -500,8 +500,8 @@ gc =
     , ballR = ballR
     , ballSpeed = ballSpeed
     , gravity = vec 0 0.01
-    , dx = cell0Center.x
-    , dy = cell0Center.y
+    , dx = leftTopCellCenter.x
+    , dy = leftTopCellCenter.y
     , topRowPS = topRowPS
     }
 
