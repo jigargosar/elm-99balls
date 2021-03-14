@@ -343,6 +343,11 @@ initTarget gp kind =
     }
 
 
+initTopRowTargets : Int -> Seed -> ( List Target, Seed )
+initTopRowTargets turn seed =
+    rndStep ( randomTopRowTargets turn, seed )
+
+
 randomTopRowTargets : Int -> Generator (List Target)
 randomTopRowTargets turns =
     rnd2 (List.map2 initTarget)
@@ -424,23 +429,23 @@ type TargetsMoved
 
 moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( TargetsMoved, Seed )
 moveTargetsDownAndAddNewRow forTurn targets seed =
-    moveTargetsDownAndAddNewRow__ forTurn targets seed
-        |> mapFst
-            (if canTargetsSafelyMoveDown__ targets then
-                TargetsMovedDown
-
-             else
-                TargetsMovedToLastRow
-            )
-
-
-moveTargetsDownAndAddNewRow__ : Int -> List Target -> Seed -> ( List Target, Seed )
-moveTargetsDownAndAddNewRow__ forTurn targets seed =
     let
         ( newTopRowTargets, newSeed ) =
-            rndStep ( randomTopRowTargets forTurn, seed )
+            initTopRowTargets forTurn seed
+
+        movedTargets =
+            List.map moveTargetDown targets
+
+        newTargets =
+            newTopRowTargets ++ movedTargets
     in
-    ( newTopRowTargets ++ List.map moveTargetDown targets, newSeed )
+    ( if canTargetsSafelyMoveDown__ targets then
+        TargetsMovedDown newTargets
+
+      else
+        TargetsMovedToLastRow newTargets
+    , newSeed
+    )
 
 
 canTargetsSafelyMoveDown__ : List Target -> Bool
@@ -708,7 +713,7 @@ initGame now stars seed0 =
             1
 
         ( targets, seed ) =
-            rndStep ( randomTopRowTargets turn, seed0 )
+            initTopRowTargets turn seed0
 
         --{ targets, turn, seed } =
         --    applyN 8 incTurnThenAddTargetRow { turn = 0, targets = [], seed = seed0 }
@@ -907,14 +912,6 @@ updateGameOnSimEnd now ballPosition game =
         newTurn =
             game.turn + 1
 
-        --( newTargets, newSeed ) =
-        --    moveTargetsDownAndAddNewRow newTurn game.targets game.seed
-        --mbOver =
-        --    if canTargetsSafelyMoveDown game.targets then
-        --        Nothing
-        --
-        --    else
-        --        Over (initDefaultTransition now) currentScore |> Just
         ( targetsMoved, newSeed ) =
             moveTargetsDownAndAddNewRow newTurn game.targets game.seed
 
