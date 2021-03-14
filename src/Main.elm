@@ -482,8 +482,7 @@ gc =
             vecSub cri ri
 
         topRowPS =
-            List.range 0 (w - 1)
-                |> List.concatMap (\x -> List.range 1 1 |> List.map (pair x))
+            List.range 0 (w - 1) |> List.map (pairTo 1)
 
         { top, right, bottom, left } =
             boundingSegFromRadii ri
