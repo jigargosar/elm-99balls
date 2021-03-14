@@ -422,11 +422,6 @@ moveTargetDown target =
     { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
 
 
-type TargetsMoved
-    = TargetsMovedDown (List Target)
-    | TargetsMovedToLastRow (List Target)
-
-
 canTargetsSafelyMoveDown : List Target -> Bool
 canTargetsSafelyMoveDown targets =
     let
