@@ -666,7 +666,7 @@ initGamePage now stars seed =
     GamePage overlay game
 
 
-spoofTurns : number -> ( Overlay, Game ) -> ( Overlay, Game )
+spoofTurns : Int -> ( Overlay, Game ) -> ( Overlay, Game )
 spoofTurns n ( overlay, game1 ) =
     if n <= 0 then
         ( overlay, game1 )
