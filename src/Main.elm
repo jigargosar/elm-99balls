@@ -417,8 +417,34 @@ moveTargetDown target =
     { target | position = vecMapY (add (gc.cri.y * 2)) target.position }
 
 
-canTargetsSafelyMoveDown : List Target -> Bool
-canTargetsSafelyMoveDown targets =
+type TargetsMoved
+    = TargetsMovedDown (List Target)
+    | TargetsMovedToLastRow (List Target)
+
+
+moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( TargetsMoved, Seed )
+moveTargetsDownAndAddNewRow forTurn targets seed =
+    moveTargetsDownAndAddNewRow__ forTurn targets seed
+        |> mapFst
+            (if canTargetsSafelyMoveDown__ targets then
+                TargetsMovedDown
+
+             else
+                TargetsMovedToLastRow
+            )
+
+
+moveTargetsDownAndAddNewRow__ : Int -> List Target -> Seed -> ( List Target, Seed )
+moveTargetsDownAndAddNewRow__ forTurn targets seed =
+    let
+        ( newTopRowTargets, newSeed ) =
+            rndStep ( randomTopRowTargets forTurn, seed )
+    in
+    ( newTopRowTargets ++ List.map moveTargetDown targets, newSeed )
+
+
+canTargetsSafelyMoveDown__ : List Target -> Bool
+canTargetsSafelyMoveDown__ targets =
     let
         maxGY =
             maximumBy (.position >> .y) targets
@@ -676,8 +702,16 @@ incTurnThenAddTargetRow a =
         newTurn =
             a.turn + 1
 
-        ( newTargets, newSeed ) =
+        ( targetsMoved, newSeed ) =
             moveTargetsDownAndAddNewRow newTurn a.targets a.seed
+
+        newTargets =
+            case targetsMoved of
+                TargetsMovedDown ts ->
+                    ts
+
+                TargetsMovedToLastRow ts ->
+                    ts
     in
     { a | turn = newTurn, targets = newTargets, seed = newSeed }
 
@@ -862,20 +896,29 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnSimEnd now ballPosition game =
     let
-        currentScore =
-            game.turn
-
         newTurn =
             game.turn + 1
 
-        ( newTargets, newSeed ) =
+        --( newTargets, newSeed ) =
+        --    moveTargetsDownAndAddNewRow newTurn game.targets game.seed
+        --mbOver =
+        --    if canTargetsSafelyMoveDown game.targets then
+        --        Nothing
+        --
+        --    else
+        --        Over (initDefaultTransition now) currentScore |> Just
+        ( targetsMoved, newSeed ) =
             moveTargetsDownAndAddNewRow newTurn game.targets game.seed
-    in
-    ( if canTargetsSafelyMoveDown game.targets then
-        Nothing
 
-      else
-        Over (initDefaultTransition now) currentScore |> Just
+        ( mbOver, newTargets ) =
+            case targetsMoved of
+                TargetsMovedDown ts ->
+                    ( Nothing, ts )
+
+                TargetsMovedToLastRow ts ->
+                    ( { anim = initDefaultTransition now, score = game.turn } |> Just, ts )
+    in
+    ( mbOver
     , { game
         | state = initTargetsEnteringState now ballPosition
         , turn = newTurn
@@ -884,15 +927,6 @@ updateGameOnSimEnd now ballPosition game =
       }
     )
         |> withoutCmd
-
-
-moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( List Target, Seed )
-moveTargetsDownAndAddNewRow forTurn targets seed =
-    let
-        ( newTopRowTargets, newSeed ) =
-            rndStep ( randomTopRowTargets forTurn, seed )
-    in
-    ( newTopRowTargets ++ List.map moveTargetDown targets, newSeed )
 
 
 stepGameTargets_ : Game -> Game
