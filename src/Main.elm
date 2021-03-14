@@ -1684,8 +1684,7 @@ viewTargetsWithAnimProgress progress targets =
         dy =
             (1 - progress) * -(gc.cri.y * 2)
     in
-    group [ transform [ translateXY 0 dy ] ]
-        (List.map viewTarget targets)
+    group [ transform [ translateXY 0 dy ] ] (List.map viewTarget targets)
 
 
 viewTarget : Target -> Svg msg
