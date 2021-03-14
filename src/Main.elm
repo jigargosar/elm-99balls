@@ -427,27 +427,6 @@ type TargetsMoved
     | TargetsMovedToLastRow (List Target)
 
 
-moveTargetsDownAndAddNewRow : Int -> List Target -> Seed -> ( TargetsMoved, Seed )
-moveTargetsDownAndAddNewRow forTurn targets seed =
-    let
-        ( newTopRowTargets, newSeed ) =
-            initTopRowTargets forTurn seed
-
-        movedTargets =
-            List.map moveTargetDown targets
-
-        newTargets =
-            newTopRowTargets ++ movedTargets
-    in
-    ( if canTargetsSafelyMoveDown__ targets then
-        TargetsMovedDown newTargets
-
-      else
-        TargetsMovedToLastRow newTargets
-    , newSeed
-    )
-
-
 canTargetsSafelyMoveDown__ : List Target -> Bool
 canTargetsSafelyMoveDown__ targets =
     let
@@ -912,16 +891,16 @@ updateGameOnSimEnd now ballPosition game =
         newTurn =
             game.turn + 1
 
-        ( targetsMoved, newSeed ) =
-            moveTargetsDownAndAddNewRow newTurn game.targets game.seed
+        ( newTargets, newSeed ) =
+            initTopRowTargets newTurn game.seed
+                |> mapFst ((++) (List.map moveTargetDown game.targets))
 
-        ( mbOver, newTargets ) =
-            case targetsMoved of
-                TargetsMovedDown ts ->
-                    ( Nothing, ts )
+        mbOver =
+            if canTargetsSafelyMoveDown__ game.targets then
+                Nothing
 
-                TargetsMovedToLastRow ts ->
-                    ( { anim = initDefaultTransition now, score = game.turn } |> Just, ts )
+            else
+                Just { anim = initDefaultTransition now, score = game.turn }
     in
     ( mbOver
     , { game
