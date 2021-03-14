@@ -682,7 +682,7 @@ initGamePage now stars seed =
     let
         ( overlay, game ) =
             ( NoOverlay, initGame now stars seed )
-                |> spoofTurns 100
+                |> spoofTurns 7
     in
     GamePage overlay game
 
