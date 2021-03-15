@@ -140,6 +140,7 @@ type alias Start =
 
 type alias Game =
     { transit : Anim0
+    , ballPosition : Vec
     , turn : Int
     , targets : List Target
     , ballCount : Int
@@ -160,8 +161,8 @@ type alias Over =
 
 
 type State
-    = WaitingForInput Vec
-    | Aiming Vec Vec
+    = WaitingForInput
+    | Aiming Vec
     | Simulating Sim
 
 
@@ -693,10 +694,11 @@ initGame now stars seed0 =
             initTopRowTargets turn seed0
     in
     { transit = initTransit now
+    , ballPosition = initialBallPosition
     , ballCount = 1
     , targets = targets
     , stars = stars
-    , state = WaitingForInput initialBallPosition
+    , state = WaitingForInput
     , turn = turn
     , seed = seed
     }
@@ -808,7 +810,7 @@ pageToWorld env pageCord =
         |> vecScale svgScale
 
 
-initAimingState : Vec -> Vec -> State
+initAimingState : Vec -> State
 initAimingState pointer =
     Aiming (pointer |> vecMapY (atMost 0))
 
@@ -816,7 +818,7 @@ initAimingState pointer =
 updateGameOnTick : Env -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        WaitingForInput ballPosition ->
+        WaitingForInput ->
             let
                 newState =
                     if
@@ -824,26 +826,26 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             && not prevPointerDown
                             && isPointInRectRI gc.ri pointer
                     then
-                        initAimingState pointer ballPosition
+                        initAimingState pointer
 
                     else
                         game.state
             in
             ( ( Nothing, { game | state = newState } ), Cmd.none )
 
-        Aiming dragStartAt ballPosition ->
+        Aiming dragStartAt ->
             let
                 newState =
                     if not pointerDown then
                         case validAimAngleTowards dragStartAt pointer of
                             Nothing ->
-                                WaitingForInput ballPosition
+                                WaitingForInput
 
                             Just angle ->
                                 Simulating
                                     (initSim
                                         (initEmitter frame
-                                            (initBall ballPosition angle)
+                                            (initBall game.ballPosition angle)
                                             game.ballCount
                                         )
                                     )
@@ -880,7 +882,8 @@ updateGameOnSimEnd now ballPosition game =
     ( mbOver
     , { game
         | transit = initTransit now
-        , state = WaitingForInput ballPosition
+        , ballPosition = ballPosition
+        , state = WaitingForInput
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
@@ -1243,7 +1246,7 @@ viewPage { vri, frame, pointer } page =
                     , viewFooter g.ballCount g.stars
 
                     -- ^--^ draw order matters, when showing aim/debug points
-                    , viewState frame pointer g.transit g.turn g.targets g.state
+                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
                     , case overlay of
                         PauseOverlay ->
                             viewPauseOverlay
@@ -1361,10 +1364,10 @@ viewFooter ballCount stars =
         ]
 
 
-viewState : Float -> Vec -> Anim0 -> Int -> List Target -> State -> Svg Msg
-viewState now pointer transit turn targets state =
+viewState : Float -> Vec -> Anim0 -> Vec -> Int -> List Target -> State -> Svg Msg
+viewState now pointer transit ballPosition turn targets state =
     case state of
-        WaitingForInput ballPosition ->
+        WaitingForInput ->
             group []
                 [ viewTargetsWithAnim now transit targets
                 , viewBall ballPosition
@@ -1375,7 +1378,7 @@ viewState now pointer transit turn targets state =
                     noView
                 ]
 
-        Aiming dragStartAt ballPosition ->
+        Aiming dragStartAt ->
             group []
                 [ viewTargets targets
                 , viewBall ballPosition
