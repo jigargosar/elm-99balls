@@ -660,9 +660,14 @@ initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
     let
         game =
-            initGame now stars seed
-                |> spoofBallCountBy 0
-                |> spoofTurns 0
+            case initGame now stars seed of
+                Running g ->
+                    g
+                        |> spoofBallCountBy 0
+                        |> spoofTurns 0
+
+                g ->
+                    g
     in
     GamePage game
 
@@ -686,7 +691,7 @@ spoofTurns n game =
                 game_
 
 
-initGame : Float -> Int -> Seed -> Game
+initGame : Float -> Int -> Seed -> Game_
 initGame now stars seed0 =
     let
         turn =
@@ -695,15 +700,16 @@ initGame now stars seed0 =
         ( targets, seed ) =
             initTopRowTargets turn seed0
     in
-    { transit = initTransit now
-    , ballPosition = initialBallPosition
-    , ballCount = 1
-    , targets = targets
-    , stars = stars
-    , state = Aiming Nothing
-    , turn = turn
-    , seed = seed
-    }
+    Running
+        { transit = initTransit now
+        , ballPosition = initialBallPosition
+        , ballCount = 1
+        , targets = targets
+        , stars = stars
+        , state = Aiming Nothing
+        , turn = turn
+        , seed = seed
+        }
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
