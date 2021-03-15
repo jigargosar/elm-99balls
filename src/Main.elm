@@ -631,7 +631,7 @@ init : Flags -> ( Model, Cmd Msg )
 init { stars } =
     let
         initialSeed =
-            seedFrom 4
+            seedFrom 5
 
         env =
             initialEnvironment
