@@ -672,13 +672,12 @@ spoofBallCountBy count game =
 
 spoofTurns : Int -> Game -> Game
 spoofTurns n game1 =
-    if n <= 0 || game1.overlay /= NoOverlay then
-        game1
+    case ( n > 0, game1.overlay ) of
+        ( True, NoOverlay ) ->
+            spoofTurns (n - 1) (updateGameOnSimEnd 0 initialBallPosition game1 |> fst)
 
-    else
-        case updateGameOnSimEnd 0 initialBallPosition game1 of
-            ( game2, _ ) ->
-                spoofTurns (n - 1) game2
+        _ ->
+            game1
 
 
 initGame : Float -> Int -> Seed -> Game
