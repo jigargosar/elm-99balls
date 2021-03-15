@@ -658,7 +658,7 @@ initGamePage now stars seed =
                 Running g ->
                     g
                         |> spoofBallCountBy 0
-                        |> spoofTurns 0
+                        |> spoofTurns 7
 
                 g ->
                     g
@@ -1265,11 +1265,10 @@ viewPage { vri, frame, pointer } page =
 
             GamePage (Over g) ->
                 group []
-                    [ --viewHeader g.turn
-                      --, viewFooter g.ballCount g.stars
-                      --, viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                      --, viewPauseOverlay
-                      viewOverOverlay frame g.transit
+                    [ viewHeader g.turn
+                    , viewFooter g.ballCount g.stars
+                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+                    , viewOverOverlay frame g.transit
                     ]
         ]
 
