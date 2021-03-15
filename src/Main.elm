@@ -139,7 +139,8 @@ type alias Start =
 
 
 type alias Game =
-    { turn : Int
+    { transit : Anim0
+    , turn : Int
     , targets : List Target
     , ballCount : Int
     , stars : Int
@@ -161,8 +162,7 @@ type alias Over =
 
 
 type State
-    = TargetsEntering Anim0 Vec
-    | WaitingForInput Vec
+    = WaitingForInput Vec
     | Aiming Vec Vec
     | Simulating Sim
 
@@ -694,10 +694,11 @@ initGame now stars seed0 =
         ( targets, seed ) =
             initTopRowTargets turn seed0
     in
-    { ballCount = 1
+    { transit = initTransit now
+    , ballCount = 1
     , targets = targets
     , stars = stars
-    , state = initTargetsEnteringState now initialBallPosition
+    , state = WaitingForInput initialBallPosition
     , turn = turn
     , seed = seed
     }
@@ -809,11 +810,6 @@ pageToWorld env pageCord =
         |> vecScale svgScale
 
 
-initTargetsEnteringState : Float -> Vec -> State
-initTargetsEnteringState now =
-    TargetsEntering (initDefaultTransition now)
-
-
 initAimingState : Vec -> Vec -> State
 initAimingState pointer =
     Aiming (pointer |> vecMapY (atMost 0))
@@ -822,17 +818,6 @@ initAimingState pointer =
 updateGameOnTick : Env -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        TargetsEntering anim ballPosition ->
-            let
-                newState =
-                    if isAnimDone frame anim then
-                        WaitingForInput ballPosition
-
-                    else
-                        game.state
-            in
-            ( ( Nothing, { game | state = newState } ), Cmd.none )
-
         WaitingForInput ballPosition ->
             let
                 newState =
@@ -895,11 +880,12 @@ updateGameOnSimEnd now ballPosition game =
                 Nothing
 
             else
-                Just { anim = initDefaultTransition now, score = game.turn }
+                Just { anim = initTransit now, score = game.turn }
     in
     ( mbOver
     , { game
-        | state = initTargetsEnteringState now ballPosition
+        | transit = initTransit now
+        , state = WaitingForInput ballPosition
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
@@ -1262,7 +1248,7 @@ viewPage { vri, frame, pointer } page =
                     , viewFooter g.ballCount g.stars
 
                     -- ^--^ draw order matters, when showing aim/debug points
-                    , viewState frame pointer g.turn g.targets g.state
+                    , viewState frame pointer g.transit g.turn g.targets g.state
                     , viewOverlay frame overlay
                     , viewDebugPointer pointer |> hideView
                     ]
@@ -1385,20 +1371,14 @@ viewFooter ballCount stars =
         ]
 
 
-viewState : Float -> Vec -> Int -> List Target -> State -> Svg Msg
-viewState now pointer turn targets state =
+viewState : Float -> Vec -> Anim0 -> Int -> List Target -> State -> Svg Msg
+viewState now pointer transit turn targets state =
     case state of
-        TargetsEntering anim ballPosition ->
-            group []
-                [ viewTargetsWithAnim now anim targets
-                , viewBall ballPosition
-                ]
-
         WaitingForInput ballPosition ->
             group []
-                [ viewTargets targets
+                [ viewTargetsWithAnim now transit targets
                 , viewBall ballPosition
-                , if turn == 1 then
+                , if turn == 1 && isAnimDone now transit then
                     viewTutorial 0 now
 
                   else
@@ -1921,8 +1901,8 @@ initAnim0 now duration =
     initAnim now duration ()
 
 
-initDefaultTransition : Float -> Anim0
-initDefaultTransition now =
+initTransit : Float -> Anim0
+initTransit now =
     initAnim0 now transitionDuration
 
 
