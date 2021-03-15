@@ -660,8 +660,8 @@ initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
     let
         ( overlay, game ) =
-            ( NoOverlay, initGame now stars seed |> spoofBallCountBy 5 )
-                |> spoofTurns 5
+            ( NoOverlay, initGame now stars seed |> spoofBallCountBy 0 )
+                |> spoofTurns 7
     in
     GamePage overlay game
 
@@ -868,19 +868,16 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnSimEnd now ballPosition game =
     let
-        newTurn =
-            game.turn + 1
-
         ( newTargets, newSeed ) =
-            initTopRowTargets newTurn game.seed
+            initTopRowTargets (game.turn + 1) game.seed
                 |> mapFst ((++) (List.map moveTargetDown game.targets))
 
-        mbOver =
+        ( mbOver, newTurn ) =
             if canTargetsSafelyMoveDown game.targets then
-                Nothing
+                ( Nothing, game.turn + 1 )
 
             else
-                Just { anim = initTransit now, score = game.turn }
+                ( Just { anim = initTransit now, score = game.turn }, game.turn )
     in
     ( mbOver
     , { game
