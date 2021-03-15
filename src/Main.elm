@@ -161,8 +161,7 @@ type alias Over =
 
 
 type State
-    = WaitingForInput
-    | Aiming Vec
+    = WaitingForInput (Maybe Vec)
     | Simulating Sim
 
 
@@ -698,7 +697,7 @@ initGame now stars seed0 =
     , ballCount = 1
     , targets = targets
     , stars = stars
-    , state = WaitingForInput
+    , state = WaitingForInput Nothing
     , turn = turn
     , seed = seed
     }
@@ -812,46 +811,44 @@ pageToWorld env pageCord =
 
 initAimingState : Vec -> State
 initAimingState pointer =
-    Aiming (pointer |> vecMapY (atMost 0))
+    WaitingForInput <| Just (pointer |> vecMapY (atMost 0))
 
 
 updateGameOnTick : Env -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        WaitingForInput ->
+        WaitingForInput mbDragStartAt ->
             let
                 newState =
-                    if
-                        pointerDown
-                            && not prevPointerDown
-                            && isPointInRectRI gc.ri pointer
-                    then
-                        initAimingState pointer
+                    case mbDragStartAt of
+                        Nothing ->
+                            if
+                                pointerDown
+                                    && not prevPointerDown
+                                    && isPointInRectRI gc.ri pointer
+                            then
+                                initAimingState pointer
 
-                    else
-                        game.state
-            in
-            ( ( Nothing, { game | state = newState } ), Cmd.none )
+                            else
+                                game.state
 
-        Aiming dragStartAt ->
-            let
-                newState =
-                    if not pointerDown then
-                        case validAimAngleTowards dragStartAt pointer of
-                            Nothing ->
-                                WaitingForInput
+                        Just dragStartAt ->
+                            if not pointerDown then
+                                case validAimAngleTowards dragStartAt pointer of
+                                    Nothing ->
+                                        WaitingForInput Nothing
 
-                            Just angle ->
-                                Simulating
-                                    (initSim
-                                        (initEmitter frame
-                                            (initBall game.ballPosition angle)
-                                            game.ballCount
-                                        )
-                                    )
+                                    Just angle ->
+                                        Simulating
+                                            (initSim
+                                                (initEmitter frame
+                                                    (initBall game.ballPosition angle)
+                                                    game.ballCount
+                                                )
+                                            )
 
-                    else
-                        game.state
+                            else
+                                game.state
             in
             ( ( Nothing, { game | state = newState } ), Cmd.none )
 
@@ -883,7 +880,7 @@ updateGameOnSimEnd now ballPosition game =
     , { game
         | transit = initTransit now
         , ballPosition = ballPosition
-        , state = WaitingForInput
+        , state = WaitingForInput Nothing
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
@@ -1367,7 +1364,7 @@ viewFooter ballCount stars =
 viewState : Float -> Vec -> Anim0 -> Vec -> Int -> List Target -> State -> Svg Msg
 viewState now pointer transit ballPosition turn targets state =
     case state of
-        WaitingForInput ->
+        WaitingForInput mbDragStartAt ->
             group []
                 [ viewTargetsWithAnim now transit targets
                 , viewBall ballPosition
@@ -1376,26 +1373,22 @@ viewState now pointer transit ballPosition turn targets state =
 
                   else
                     noView
-                ]
-
-        Aiming dragStartAt ->
-            group []
-                [ viewTargets targets
-                , viewBall ballPosition
-                , if turn == 1 then
-                    viewTutorial 0 now
-
-                  else
-                    noView
-                , case validAimAngleTowards dragStartAt pointer of
-                    Nothing ->
-                        noView
-
-                    Just angle ->
+                , case
+                    mbDragStartAt
+                        |> Maybe.andThen
+                            (\dragStartAt ->
+                                validAimAngleTowards dragStartAt pointer
+                                    |> Maybe.map (pair dragStartAt)
+                            )
+                  of
+                    Just ( dragStartAt, angle ) ->
                         group []
                             [ viewTravelPath now (ballTravelPath targets ballPosition angle)
                             , viewDebugPoints [ pointer, dragStartAt ]
                             ]
+
+                    Nothing ->
+                        noView
                 ]
 
         Simulating sim ->
