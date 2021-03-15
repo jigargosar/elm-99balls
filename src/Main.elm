@@ -151,14 +151,12 @@ type alias Game =
 
 type Overlay
     = PauseOverlay
-    | OverOverlay Over
+    | OverOverlay
     | NoOverlay
 
 
 type alias Over =
-    { anim : Anim0
-    , score : Int
-    }
+    ()
 
 
 type State
@@ -681,8 +679,8 @@ spoofTurns n ( overlay, game1 ) =
             ( ( Nothing, game2 ), _ ) ->
                 spoofTurns (n - 1) ( overlay, game2 )
 
-            ( ( Just over, game2 ), _ ) ->
-                ( OverOverlay over, game2 )
+            ( ( _, game2 ), _ ) ->
+                ( OverOverlay, game2 )
 
 
 initGame : Float -> Int -> Seed -> Game
@@ -723,7 +721,7 @@ update message (Model env page) =
                                 |> mapFst
                                     (\( mbOver, newGame ) ->
                                         GamePage
-                                            (Maybe.unwrap NoOverlay OverOverlay mbOver)
+                                            (Maybe.unwrap NoOverlay (always OverOverlay) mbOver)
                                             (stepGameTargets_ newGame)
                                     )
 
@@ -877,7 +875,7 @@ updateGameOnSimEnd now ballPosition game =
                 ( Nothing, game.turn + 1 )
 
             else
-                ( Just { anim = initTransit now, score = game.turn }, game.turn )
+                ( Just (), game.turn )
     in
     ( mbOver
     , { game
@@ -1246,30 +1244,25 @@ viewPage { vri, frame, pointer } page =
 
                     -- ^--^ draw order matters, when showing aim/debug points
                     , viewState frame pointer g.transit g.turn g.targets g.state
-                    , viewOverlay frame overlay
+                    , case overlay of
+                        PauseOverlay ->
+                            viewPauseOverlay
+
+                        OverOverlay ->
+                            viewOverOverlay frame g.transit
+
+                        NoOverlay ->
+                            noView
                     , viewDebugPointer pointer |> hideView
                     ]
         ]
 
 
-viewOverlay : Float -> Overlay -> Svg Msg
-viewOverlay frame overlay =
-    case overlay of
-        PauseOverlay ->
-            viewPauseOverlay
-
-        OverOverlay over ->
-            viewOverOverlay frame over
-
-        NoOverlay ->
-            noView
-
-
-viewOverOverlay : Float -> Over -> Svg Msg
-viewOverOverlay frame { anim } =
+viewOverOverlay : Float -> Anim0 -> Svg Msg
+viewOverOverlay frame transit =
     let
         progress =
-            clampedAnimProgress frame anim
+            transitProgress frame transit
     in
     group [ onClick RestartGameClicked ]
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
@@ -1898,11 +1891,6 @@ initAnim0 now duration =
     initAnim now duration ()
 
 
-initTransit : Float -> Anim0
-initTransit now =
-    initAnim0 now transitionDuration
-
-
 allAnimDone : Float -> List (Anim a) -> Bool
 allAnimDone now =
     List.all (isAnimDone now)
@@ -1940,3 +1928,13 @@ unsafe__AnimProgress now (Anim { start, duration }) =
 clampedAnimProgress : Float -> Anim a -> Float
 clampedAnimProgress now anim =
     unsafe__AnimProgress now anim |> clamp 0 1
+
+
+initTransit : Float -> Anim0
+initTransit now =
+    initAnim0 now transitionDuration
+
+
+transitProgress : Float -> Anim a -> Float
+transitProgress =
+    clampedAnimProgress
