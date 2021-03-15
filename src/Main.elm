@@ -131,7 +131,7 @@ initialEnvironment =
 
 type Page
     = StartPage Start
-    | GamePage Overlay Game
+    | GamePage Game
 
 
 type alias Start =
@@ -140,6 +140,7 @@ type alias Start =
 
 type alias Game =
     { transit : Anim0
+    , overlay : Overlay
     , ballPosition : Vec
     , turn : Int
     , targets : List Target
@@ -657,11 +658,11 @@ init { stars } =
 initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
     let
-        ( overlay, game ) =
-            ( NoOverlay, initGame now stars seed |> spoofBallCountBy 0 )
+        game =
+            (initGame now stars seed |> spoofBallCountBy 0)
                 |> spoofTurns 7
     in
-    GamePage overlay game
+    GamePage game
 
 
 spoofBallCountBy : Int -> Game -> Game
@@ -669,18 +670,15 @@ spoofBallCountBy count game =
     { game | ballCount = game.ballCount + count |> atLeast 1 }
 
 
-spoofTurns : Int -> ( Overlay, Game ) -> ( Overlay, Game )
-spoofTurns n ( overlay, game1 ) =
-    if n <= 0 then
-        ( overlay, game1 )
+spoofTurns : Int -> Game -> Game
+spoofTurns n game1 =
+    if n <= 0 || game1.overlay /= NoOverlay then
+        game1
 
     else
         case updateGameOnSimEnd 0 initialBallPosition game1 of
-            ( ( Nothing, game2 ), _ ) ->
-                spoofTurns (n - 1) ( overlay, game2 )
-
-            ( ( _, game2 ), _ ) ->
-                ( OverOverlay, game2 )
+            ( game2, _ ) ->
+                spoofTurns (n - 1) game2
 
 
 initGame : Float -> Int -> Seed -> Game
@@ -693,6 +691,7 @@ initGame now stars seed0 =
             initTopRowTargets turn seed0
     in
     { transit = initTransit now
+    , overlay = NoOverlay
     , ballPosition = initialBallPosition
     , ballCount = 1
     , targets = targets
@@ -717,14 +716,9 @@ update message (Model env page) =
             let
                 ( newPage, pageCmd ) =
                     case page of
-                        GamePage NoOverlay game ->
+                        GamePage game ->
                             updateGameOnTick env game
-                                |> mapFst
-                                    (\( mbOver, newGame ) ->
-                                        GamePage
-                                            (Maybe.unwrap NoOverlay (always OverOverlay) mbOver)
-                                            (stepGameTargets_ newGame)
-                                    )
+                                |> mapFst GamePage
 
                         _ ->
                             ( page, Cmd.none )
@@ -760,7 +754,7 @@ update message (Model env page) =
 
         RestartGameClicked ->
             case page of
-                GamePage _ game ->
+                GamePage game ->
                     ( Model env (initGamePage env.frame game.stars game.seed)
                     , playSound "btn"
                     )
@@ -770,8 +764,17 @@ update message (Model env page) =
 
         ResumeGameClicked ->
             case page of
-                GamePage PauseOverlay game ->
-                    ( Model env (GamePage NoOverlay game)
+                GamePage game ->
+                    ( Model env
+                        (GamePage
+                            (case game.overlay of
+                                PauseOverlay ->
+                                    { game | overlay = NoOverlay }
+
+                                _ ->
+                                    game
+                            )
+                        )
                     , playSound "btn"
                     )
 
@@ -780,8 +783,17 @@ update message (Model env page) =
 
         PauseGameClicked ->
             case page of
-                GamePage NoOverlay game ->
-                    ( Model env (GamePage PauseOverlay game)
+                GamePage game ->
+                    ( Model env
+                        (GamePage
+                            (case game.overlay of
+                                NoOverlay ->
+                                    { game | overlay = PauseOverlay }
+
+                                _ ->
+                                    game
+                            )
+                        )
                     , playSound "btn"
                     )
 
@@ -814,10 +826,10 @@ initAimingState pointer =
     Aiming <| Just (pointer |> vecMapY (atMost 0))
 
 
-updateGameOnTick : Env -> Game -> ( ( Maybe Over, Game ), Cmd msg )
+updateGameOnTick : Env -> Game -> ( Game, Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
-    case game.state of
-        Aiming mbDragStartAt ->
+    case ( game.overlay, game.state ) of
+        ( NoOverlay, Aiming mbDragStartAt ) ->
             let
                 newState =
                     case mbDragStartAt of
@@ -850,42 +862,45 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             else
                                 game.state
             in
-            ( ( Nothing, { game | state = newState } ), Cmd.none )
+            ( { game | state = newState } |> stepGameTargets_, Cmd.none )
 
-        Simulating sim ->
-            case ballPositionOnSimEnd frame sim of
+        ( NoOverlay, Simulating sim ) ->
+            (case ballPositionOnSimEnd frame sim of
                 Just ballPosition ->
                     updateGameOnSimEnd frame ballPosition game
 
                 Nothing ->
                     stepSim frame game sim
-                        |> mapFst (pair Nothing)
+            )
+                |> mapFst stepGameTargets_
+
+        _ ->
+            ( game, Cmd.none )
 
 
-updateGameOnSimEnd : Float -> Vec -> Game -> ( ( Maybe Over, Game ), Cmd msg )
+updateGameOnSimEnd : Float -> Vec -> Game -> ( Game, Cmd msg )
 updateGameOnSimEnd now ballPosition game =
     let
         ( newTargets, newSeed ) =
             initTopRowTargets (game.turn + 1) game.seed
                 |> mapFst ((++) (List.map moveTargetDown game.targets))
 
-        ( mbOver, newTurn ) =
+        ( newOverlay, newTurn ) =
             if canTargetsSafelyMoveDown game.targets then
-                ( Nothing, game.turn + 1 )
+                ( game.overlay, game.turn + 1 )
 
             else
-                ( Just (), game.turn )
+                ( OverOverlay, game.turn )
     in
-    ( mbOver
-    , { game
+    { game
         | transit = initTransit now
+        , overlay = newOverlay
         , ballPosition = ballPosition
         , state = Aiming Nothing
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
-      }
-    )
+    }
         |> withoutCmd
 
 
@@ -1237,14 +1252,14 @@ viewPage { vri, frame, pointer } page =
                     , words "START" [ fillP white, transform [ scale 3 ] ]
                     ]
 
-            GamePage overlay g ->
+            GamePage g ->
                 group []
                     [ viewHeader g.turn
                     , viewFooter g.ballCount g.stars
 
                     -- ^--^ draw order matters, when showing aim/debug points
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                    , case overlay of
+                    , case g.overlay of
                         PauseOverlay ->
                             viewPauseOverlay
 
