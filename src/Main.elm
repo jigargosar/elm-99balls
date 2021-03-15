@@ -161,7 +161,7 @@ type alias Over =
 
 
 type State
-    = WaitingForInput (Maybe Vec)
+    = Aiming (Maybe Vec)
     | Simulating Sim
 
 
@@ -697,7 +697,7 @@ initGame now stars seed0 =
     , ballCount = 1
     , targets = targets
     , stars = stars
-    , state = WaitingForInput Nothing
+    , state = Aiming Nothing
     , turn = turn
     , seed = seed
     }
@@ -811,13 +811,13 @@ pageToWorld env pageCord =
 
 initAimingState : Vec -> State
 initAimingState pointer =
-    WaitingForInput <| Just (pointer |> vecMapY (atMost 0))
+    Aiming <| Just (pointer |> vecMapY (atMost 0))
 
 
 updateGameOnTick : Env -> Game -> ( ( Maybe Over, Game ), Cmd msg )
 updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
     case game.state of
-        WaitingForInput mbDragStartAt ->
+        Aiming mbDragStartAt ->
             let
                 newState =
                     case mbDragStartAt of
@@ -836,7 +836,7 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
                             if not pointerDown then
                                 case validAimAngleTowards dragStartAt pointer of
                                     Nothing ->
-                                        WaitingForInput Nothing
+                                        Aiming Nothing
 
                                     Just angle ->
                                         Simulating
@@ -880,7 +880,7 @@ updateGameOnSimEnd now ballPosition game =
     , { game
         | transit = initTransit now
         , ballPosition = ballPosition
-        , state = WaitingForInput Nothing
+        , state = Aiming Nothing
         , turn = newTurn
         , targets = newTargets
         , seed = newSeed
@@ -1364,7 +1364,7 @@ viewFooter ballCount stars =
 viewState : Float -> Vec -> Anim0 -> Vec -> Int -> List Target -> State -> Svg Msg
 viewState now pointer transit ballPosition turn targets state =
     case state of
-        WaitingForInput mbDragStartAt ->
+        Aiming mbDragStartAt ->
             group []
                 [ viewTargetsWithAnim now transit targets
                 , viewBall ballPosition
