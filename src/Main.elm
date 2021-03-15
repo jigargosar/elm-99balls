@@ -1268,7 +1268,6 @@ viewPage { vri, frame, pointer } page =
 
                         NoOverlay ->
                             noView
-                    , viewDebugPointer pointer |> hideView
                     ]
         ]
 
@@ -1585,14 +1584,6 @@ svgAttrs vri =
 viewBoxFromRI : { a | x : Float, y : Float } -> Attribute b
 viewBoxFromRI ri =
     T.viewBox -ri.x -ri.y (ri.x * 2) (ri.y * 2)
-
-
-viewDebugPointer : Vec -> Svg msg
-viewDebugPointer pointer =
-    group []
-        [ circle (gc.ballR * 0.5) [ fillH 0.4, transform [ translate pointer ] ]
-        , polySeg ( vecZero, pointer ) [ strokeH 0.6 ]
-        ]
 
 
 viewDebugPoints : List Vec -> Svg msg
