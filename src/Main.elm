@@ -156,12 +156,6 @@ type alias Game =
     }
 
 
-type Overlay
-    = PauseOverlay
-    | OverOverlay
-    | NoOverlay
-
-
 type State
     = Aiming (Maybe Vec)
     | Simulating Sim
@@ -1796,6 +1790,10 @@ viewBall p =
 polyline : List Vec -> List (Attribute msg) -> Svg msg
 polyline pts aa =
     Svg.polyline (points pts :: aa) []
+
+
+
+--noinspection ElmUnusedSymbol
 
 
 polySeg : ( Vec, Vec ) -> List (Attribute msg) -> Svg msg
