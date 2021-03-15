@@ -1251,9 +1251,6 @@ viewPage { vri, frame, pointer } page =
                     [ viewHeader g.turn
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-
-                    --, viewPauseOverlay
-                    --, viewOverOverlay frame g.transit
                     ]
 
             GamePage (Paused g) ->
@@ -1262,8 +1259,6 @@ viewPage { vri, frame, pointer } page =
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
                     , viewPauseOverlay
-
-                    --, viewOverOverlay frame g.transit
                     ]
 
             GamePage (Over g) ->
