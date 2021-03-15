@@ -1192,6 +1192,9 @@ subscriptions _ =
         [ Browser.Events.onAnimationFrameDelta (always OnTick)
             -- for monitors where refresh rate is >60 i.e. 144
             -- since we are not using delta for updates.
+            -- also high refresh rate can lead to too many updates
+            -- perhaps, causing high load, in addition to its
+            -- inherent implementation complexity.
             |> always (Time.every (1000 / 60) (always OnTick))
         , Browser.Events.onResize OnDomResize
         ]
