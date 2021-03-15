@@ -659,7 +659,8 @@ initGamePage : Float -> Int -> Seed -> Page
 initGamePage now stars seed =
     let
         game =
-            (initGame now stars seed |> spoofBallCountBy 0)
+            initGame now stars seed
+                |> spoofBallCountBy 0
                 |> spoofTurns 7
     in
     GamePage game
@@ -671,13 +672,8 @@ spoofBallCountBy count game =
 
 
 spoofTurns : Int -> Game -> Game
-spoofTurns n game1 =
-    case ( n > 0, game1.overlay ) of
-        ( True, NoOverlay ) ->
-            spoofTurns (n - 1) (updateGameOnSimEnd 0 initialBallPosition game1 |> fst)
-
-        _ ->
-            game1
+spoofTurns n =
+    applyN n (updateGameOnSimEnd 0 initialBallPosition >> fst)
 
 
 initGame : Float -> Int -> Seed -> Game
@@ -879,28 +875,33 @@ updateGameOnTick { pointer, pointerDown, prevPointerDown, frame } game =
 
 updateGameOnSimEnd : Float -> Vec -> Game -> ( Game, Cmd msg )
 updateGameOnSimEnd now ballPosition game =
-    let
-        ( newTargets, newSeed ) =
-            initTopRowTargets (game.turn + 1) game.seed
-                |> mapFst ((++) (List.map moveTargetDown game.targets))
+    case game.overlay of
+        OverOverlay ->
+            ( game, Cmd.none )
 
-        ( newOverlay, newTurn ) =
-            if canTargetsSafelyMoveDown game.targets then
-                ( game.overlay, game.turn + 1 )
+        _ ->
+            let
+                ( newTargets, newSeed ) =
+                    initTopRowTargets (game.turn + 1) game.seed
+                        |> mapFst ((++) (List.map moveTargetDown game.targets))
 
-            else
-                ( OverOverlay, game.turn )
-    in
-    { game
-        | transit = initTransit now
-        , overlay = newOverlay
-        , ballPosition = ballPosition
-        , state = Aiming Nothing
-        , turn = newTurn
-        , targets = newTargets
-        , seed = newSeed
-    }
-        |> withoutCmd
+                ( newOverlay, newTurn ) =
+                    if canTargetsSafelyMoveDown game.targets then
+                        ( game.overlay, game.turn + 1 )
+
+                    else
+                        ( OverOverlay, game.turn )
+            in
+            { game
+                | transit = initTransit now
+                , overlay = newOverlay
+                , ballPosition = ballPosition
+                , state = Aiming Nothing
+                , turn = newTurn
+                , targets = newTargets
+                , seed = newSeed
+            }
+                |> withoutCmd
 
 
 stepGameTargets_ : Game -> Game
