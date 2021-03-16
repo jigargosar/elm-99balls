@@ -1285,8 +1285,7 @@ viewPage { vri, frame, pointer } page =
           --            ]
           group
             [ transform [ translateXY (-512 / 2) (-512 / 2), scale 0.4 ]
-
-            --, style "color" "green"
+            , style "color" "green"
             , fillP white
             , strokeP white
             ]
