@@ -668,6 +668,7 @@ initGamePage now stars seed =
                     g
                         |> spoofBallCountBy 0
                         |> spoofTurns 0
+                        |> (pauseGame >> fst)
 
                 g ->
                     g
@@ -793,8 +794,8 @@ update message (Model env page) =
 
         PauseGameClicked ->
             case page of
-                GamePage (Running game) ->
-                    ( Model env (GamePage (Paused game)), playSound "btn" )
+                GamePage game ->
+                    pauseGame game |> mapFst (GamePage >> Model env)
 
                 _ ->
                     ( Model env page, Cmd.none )
@@ -808,6 +809,16 @@ update message (Model env page) =
 
                 _ ->
                     ( Model env page, Cmd.none )
+
+
+pauseGame : Game_ -> ( Game_, Cmd msg )
+pauseGame game_ =
+    case game_ of
+        Running game ->
+            ( Paused game, playSound "btn" )
+
+        _ ->
+            ( game_, Cmd.none )
 
 
 pageToWorld : Env -> Vec -> Vec
@@ -1309,6 +1320,7 @@ viewPauseOverlay =
     in
     group [ onClick ResumeGameClicked ]
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+        , rect (vec (gc.cellR * 5) (gc.cellR * 2)) [ fillP white ]
         , group
             [ fade progress
             , fillP lightOrange
