@@ -1357,7 +1357,7 @@ pauseIcon s c =
             [ scale s
             , translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2)
             ]
-        , style "color" (Color.toCssString c)
+        , style "color" (toCssString c)
         ]
         [ SvgIcon.viewIcon icon ]
 
@@ -1369,14 +1369,16 @@ restartIcon s c =
             Icon.redo
     in
     group
-        [ transform
-            [ Rotate -45 0 0
-            , scale s
-            , translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2)
-            ]
-        , style "color" (Color.toCssString c)
-        ]
-        [ SvgIcon.viewIcon icon ]
+        [ transform [ Rotate -45 0 0, scale s ], fillP c ]
+        [ viewIcon Icon.redo ]
+
+
+viewIcon icon =
+    Svg.path
+        (transform [ translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2) ]
+            :: List.map S.d icon.paths
+        )
+        []
 
 
 lightOrange : Color
