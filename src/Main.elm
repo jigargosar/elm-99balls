@@ -1329,16 +1329,16 @@ viewHeader turn =
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , viewIconBtnHelp RestartGameClicked wc.restartBtn.c white viewRestartIcon
+        , iconBtnContainer RestartGameClicked wc.restartBtn.c white [ restartIcon ]
         , viewIconBtn PauseGameClicked wc.pauseBtn.c white Icon.pause
         ]
 
 
 viewIconBtn msg center color icon =
-    viewIconBtnHelp msg center color (viewIcon icon)
+    iconBtnContainer msg center color [ viewIcon icon ]
 
 
-viewIconBtnHelp msg center color iconView =
+iconBtnContainer msg center color =
     group
         [ transform [ translate center, scale (gc.cellR / 512) ]
         , fillP color
@@ -1346,11 +1346,10 @@ viewIconBtnHelp msg center color iconView =
         , S.cursor "pointer"
         , alwaysPreventDefaultOn "click" (JD.succeed msg)
         ]
-        [ iconView ]
 
 
-viewRestartIcon : Svg msg
-viewRestartIcon =
+restartIcon : Svg msg
+restartIcon =
     group
         [ transform [ Rotate -45 0 0 ] ]
         [ viewIcon Icon.redo ]
@@ -1577,20 +1576,6 @@ v-26c0-4.136,3.364-7.5,7.5-7.5s7.5,3.364,7.5,7.5V102v16.5h15V102c0-4.136,3.364-7
 l0.025,32.852C177.291,169.014,158.36,188.079,135.092,188.079z
 """
             :: aa
-        )
-        []
-
-
-restartSvg : Svg msg
-restartSvg =
-    Svg.path
-        (S.d
-            """M12.083,1.887c-0.795-0.794-1.73-1.359-2.727-1.697v2.135c0.48,0.239,0.935,0.55,1.334,0.95
-c1.993,1.994,1.993,5.236,0,7.229c-1.993,1.99-5.233,1.99-7.229,0c-1.991-1.995-1.991-5.235,0-7.229
-C3.466,3.269,3.482,3.259,3.489,3.25h0.002l1.181,1.179L4.665,0.685L0.923,0.68l1.176,1.176C2.092,1.868,2.081,1.88,2.072,1.887
-c-2.763,2.762-2.763,7.243,0,10.005c2.767,2.765,7.245,2.765,10.011,0C14.844,9.13,14.847,4.649,12.083,1.887z
-"""
-            :: [ transform [ translateXY -(14.155 / 2) -(14.155 / 2) ] ]
         )
         []
 
