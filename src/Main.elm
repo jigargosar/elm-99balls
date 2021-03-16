@@ -1313,7 +1313,7 @@ viewPauseOverlay =
             1
 
         rightBtnX =
-            gc.cellR * 2.5
+            gc.ri.x / 2.5
     in
     group []
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
