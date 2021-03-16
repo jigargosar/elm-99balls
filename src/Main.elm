@@ -1348,18 +1348,9 @@ viewHeader turn =
 
 pauseIcon : Float -> Color -> Svg msg
 pauseIcon s c =
-    let
-        icon =
-            Icon.pause
-    in
     group
-        [ transform
-            [ scale s
-            , translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2)
-            ]
-        , style "color" (toCssString c)
-        ]
-        [ SvgIcon.viewIcon icon ]
+        [ transform [ scale s ], fillP c ]
+        [ viewIcon Icon.pause ]
 
 
 restartIcon : Float -> Color -> Svg msg
