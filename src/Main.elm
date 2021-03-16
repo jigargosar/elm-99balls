@@ -1244,7 +1244,8 @@ view (Model env page) =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
             |> always noView
-        , Icon.css
+
+        --, Icon.css
         , viewPage env page
         ]
 
@@ -1283,14 +1284,6 @@ viewPage { vri, frame, pointer } page =
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
                     , viewOverOverlay frame g.transit
                     ]
-        , group
-            [ transform [ translateXY (-512 / 2) (-512 / 2), scale 0.4 ]
-            , style "color" "white"
-            , style "background-color" "black"
-            , fillP white
-            , strokeP white
-            ]
-            [ SvgIcon.viewIcon Icon.pause ]
         ]
 
 
