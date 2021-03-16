@@ -1,8 +1,9 @@
 module Util exposing (..)
 
 import Basics.Extra exposing (atLeast)
+import Color exposing (Color)
 import Float.Extra
-import Html exposing (text)
+import Html exposing (Attribute, text)
 import Html.Attributes exposing (style)
 import Html.Events as E
 import Json.Decode as JD exposing (Decoder)
@@ -14,8 +15,6 @@ import Random.Float
 import Random.List
 import TypedSvg.Attributes as T
 import TypedSvg.Types exposing (..)
-import Color exposing (Color)
-import Html exposing (Attribute)
 
 
 type alias Vec =
@@ -30,6 +29,14 @@ vec a b =
 vecZero : Vec
 vecZero =
     vec 0 0
+
+
+vecX x =
+    vec x 0
+
+
+vecY y =
+    vec 0 y
 
 
 vecFromTuple : ( Float, Float ) -> Vec
@@ -164,6 +171,16 @@ vecMapY fn =
 vecMapX : (Float -> Float) -> Vec -> Vec
 vecMapX fn =
     vecMapBoth fn identity
+
+
+vecDX : Float -> Vec -> Vec
+vecDX dx =
+    vecMapX (add dx)
+
+
+vecDY : Float -> Vec -> Vec
+vecDY dy =
+    vecMapY (add dy)
 
 
 vecApply : (Float -> Float -> a) -> Vec -> a
@@ -629,12 +646,12 @@ inc =
     add 1
 
 
-round2 : (Float, Float) -> (Int, Int)
+round2 : ( Float, Float ) -> ( Int, Int )
 round2 =
     mapEach round
 
 
-toFloat2 : (Int, Int) -> (Float, Float)
+toFloat2 : ( Int, Int ) -> ( Float, Float )
 toFloat2 =
     mapEach toFloat
 
@@ -644,7 +661,7 @@ roundFloat =
     round >> toFloat
 
 
-roundFloat2 : (Float, Float) -> (Float, Float)
+roundFloat2 : ( Float, Float ) -> ( Float, Float )
 roundFloat2 =
     mapEach roundFloat
 
@@ -700,27 +717,27 @@ mapEach fn =
     Tuple.mapBoth fn fn
 
 
-pairTo : a -> b -> (b, a)
+pairTo : a -> b -> ( b, a )
 pairTo b a =
     ( a, b )
 
 
-fst : (a, b) -> a
+fst : ( a, b ) -> a
 fst =
     Tuple.first
 
 
-snd : (a, b) -> b
+snd : ( a, b ) -> b
 snd =
     Tuple.second
 
 
-mapFst : (a -> x) -> (a, b) -> (x, b)
+mapFst : (a -> x) -> ( a, b ) -> ( x, b )
 mapFst =
     Tuple.mapFirst
 
 
-mapSnd : (b -> y) -> (a, b) -> (a, y)
+mapSnd : (b -> y) -> ( a, b ) -> ( a, y )
 mapSnd =
     Tuple.mapSecond
 
@@ -831,7 +848,7 @@ seedFrom =
     Random.initialSeed
 
 
-rndStep : (Generator a, Random.Seed) -> (a, Random.Seed)
+rndStep : ( Generator a, Random.Seed ) -> ( a, Random.Seed )
 rndStep ( g, s ) =
     Random.step g s
 
@@ -841,7 +858,7 @@ rndLenList lenGen gen =
     rndAndThen (\i -> rndList i gen) lenGen
 
 
-rndPair : Generator a -> Generator b -> Generator (a, b)
+rndPair : Generator a -> Generator b -> Generator ( a, b )
 rndPair =
     Random.pair
 

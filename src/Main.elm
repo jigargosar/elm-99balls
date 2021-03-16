@@ -1311,10 +1311,16 @@ viewPauseOverlay =
     let
         progress =
             1
+
+        rightBtnX =
+            gc.cellR * 2.5
     in
-    group [ onClick ResumeGameClicked ]
+    group []
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
         , rect (vec (gc.cellR * 5) (gc.cellR * 2)) [ fillP white ]
+        , iconBtnContainer RestartGameClicked (vecX -rightBtnX) black [ restartIcon ]
+        , viewIconBtn ResumeGameClicked (vecX rightBtnX) black Icon.home
+        , viewIconBtn ResumeGameClicked vecZero black Icon.play
         , group
             [ fade progress
             , fillP lightOrange
