@@ -22,6 +22,7 @@
             "elm-community/typed-svg": "6.0.0",
             "evancz/elm-playground": "1.0.3",
             "ianmackenzie/elm-float-extra": "1.1.0",
+            "lattyware/elm-fontawesome": "5.0.0",
             "terezka/line-charts": "2.0.1"
         },
         "indirect": {

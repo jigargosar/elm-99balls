@@ -4,6 +4,14 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
+import FontAwesome.Attributes as Icon
+import FontAwesome.Brands as Icon
+import FontAwesome.Icon as Icon exposing (Icon)
+import FontAwesome.Layering as Icon
+import FontAwesome.Solid as Icon
+import FontAwesome.Styles as Icon
+import FontAwesome.Svg as SvgIcon
+import FontAwesome.Transforms as Icon
 import Html exposing (Attribute, Html, div, node)
 import Html.Attributes as A exposing (style)
 import Html.Events as E exposing (onClick)
@@ -41,10 +49,15 @@ port saveStars : Int -> Cmd msg
 
   - [x] add actual star shape svg
 
+  - pause icon
+
+  - get temp icons, pause/play/shop/restart/
+
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
 
   - pause screen
+      - with restart/home/resume
 
   - mute btn
 
@@ -1231,6 +1244,7 @@ view (Model env page) =
         ]
         [ node "link" [ A.href "styles.css", A.rel "stylesheet" ] []
             |> always noView
+        , Icon.css
         , viewPage env page
         ]
 
@@ -1238,36 +1252,45 @@ view (Model env page) =
 viewPage : Env -> Page -> Html Msg
 viewPage { vri, frame, pointer } page =
     Svg.svg (svgAttrs vri)
-        [ rect wc.ri [ fillP black ]
-        , case page of
-            StartPage _ ->
-                group [ onClick StartGameClicked ]
-                    [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP lightOrange ]
-                    , words "START" [ fillP white, transform [ scale 3 ] ]
-                    ]
+        [ --
+          --  rect wc.ri [ fillP black ]
+          --, case page of
+          --    StartPage _ ->
+          --        group [ onClick StartGameClicked ]
+          --            [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP lightOrange ]
+          --            , words "START" [ fillP white, transform [ scale 3 ] ]
+          --            ]
+          --
+          --    GamePage (Running g) ->
+          --        group []
+          --            [ viewHeader g.turn
+          --            , viewFooter g.ballCount g.stars
+          --            , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+          --            ]
+          --
+          --    GamePage (Paused g) ->
+          --        group []
+          --            [ viewHeader g.turn
+          --            , viewFooter g.ballCount g.stars
+          --            , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+          --            , viewPauseOverlay
+          --            ]
+          --
+          --    GamePage (Over g) ->
+          --        group []
+          --            [ viewHeader g.turn
+          --            , viewFooter g.ballCount g.stars
+          --            , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+          --            , viewOverOverlay frame g.transit
+          --            ]
+          group
+            [ transform [ translateXY (-512 / 2) (-512 / 2), scale 0.4 ]
 
-            GamePage (Running g) ->
-                group []
-                    [ viewHeader g.turn
-                    , viewFooter g.ballCount g.stars
-                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                    ]
-
-            GamePage (Paused g) ->
-                group []
-                    [ viewHeader g.turn
-                    , viewFooter g.ballCount g.stars
-                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                    , viewPauseOverlay
-                    ]
-
-            GamePage (Over g) ->
-                group []
-                    [ viewHeader g.turn
-                    , viewFooter g.ballCount g.stars
-                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                    , viewOverOverlay frame g.transit
-                    ]
+            --, style "color" "green"
+            , fillP white
+            , strokeP white
+            ]
+            [ SvgIcon.viewIcon Icon.pause ]
         ]
 
 
@@ -1328,6 +1351,7 @@ viewHeader turn =
                 , S.cursor "pointer"
                 , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
                 ]
+            , group [ transform [], fillP white ] [ SvgIcon.viewIcon Icon.pause ]
             ]
         ]
 
