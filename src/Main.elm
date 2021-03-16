@@ -1336,22 +1336,20 @@ viewHeader turn =
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , group [ transform [ translate wc.restartBtn.c ] ]
-            [ restartIcon 0.1 white
-            , rect wc.restartBtn.ri
-                [ S.pointerEvents "fill"
-                , S.cursor "pointer"
-                , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
-                ]
+        , group
+            [ transform [ translate wc.restartBtn.c ]
+            , S.pointerEvents "bounding-box"
+            , S.cursor "pointer"
+            , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
             ]
-        , group [ transform [ translate wc.pauseBtn.c ] ]
-            [ pauseIcon 0.1 white
-            , rect wc.pauseBtn.ri
-                [ S.pointerEvents "fill"
-                , S.cursor "pointer"
-                , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
-                ]
+            [ restartIcon 0.1 white ]
+        , group
+            [ transform [ translate wc.pauseBtn.c ]
+            , S.pointerEvents "bounding-box"
+            , S.cursor "pointer"
+            , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
             ]
+            [ pauseIcon 0.1 white ]
         ]
 
 
