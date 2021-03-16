@@ -1337,20 +1337,14 @@ viewHeader turn =
             ]
             [ restartIcon 0.1 white ]
         , group
-            [ transform [ translate wc.pauseBtn.c ]
+            [ transform [ translate wc.pauseBtn.c, scale 0.1 ]
+            , fillP white
             , S.pointerEvents "bounding-box"
             , S.cursor "pointer"
             , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
             ]
-            [ pauseIcon 0.1 white ]
+            [ viewIcon Icon.pause ]
         ]
-
-
-pauseIcon : Float -> Color -> Svg msg
-pauseIcon s c =
-    group
-        [ transform [ scale s ], fillP c ]
-        [ viewIcon Icon.pause ]
 
 
 restartIcon : Float -> Color -> Svg msg
