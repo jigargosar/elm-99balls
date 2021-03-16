@@ -1329,12 +1329,12 @@ viewHeader turn =
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , viewIconBtn RestartGameClicked wc.restartBtn.c white [ viewRestartIcon ]
-        , viewIconBtn PauseGameClicked wc.pauseBtn.c white [ viewIcon Icon.pause ]
+        , viewIconBtn RestartGameClicked wc.restartBtn.c white viewRestartIcon
+        , viewIconBtn PauseGameClicked wc.pauseBtn.c white (viewIcon Icon.pause)
         ]
 
 
-viewIconBtn msg center color =
+viewIconBtn msg center color iv =
     group
         [ transform [ translate center, scale (gc.cellR / 512) ]
         , fillP color
@@ -1342,13 +1342,7 @@ viewIconBtn msg center color =
         , S.cursor "pointer"
         , alwaysPreventDefaultOn "click" (JD.succeed msg)
         ]
-
-
-btnAttrs msg =
-    [ S.pointerEvents "bounding-box"
-    , S.cursor "pointer"
-    , alwaysPreventDefaultOn "click" (JD.succeed msg)
-    ]
+        [ iv ]
 
 
 viewRestartIcon : Svg msg
@@ -1358,6 +1352,7 @@ viewRestartIcon =
         [ viewIcon Icon.redo ]
 
 
+viewIcon : Icon -> Svg msg
 viewIcon icon =
     Svg.path
         (transform [ translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2) ]
