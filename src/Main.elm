@@ -1333,9 +1333,9 @@ viewHeader turn =
     in
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
+        , iconBtnContainer RestartGameClicked leftBtnCenter white [ restartIcon ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , iconBtnContainer RestartGameClicked leftBtnCenter white [ restartIcon ]
         , viewIconBtn PauseGameClicked rightBtnCenter white Icon.pause
         ]
 
