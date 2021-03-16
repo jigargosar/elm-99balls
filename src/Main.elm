@@ -1253,39 +1253,40 @@ viewPage : Env -> Page -> Html Msg
 viewPage { vri, frame, pointer } page =
     Svg.svg (svgAttrs vri)
         [ --
-          --  rect wc.ri [ fillP black ]
-          --, case page of
-          --    StartPage _ ->
-          --        group [ onClick StartGameClicked ]
-          --            [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP lightOrange ]
-          --            , words "START" [ fillP white, transform [ scale 3 ] ]
-          --            ]
-          --
-          --    GamePage (Running g) ->
-          --        group []
-          --            [ viewHeader g.turn
-          --            , viewFooter g.ballCount g.stars
-          --            , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-          --            ]
-          --
-          --    GamePage (Paused g) ->
-          --        group []
-          --            [ viewHeader g.turn
-          --            , viewFooter g.ballCount g.stars
-          --            , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-          --            , viewPauseOverlay
-          --            ]
-          --
-          --    GamePage (Over g) ->
-          --        group []
-          --            [ viewHeader g.turn
-          --            , viewFooter g.ballCount g.stars
-          --            , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-          --            , viewOverOverlay frame g.transit
-          --            ]
-          group
+          rect wc.ri [ fillP black ]
+        , case page of
+            StartPage _ ->
+                group [ onClick StartGameClicked ]
+                    [ rect (vec (gc.cellR * 2) (gc.cellR * 0.9)) [ fillP lightOrange ]
+                    , words "START" [ fillP white, transform [ scale 3 ] ]
+                    ]
+
+            GamePage (Running g) ->
+                group []
+                    [ viewHeader g.turn
+                    , viewFooter g.ballCount g.stars
+                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+                    ]
+
+            GamePage (Paused g) ->
+                group []
+                    [ viewHeader g.turn
+                    , viewFooter g.ballCount g.stars
+                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+                    , viewPauseOverlay
+                    ]
+
+            GamePage (Over g) ->
+                group []
+                    [ viewHeader g.turn
+                    , viewFooter g.ballCount g.stars
+                    , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
+                    , viewOverOverlay frame g.transit
+                    ]
+        , group
             [ transform [ translateXY (-512 / 2) (-512 / 2), scale 0.4 ]
-            , style "color" "green"
+            , style "color" "white"
+            , style "background-color" "black"
             , fillP white
             , strokeP white
             ]
@@ -1336,23 +1337,65 @@ viewHeader turn =
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
         , group [ transform [ translate wc.restartBtn.c ] ]
-            [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ]
+            [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ] |> hideView
             , rect wc.restartBtn.ri
                 [ S.pointerEvents "fill"
                 , S.cursor "pointer"
                 , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
                 ]
+            , group
+                [ transform
+                    [ Rotate -45 0 0
+                    , scale 0.1
+                    , translateXY -(toFloat Icon.redo.width / 2) -(toFloat Icon.redo.height / 2)
+                    ]
+                , style "color" "white"
+                ]
+                [ SvgIcon.viewIcon Icon.redo ]
             ]
         , group [ transform [ translate wc.pauseBtn.c ] ]
-            [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ]
+            [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ] |> hideView
             , rect wc.pauseBtn.ri
                 [ S.pointerEvents "fill"
                 , S.cursor "pointer"
                 , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
                 ]
-            , group [ transform [], fillP white ] [ SvgIcon.viewIcon Icon.pause ]
+            , pauseIcon 0.1 white
             ]
         ]
+
+
+pauseIcon : Float -> Color -> Svg msg
+pauseIcon s c =
+    let
+        icon =
+            Icon.pause
+    in
+    group
+        [ transform
+            [ scale s
+            , translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2)
+            ]
+        , style "color" (Color.toCssString c)
+        ]
+        [ SvgIcon.viewIcon icon ]
+
+
+restartIcon : Float -> Color -> Svg msg
+restartIcon s c =
+    let
+        icon =
+            Icon.redo
+    in
+    group
+        [ transform
+            [ Rotate -45 0 0
+            , scale s
+            , translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2)
+            ]
+        , style "color" (Color.toCssString c)
+        ]
+        [ SvgIcon.viewIcon icon ]
 
 
 lightOrange : Color
