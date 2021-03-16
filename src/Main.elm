@@ -4,14 +4,8 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
-import FontAwesome.Attributes as Icon
-import FontAwesome.Brands as Icon
-import FontAwesome.Icon as Icon exposing (Icon)
-import FontAwesome.Layering as Icon
+import FontAwesome.Icon exposing (Icon)
 import FontAwesome.Solid as Icon
-import FontAwesome.Styles as Icon
-import FontAwesome.Svg as SvgIcon
-import FontAwesome.Transforms as Icon
 import Html exposing (Attribute, Html, div, node)
 import Html.Attributes as A exposing (style)
 import Html.Events as E exposing (onClick)
