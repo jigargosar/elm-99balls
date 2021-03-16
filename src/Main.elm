@@ -1336,15 +1336,26 @@ viewHeader turn =
             , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
             ]
             [ restartIcon 0.1 white ]
-        , group
-            [ transform [ translate wc.pauseBtn.c, scale 0.1 ]
-            , fillP white
-            , S.pointerEvents "bounding-box"
-            , S.cursor "pointer"
-            , alwaysPreventDefaultOn "click" (JD.succeed PauseGameClicked)
-            ]
-            [ viewIcon Icon.pause ]
+        , viewIconBtn PauseGameClicked Icon.pause wc.pauseBtn.c white
         ]
+
+
+viewIconBtn msg icon center color =
+    group
+        [ transform [ translate center, scale 0.1 ]
+        , fillP color
+        , S.pointerEvents "bounding-box"
+        , S.cursor "pointer"
+        , alwaysPreventDefaultOn "click" (JD.succeed msg)
+        ]
+        [ viewIcon icon ]
+
+
+btnAttrs msg =
+    [ S.pointerEvents "bounding-box"
+    , S.cursor "pointer"
+    , alwaysPreventDefaultOn "click" (JD.succeed msg)
+    ]
 
 
 restartIcon : Float -> Color -> Svg msg
