@@ -1343,15 +1343,7 @@ viewHeader turn =
                 , S.cursor "pointer"
                 , alwaysPreventDefaultOn "click" (JD.succeed RestartGameClicked)
                 ]
-            , group
-                [ transform
-                    [ Rotate -45 0 0
-                    , scale 0.1
-                    , translateXY -(toFloat Icon.redo.width / 2) -(toFloat Icon.redo.height / 2)
-                    ]
-                , style "color" "white"
-                ]
-                [ SvgIcon.viewIcon Icon.redo ]
+            , restartIcon 0.1 white
             ]
         , group [ transform [ translate wc.pauseBtn.c ] ]
             [ group [ transform [ scale 4 ], fillP white ] [ restartSvg ] |> hideView
