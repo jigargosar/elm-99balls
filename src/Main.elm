@@ -43,15 +43,15 @@ port saveStars : Int -> Cmd msg
 
   - [x] add actual star shape svg
 
-  - pause icon
+  - [x] pause icon
+
+  - pause screen
+      - with restart/home/resume
 
   - get temp icons, pause/play/shop/restart/
 
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
-
-  - pause screen
-      - with restart/home/resume
 
   - mute btn
 
