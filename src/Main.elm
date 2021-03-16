@@ -1325,12 +1325,22 @@ viewPauseOverlay =
 
 viewHeader : Int -> Svg Msg
 viewHeader turn =
+    let
+        rightBtnX =
+            wc.header.ri.x - gc.cellR * 2
+
+        leftBtnCenter =
+            vec -rightBtnX 0
+
+        rightBtnCenter =
+            vec rightBtnX 0
+    in
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , iconBtnContainer RestartGameClicked wc.restartBtn.c white [ restartIcon ]
-        , viewIconBtn PauseGameClicked wc.pauseBtn.c white Icon.pause
+        , iconBtnContainer RestartGameClicked leftBtnCenter white [ restartIcon ]
+        , viewIconBtn PauseGameClicked rightBtnCenter white Icon.pause
         ]
 
 
