@@ -521,8 +521,8 @@ type alias WorldConf =
     { ri : Vec
     , header : { ri : Vec, c : Vec }
     , footer : { ri : Vec, c : Vec }
-    , restartBtn : { ri : Vec, c : Vec }
-    , pauseBtn : { ri : Vec, c : Vec }
+    , restartBtn : { c : Vec }
+    , pauseBtn : { c : Vec }
     }
 
 
@@ -547,8 +547,8 @@ wc =
     { ri = ri
     , header = header
     , footer = footer
-    , restartBtn = { ri = gc.cri, c = vec (-header.ri.x + gc.cellR * 2) 0 }
-    , pauseBtn = { ri = gc.cri, c = vec -(-header.ri.x + gc.cellR * 2) 0 }
+    , restartBtn = { c = vec (-header.ri.x + gc.cellR * 2) 0 }
+    , pauseBtn = { c = vec -(-header.ri.x + gc.cellR * 2) 0 }
     }
 
 
