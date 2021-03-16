@@ -1364,10 +1364,6 @@ pauseIcon s c =
 
 restartIcon : Float -> Color -> Svg msg
 restartIcon s c =
-    let
-        icon =
-            Icon.redo
-    in
     group
         [ transform [ Rotate -45 0 0, scale s ], fillP c ]
         [ viewIcon Icon.redo ]
