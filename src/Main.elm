@@ -1329,11 +1329,11 @@ viewHeader turn =
         rightBtnX =
             wc.header.ri.x - gc.cellR * 2
 
-        leftBtnCenter =
-            vec -rightBtnX 0
-
         rightBtnCenter =
             vec rightBtnX 0
+
+        leftBtnCenter =
+            vec -rightBtnX 0
     in
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
