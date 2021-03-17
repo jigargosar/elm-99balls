@@ -661,7 +661,7 @@ initGamePage now stars seed =
                 Running g ->
                     g
                         |> spoofBallCountBy 0
-                        |> spoofTurns 7
+                        |> spoofTurns 7 now
 
                 --|> (pauseGame >> fst)
                 g ->
@@ -675,15 +675,15 @@ spoofBallCountBy count game =
     { game | ballCount = game.ballCount + count |> atLeast 1 }
 
 
-spoofTurns : Int -> Game -> Game_
-spoofTurns n game =
+spoofTurns : number -> Float -> Game -> Game_
+spoofTurns n now game =
     if n <= 0 then
         Running game
 
     else
-        case game |> updateGameOnSimEnd 0 initialBallPosition |> fst of
+        case game |> updateGameOnSimEnd now initialBallPosition |> fst of
             Running newGame ->
-                spoofTurns (n - 1) newGame
+                spoofTurns (n - 1) now newGame
 
             game_ ->
                 game_
