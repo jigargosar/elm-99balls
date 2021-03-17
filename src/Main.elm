@@ -1361,7 +1361,7 @@ viewHeader turn =
         , group [ fillP white ]
             [ btn RestartGameClicked
                 [ transform [ translateXY -rightBtnX 0 ] ]
-                [ viewRestartIcon ]
+                [ viewIcon Icon.volumeUp ]
             , words (String.fromInt turn)
                 [ transform [ scale 4 ], T.fontWeight FontWeightBold ]
             , btn PauseGameClicked
