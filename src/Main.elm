@@ -1330,9 +1330,9 @@ viewPauseOverlay =
             gc.ri.x / 2.5
     in
     group []
-        [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
-        , rect (vec (gc.cellR * 5) (gc.cellR * 2)) [ fillP white ]
-        , group [ fillP black ]
+        [ rect wc.ri [ fillP white, fade (progress |> lerp 0 0.8) ]
+        , rect (vec (gc.ri.x * 0.7) (gc.cellR * 1.6)) [ fillP black, Px.rx gc.cellR ]
+        , group [ fillP white ]
             [ btn RestartGameClicked
                 [ transform [ translateXY -rightBtnX 0 ] ]
                 [ viewRestartIcon ]
