@@ -56,6 +56,8 @@ port saveStars : Int -> Cmd msg
       - best win cup icon
       - play btn / goes to home
 
+  - mute btn
+
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
 
@@ -673,9 +675,9 @@ initGamePage now stars seed =
                 Running g ->
                     g
                         |> spoofBallCountBy 0
-                        |> spoofTurns 0
-                        |> (pauseGame >> fst)
+                        |> spoofTurns 10
 
+                --|> (pauseGame >> fst)
                 g ->
                     g
     in
