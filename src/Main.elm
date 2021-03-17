@@ -1275,7 +1275,7 @@ view (Model env page) =
 
 
 viewPage : Env -> Page -> Html Msg
-viewPage { vri, frame, pointer } page =
+viewPage { vri, frame, pointer, mute } page =
     Svg.svg (svgAttrs vri)
         [ --
           rect wc.ri [ fillP black ]
@@ -1288,14 +1288,14 @@ viewPage { vri, frame, pointer } page =
 
             GamePage (Running g) ->
                 group []
-                    [ viewHeader g.turn
+                    [ viewHeader mute g.turn
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
                     ]
 
             GamePage (Paused g) ->
                 group []
-                    [ viewHeader g.turn
+                    [ viewHeader mute g.turn
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
                     , viewPauseOverlay
@@ -1303,7 +1303,7 @@ viewPage { vri, frame, pointer } page =
 
             GamePage (Over g) ->
                 group []
-                    [ viewHeader g.turn
+                    [ viewHeader mute g.turn
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
                     , viewOverOverlay frame g.transit g.turn 991
@@ -1369,8 +1369,8 @@ viewPauseOverlay =
         ]
 
 
-viewHeader : Int -> Svg Msg
-viewHeader turn =
+viewHeader : Bool -> Int -> Svg Msg
+viewHeader mute turn =
     let
         rightBtnX =
             wc.header.ri.x - gc.cellR * 2
@@ -1380,7 +1380,14 @@ viewHeader turn =
         , group [ fillP white ]
             [ btn ToggleMuteClicked
                 [ transform [ translateXY -rightBtnX 0 ] ]
-                [ viewIcon Icon.volumeUp ]
+                [ viewIcon
+                    (if mute then
+                        Icon.volumeMute
+
+                     else
+                        Icon.volumeUp
+                    )
+                ]
             , words (String.fromInt turn)
                 [ transform [ scale 4 ], T.fontWeight FontWeightBold ]
             , btn PauseGameClicked
