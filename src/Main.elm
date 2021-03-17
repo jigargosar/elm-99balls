@@ -1350,6 +1350,7 @@ viewPauseOverlay =
             [ words "PAUSED" [ transform [ translateXY 0 -50, scale 5 ] ]
             , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
             ]
+            |> hideView
         ]
 
 
