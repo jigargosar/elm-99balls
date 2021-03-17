@@ -1321,7 +1321,7 @@ viewOverOverlay frame transit score hiScore =
             transitProgress frame transit
     in
     group [ onClick HomeBtnClicked ]
-        [ rect wc.ri [ fillP white, fade (progress |> lerp 0 0.8) ]
+        [ rect wc.ri [ fillP white, fade (progress |> lerp 0 0.9) ]
         , group
             [ fade progress
             , fillP black
