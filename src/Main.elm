@@ -45,10 +45,12 @@ port saveStars : Int -> Cmd msg
 
   - [x] pause icon
 
-  - pause screen
+  - [x] pause screen
       - with restart/home/resume
 
-  - get temp icons, pause/play/shop/restart/
+  - [x] get temp icons, pause/play/shop/restart/
+
+  - game over screen
 
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
