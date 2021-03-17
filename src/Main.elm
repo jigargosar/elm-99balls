@@ -1289,7 +1289,7 @@ viewPage { vri, frame, pointer } page =
                     [ viewHeader g.turn
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                    , viewPauseOverlay
+                    , viewPauseOverlay frame g.transit
                     ]
 
             GamePage (Over g) ->
@@ -1320,11 +1320,11 @@ viewOverOverlay frame transit =
         ]
 
 
-viewPauseOverlay : Svg Msg
-viewPauseOverlay =
+viewPauseOverlay : Float -> Anim0 -> Svg Msg
+viewPauseOverlay now transit =
     let
         progress =
-            1
+            transitProgress now transit
 
         rightBtnX =
             gc.ri.x / 2.5
