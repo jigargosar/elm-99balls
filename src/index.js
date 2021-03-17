@@ -30,6 +30,7 @@ app.ports["playSound"]["subscribe"]((function () {
     const soundNameToPathMap =
         {
             btn: 'snd_btn.ogg',
+            over: 'snd_over.ogg',
             shoot: 'snd_shoot.ogg',
             hit: 'snd_hit.ogg',
             bonus_hit: 'snd_bonus_hit.ogg',

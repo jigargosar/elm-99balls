@@ -675,7 +675,7 @@ initGamePage now stars seed =
                 Running g ->
                     g
                         |> spoofBallCountBy 0
-                        |> spoofTurns 8
+                        |> spoofTurns 7
 
                 --|> (pauseGame >> fst)
                 g ->
