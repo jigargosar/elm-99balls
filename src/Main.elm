@@ -97,7 +97,9 @@ main =
 
 
 type alias Flags =
-    { stars : Int }
+    { stars : Int
+    , mute : Bool
+    }
 
 
 type Model
@@ -629,13 +631,10 @@ type Msg
 
 
 init : Flags -> ( Model, Cmd Msg )
-init { stars } =
+init { stars, mute } =
     let
         initialSeed =
             seedFrom 5
-
-        mute =
-            False
 
         env =
             initEnv mute
