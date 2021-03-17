@@ -50,7 +50,7 @@ port saveStars : Int -> Cmd msg
 
   - [x] get temp icons, pause/play/shop/restart/
 
-  - game over screen
+  - [x] game over screen
       - sound
       - score
       - best win cup icon
