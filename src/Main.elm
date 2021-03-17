@@ -823,6 +823,9 @@ update message (Model env page) =
                 GamePage (Paused g) ->
                     ( Model env (initStartPage g.stars g.seed), playSound "btn" )
 
+                GamePage (Over g) ->
+                    ( Model env (initStartPage g.stars g.seed), playSound "btn" )
+
                 _ ->
                     ( Model env page, Cmd.none )
 
@@ -1316,7 +1319,7 @@ viewOverOverlay frame transit =
         progress =
             transitProgress frame transit
     in
-    group [ onClick RestartGameClicked ]
+    group [ onClick HomeBtnClicked ]
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
         , group
             [ fade progress
