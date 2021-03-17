@@ -675,7 +675,7 @@ initGamePage now stars seed =
                 Running g ->
                     g
                         |> spoofBallCountBy 0
-                        |> spoofTurns 7
+                        |> spoofTurns 8
 
                 --|> (pauseGame >> fst)
                 g ->
@@ -1321,7 +1321,7 @@ viewOverOverlay frame transit =
             transitProgress frame transit
     in
     group [ onClick HomeBtnClicked ]
-        [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
+        [ rect wc.ri [ fillP white, fade (progress |> lerp 0 0.8) ]
         , group
             [ fade progress
             , fillP lightOrange
