@@ -141,6 +141,11 @@ type Page
     | GamePage Game_
 
 
+initStartPage : Int -> Seed -> Page
+initStartPage stars seed =
+    StartPage (Start stars seed)
+
+
 type alias Start =
     { stars : Int, seed : Seed }
 
@@ -627,6 +632,7 @@ type Msg
     | RestartGameClicked
     | PauseGameClicked
     | ResumeGameClicked
+    | HomeBtnClicked
     | StartGameClicked
 
 
@@ -800,6 +806,14 @@ update message (Model env page) =
                     ( Model env (initGamePage env.frame start.stars start.seed)
                     , playSound "btn"
                     )
+
+                _ ->
+                    ( Model env page, Cmd.none )
+
+        HomeBtnClicked ->
+            case page of
+                GamePage (Paused g) ->
+                    ( Model env (initStartPage g.stars g.seed), playSound "btn" )
 
                 _ ->
                     ( Model env page, Cmd.none )
@@ -1318,9 +1332,17 @@ viewPauseOverlay =
     group []
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
         , rect (vec (gc.cellR * 5) (gc.cellR * 2)) [ fillP white ]
-        , iconBtnContainer RestartGameClicked (vecX -rightBtnX) black [ viewRestartIcon ]
-        , viewIconBtn ResumeGameClicked (vecX rightBtnX) black Icon.home
-        , viewIconBtn ResumeGameClicked vecZero black Icon.play
+        , group [ fillP black ]
+            [ btn RestartGameClicked
+                [ transform [ translateXY -rightBtnX 0 ] ]
+                [ viewRestartIcon ]
+            , btn ResumeGameClicked
+                [ transform [ translateXY 0 0 ] ]
+                [ viewIcon Icon.play ]
+            , btn HomeBtnClicked
+                [ transform [ translateXY rightBtnX 0 ] ]
+                [ viewIcon Icon.home ]
+            ]
         , group
             [ fade progress
             , fillP lightOrange
@@ -1336,34 +1358,27 @@ viewHeader turn =
     let
         rightBtnX =
             wc.header.ri.x - gc.cellR * 2
-
-        rightBtnCenter =
-            vec rightBtnX 0
-
-        leftBtnCenter =
-            vec -rightBtnX 0
     in
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
-        , iconBtnContainer RestartGameClicked leftBtnCenter white [ viewRestartIcon ]
+        , btn RestartGameClicked
+            [ fillP white, transform [ translateXY -rightBtnX 0 ] ]
+            [ viewRestartIcon ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , viewIconBtn PauseGameClicked rightBtnCenter white Icon.pause
+        , btn PauseGameClicked
+            [ fillP white, transform [ translateXY rightBtnX 0 ] ]
+            [ viewIcon Icon.pause ]
         ]
 
 
-viewIconBtn msg center color icon =
-    iconBtnContainer msg center color [ viewIcon icon ]
-
-
-iconBtnContainer msg center color =
+btn msg aa =
     group
-        [ transform [ translate center, scale (gc.cellR / 512) ]
-        , fillP color
-        , S.pointerEvents "bounding-box"
-        , S.cursor "pointer"
-        , alwaysPreventDefaultOn "click" (JD.succeed msg)
-        ]
+        (S.pointerEvents "bounding-box"
+            :: S.cursor "pointer"
+            :: alwaysPreventDefaultOn "click" (JD.succeed msg)
+            :: aa
+        )
 
 
 viewRestartIcon : Svg msg
@@ -1379,7 +1394,11 @@ viewIcon icon =
 viewRotatedIcon : Float -> Icon -> Svg msg
 viewRotatedIcon deg icon =
     Svg.path
-        (transform [ rotate deg, translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2) ]
+        (transform
+            [ rotate deg
+            , scale ((gc.cellR / 512) * 1.1)
+            , translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2)
+            ]
             :: List.map S.d icon.paths
         )
         []
