@@ -108,17 +108,19 @@ type alias Env =
     , prevPointer : Vec
     , frame : Float
     , vri : Vec
+    , mute : Bool
     }
 
 
-initialEnvironment : Env
-initialEnvironment =
+initEnv : Bool -> Env
+initEnv mute =
     { pointerDown = False
     , prevPointerDown = False
     , pointer = vecZero
     , prevPointer = vecZero
     , frame = 0
     , vri = gc.ri
+    , mute = mute
     }
 
 
@@ -615,6 +617,7 @@ type Msg
     | OnTick
     | PointerDown Bool Vec
     | PointerMoved Vec
+    | ToggleMuteClicked
     | RestartGameClicked
     | PauseGameClicked
     | ResumeGameClicked
@@ -628,8 +631,11 @@ init { stars } =
         initialSeed =
             seedFrom 5
 
+        mute =
+            False
+
         env =
-            initialEnvironment
+            initEnv mute
 
         page =
             initGamePage env.frame stars initialSeed
@@ -747,6 +753,19 @@ update message (Model env page) =
             ( Model
                 { env
                     | pointer = pointer |> pageToWorld env
+                }
+                page
+            , Cmd.none
+            )
+
+        ToggleMuteClicked ->
+            let
+                mute =
+                    not env.mute
+            in
+            ( Model
+                { env
+                    | mute = mute
                 }
                 page
             , Cmd.none
@@ -1359,7 +1378,7 @@ viewHeader turn =
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
         , group [ fillP white ]
-            [ btn RestartGameClicked
+            [ btn ToggleMuteClicked
                 [ transform [ translateXY -rightBtnX 0 ] ]
                 [ viewIcon Icon.volumeUp ]
             , words (String.fromInt turn)
