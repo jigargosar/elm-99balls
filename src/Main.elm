@@ -51,6 +51,10 @@ port saveStars : Int -> Cmd msg
   - [x] get temp icons, pause/play/shop/restart/
 
   - game over screen
+      - sound
+      - score
+      - best win cup icon
+      - play btn / goes to home
 
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
