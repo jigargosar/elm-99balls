@@ -35,27 +35,6 @@ port saveStars : Int -> Cmd msg
 
 # Tasks
 
-  - [x] target kill anim
-
-  - [x] make bonus anim bit staggered.
-
-  - [x] add stars
-
-  - [x] add actual star shape svg
-
-  - [x] pause icon
-
-  - [x] pause screen
-      - with restart/home/resume
-
-  - [x] get temp icons, pause/play/shop/restart/
-
-  - [x] game over screen
-      - sound
-      - score
-      - best win cup icon
-      - play btn / goes to home
-
   - mute btn
 
   - start screen with logo/play/shop buttons.
