@@ -63,6 +63,7 @@ app.ports["playSound"]["subscribe"]((function () {
     )
 
     return function playSound(name) {
+        if (mute) return
         const sound = soundMap[name]
         if (sound) {
             sound.play()
