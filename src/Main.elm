@@ -915,14 +915,14 @@ updateGameOnSimEnd now ballPosition game =
             initTopRowTargets (game.turn + 1) game.seed
                 |> mapFst ((++) (List.map moveTargetDown game.targets))
 
-        ( constructor, newTurn ) =
+        ( constructor, newTurn, cmd ) =
             if canTargetsSafelyMoveDown game.targets then
-                ( Running, game.turn + 1 )
+                ( Running, game.turn + 1, Cmd.none )
 
             else
-                ( Over, game.turn )
+                ( Over, game.turn, playSound "over" )
     in
-    constructor
+    ( constructor
         { game
             | transit = initTransit now
             , ballPosition = ballPosition
@@ -931,7 +931,8 @@ updateGameOnSimEnd now ballPosition game =
             , targets = newTargets
             , seed = newSeed
         }
-        |> withoutCmd
+    , cmd
+    )
 
 
 stepGameTargets_ : Game -> Game
