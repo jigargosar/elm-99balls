@@ -4,11 +4,14 @@ import {Elm} from "./Main.elm"
 // noinspection ES6UnusedImports
 import {Howl, Howler} from 'howler';
 
+let mute = localStorage.getItem("mute") === "true"
 
 const app = Elm["Main"].init({
     node: document.getElementById('root'),
     flags: {
-        stars: Number.parseInt(localStorage.getItem("stars")) || 0
+        stars: Number.parseInt(localStorage.getItem("stars")) || 0,
+        mute
+
     }
 });
 
@@ -24,6 +27,11 @@ function mapValues(fn, obj) {
 
 app.ports["saveStars"]["subscribe"]((function (stars) {
     localStorage.setItem("stars", stars)
+}))
+
+app.ports["setMute"]["subscribe"]((function (mute_) {
+    mute = mute_
+    localStorage.setItem("mute", mute)
 }))
 
 app.ports["playSound"]["subscribe"]((function () {
