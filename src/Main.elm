@@ -1309,13 +1309,13 @@ viewPage { vri, frame, pointer } page =
                     [ viewHeader g.turn
                     , viewFooter g.ballCount g.stars
                     , viewState frame pointer g.transit g.ballPosition g.turn g.targets g.state
-                    , viewOverOverlay frame g.transit
+                    , viewOverOverlay frame g.transit g.turn 991
                     ]
         ]
 
 
-viewOverOverlay : Float -> Anim0 -> Svg Msg
-viewOverOverlay frame transit =
+viewOverOverlay : Float -> Anim0 -> Int -> Int -> Svg Msg
+viewOverOverlay frame transit score hiScore =
     let
         progress =
             transitProgress frame transit
@@ -1324,10 +1324,20 @@ viewOverOverlay frame transit =
         [ rect wc.ri [ fillP white, fade (progress |> lerp 0 0.8) ]
         , group
             [ fade progress
-            , fillP lightOrange
+            , fillP black
+            , T.fontWeight FontWeightBold
             ]
-            [ words "Game Over" [ transform [ translateXY 0 -50, scale 5 ] ]
-            , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
+            [ group [ transform [ translateXY 0 -(gc.cellR * 4) ] ]
+                [ words "SCORE" [ transform [ translateXY 0 -gc.cellR, scale 5 ] ]
+                , words (String.fromInt score) [ transform [ translateXY 0 gc.cellR, scale 4 ] ]
+                ]
+            , group [ transform [ translateXY 0 gc.cellR ] ]
+                [ words "BEST" [ transform [ translateXY 0 -gc.cellR, scale 5 ] ]
+                , words (String.fromInt hiScore) [ transform [ translateXY 0 gc.cellR, scale 4 ] ]
+                ]
+            , btn ResumeGameClicked
+                [ transform [ translateXY 0 (gc.cellR * 5), scale 1.5 ] ]
+                [ viewIcon Icon.play ]
             ]
         ]
 
