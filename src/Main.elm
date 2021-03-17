@@ -36,11 +36,10 @@ port saveStars : Int -> Cmd msg
 # Tasks
 
   - mute btn
+      - try introducing session
 
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
-
-  - mute btn
 
   - test input handling on phone/touch device.
       - Concern: angle flickering on touch release
@@ -120,6 +119,14 @@ initialEnvironment =
     , prevPointer = vecZero
     , frame = 0
     , vri = gc.ri
+    }
+
+
+type alias Session =
+    { hiScore : Int
+    , stars : Int
+    , seed : Seed
+    , mute : Bool
     }
 
 
