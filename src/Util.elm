@@ -978,6 +978,10 @@ translateXY =
     Translate
 
 
+rotate deg =
+    Rotate deg 0 0
+
+
 
 -- Events
 

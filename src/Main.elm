@@ -1318,7 +1318,7 @@ viewPauseOverlay =
     group []
         [ rect wc.ri [ fillP black, fade (progress |> lerp 0 0.9) ]
         , rect (vec (gc.cellR * 5) (gc.cellR * 2)) [ fillP white ]
-        , iconBtnContainer RestartGameClicked (vecX -rightBtnX) black [ restartIcon ]
+        , iconBtnContainer RestartGameClicked (vecX -rightBtnX) black [ viewRestartIcon ]
         , viewIconBtn ResumeGameClicked (vecX rightBtnX) black Icon.home
         , viewIconBtn ResumeGameClicked vecZero black Icon.play
         , group
@@ -1345,7 +1345,7 @@ viewHeader turn =
     in
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
-        , iconBtnContainer RestartGameClicked leftBtnCenter white [ restartIcon ]
+        , iconBtnContainer RestartGameClicked leftBtnCenter white [ viewRestartIcon ]
         , words (String.fromInt turn)
             [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
         , viewIconBtn PauseGameClicked rightBtnCenter white Icon.pause
@@ -1366,17 +1366,20 @@ iconBtnContainer msg center color =
         ]
 
 
-restartIcon : Svg msg
-restartIcon =
-    group
-        [ transform [ Rotate -45 0 0 ] ]
-        [ viewIcon Icon.redo ]
+viewRestartIcon : Svg msg
+viewRestartIcon =
+    viewRotatedIcon -45 Icon.redo
 
 
 viewIcon : Icon -> Svg msg
 viewIcon icon =
+    viewRotatedIcon 0 icon
+
+
+viewRotatedIcon : Float -> Icon -> Svg msg
+viewRotatedIcon deg icon =
     Svg.path
-        (transform [ translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2) ]
+        (transform [ rotate deg, translateXY -(toFloat icon.width / 2) -(toFloat icon.height / 2) ]
             :: List.map S.d icon.paths
         )
         []
