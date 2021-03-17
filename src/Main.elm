@@ -765,7 +765,7 @@ update message (Model env page) =
                 mute =
                     not env.mute
             in
-            ( Model { env | mute = mute } page, Cmd.batch [ setMute mute, playSound "btn" ] )
+            ( Model { env | mute = mute } page, Cmd.batch [ setMute mute ] )
 
         RestartGameClicked ->
             let
