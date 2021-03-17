@@ -1361,14 +1361,16 @@ viewHeader turn =
     in
     group [ transform [ translate wc.header.c ] ]
         [ rect wc.header.ri [ fillP darkCharcoal ]
-        , btn RestartGameClicked
-            [ fillP white, transform [ translateXY -rightBtnX 0 ] ]
-            [ viewRestartIcon ]
-        , words (String.fromInt turn)
-            [ fillP white, transform [ scale 4 ], T.fontWeight FontWeightBold ]
-        , btn PauseGameClicked
-            [ fillP white, transform [ translateXY rightBtnX 0 ] ]
-            [ viewIcon Icon.pause ]
+        , group [ fillP white ]
+            [ btn RestartGameClicked
+                [ transform [ translateXY -rightBtnX 0 ] ]
+                [ viewRestartIcon ]
+            , words (String.fromInt turn)
+                [ transform [ scale 4 ], T.fontWeight FontWeightBold ]
+            , btn PauseGameClicked
+                [ transform [ translateXY rightBtnX 0 ] ]
+                [ viewIcon Icon.pause ]
+            ]
         ]
 
 
