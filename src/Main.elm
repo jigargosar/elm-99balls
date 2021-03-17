@@ -125,7 +125,6 @@ initialEnvironment =
 type alias Session =
     { hiScore : Int
     , stars : Int
-    , seed : Seed
     , mute : Bool
     }
 
