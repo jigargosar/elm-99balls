@@ -27,6 +27,9 @@ import Util exposing (..)
 port playSound : String -> Cmd msg
 
 
+port setMute : Bool -> Cmd msg
+
+
 port saveStars : Int -> Cmd msg
 
 
@@ -763,13 +766,7 @@ update message (Model env page) =
                 mute =
                     not env.mute
             in
-            ( Model
-                { env
-                    | mute = mute
-                }
-                page
-            , Cmd.none
-            )
+            ( Model { env | mute = mute } page, setMute mute )
 
         RestartGameClicked ->
             let
