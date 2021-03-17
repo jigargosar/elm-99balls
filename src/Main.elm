@@ -122,13 +122,6 @@ initialEnvironment =
     }
 
 
-type alias Session =
-    { hiScore : Int
-    , stars : Int
-    , mute : Bool
-    }
-
-
 type Page
     = StartPage Start
     | GamePage Game_
