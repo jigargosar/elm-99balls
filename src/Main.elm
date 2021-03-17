@@ -668,7 +668,7 @@ initGamePage now stars seed =
                     g
                         |> spoofBallCountBy 0
                         |> spoofTurns 0
-                        |> (pauseGame now >> fst)
+                        |> (pauseGame >> fst)
 
                 g ->
                     g
@@ -795,7 +795,7 @@ update message (Model env page) =
         PauseGameClicked ->
             case page of
                 GamePage game ->
-                    pauseGame env.frame game |> mapFst (GamePage >> Model env)
+                    pauseGame game |> mapFst (GamePage >> Model env)
 
                 _ ->
                     ( Model env page, Cmd.none )
@@ -819,11 +819,11 @@ update message (Model env page) =
                     ( Model env page, Cmd.none )
 
 
-pauseGame : Float -> Game_ -> ( Game_, Cmd msg )
-pauseGame now game_ =
+pauseGame : Game_ -> ( Game_, Cmd msg )
+pauseGame game_ =
     case game_ of
         Running game ->
-            ( Paused { game | transit = initTransit now }, playSound "btn" )
+            ( Paused game, playSound "btn" )
 
         _ ->
             ( game_, Cmd.none )
@@ -1323,14 +1323,11 @@ viewOverOverlay frame transit =
 viewPauseOverlay : Float -> Anim0 -> Svg Msg
 viewPauseOverlay now transit =
     let
-        progress =
-            transitProgress now transit
-
         rightBtnX =
             gc.ri.x / 2.5
     in
     group []
-        [ rect wc.ri [ fillP white, fade (progress |> lerp 0 0.8) ]
+        [ rect wc.ri [ fillP white, fade 0.8 ]
         , rect (vec (gc.ri.x * 0.7) (gc.cellR * 1.6)) [ fillP black, Px.rx gc.cellR ]
         , group [ fillP white ]
             [ btn RestartGameClicked
@@ -1344,8 +1341,7 @@ viewPauseOverlay now transit =
                 [ viewIcon Icon.home ]
             ]
         , group
-            [ fade progress
-            , fillP lightOrange
+            [ fillP lightOrange
             ]
             [ words "PAUSED" [ transform [ translateXY 0 -50, scale 5 ] ]
             , words "Tap to Continue" [ transform [ translateXY 0 50, scale 3 ] ]
