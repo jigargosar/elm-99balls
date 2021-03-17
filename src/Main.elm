@@ -668,7 +668,7 @@ initGamePage now stars seed =
                     g
                         |> spoofBallCountBy 0
                         |> spoofTurns 0
-                        |> (pauseGame >> fst)
+                        |> (pauseGame now >> fst)
 
                 g ->
                     g
@@ -795,7 +795,7 @@ update message (Model env page) =
         PauseGameClicked ->
             case page of
                 GamePage game ->
-                    pauseGame game |> mapFst (GamePage >> Model env)
+                    pauseGame env.frame game |> mapFst (GamePage >> Model env)
 
                 _ ->
                     ( Model env page, Cmd.none )
@@ -819,11 +819,11 @@ update message (Model env page) =
                     ( Model env page, Cmd.none )
 
 
-pauseGame : Game_ -> ( Game_, Cmd msg )
-pauseGame game_ =
+pauseGame : Float -> Game_ -> ( Game_, Cmd msg )
+pauseGame now game_ =
     case game_ of
         Running game ->
-            ( Paused game, playSound "btn" )
+            ( Paused { game | transit = initTransit now }, playSound "btn" )
 
         _ ->
             ( game_, Cmd.none )
