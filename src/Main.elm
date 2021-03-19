@@ -1837,20 +1837,23 @@ viewBonusBall p =
         vc =
             Svg.circle [ Px.r innerRadius ] []
 
-        vc2 n =
+        vc2 maxOffset n =
             let
                 offset =
                     toFloat n
 
-                o =
-                    offset / glowOffset
+                frac =
+                    offset / toFloat maxOffset
+
+                alpha =
+                    1 - frac
             in
-            [ Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius + offset), fade (1 - o) ] []
-            , Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius - offset), fade (1 - o) ] []
+            [ Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius + offset), fade alpha ] []
+            , Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius - offset), fade alpha ] []
             ]
 
         glowOffset =
-            strokeW * 1.5
+            strokeW * 2 |> round
     in
     group
         [ transform [ translate p ]
@@ -1858,9 +1861,9 @@ viewBonusBall p =
         , Px.strokeWidth strokeW
         ]
         (vc
-            :: (List.range 0 (round glowOffset)
+            :: (List.range 1 glowOffset
                     --rangeF 1 glowOffset (round glowOffset)
-                    |> List.concatMap vc2
+                    |> List.concatMap (vc2 glowOffset)
                )
         )
 
