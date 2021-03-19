@@ -1866,7 +1866,6 @@ viewBonusBall clock p =
         ]
         (vc
             :: (List.range 0 glowOffset
-                    --rangeF 1 glowOffset (round glowOffset)
                     |> List.concatMap (vc2 glowOffset)
                )
         )
