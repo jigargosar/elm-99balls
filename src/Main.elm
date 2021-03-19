@@ -636,7 +636,7 @@ init : Flags -> ( Model, Cmd Msg )
 init { stars, mute } =
     let
         initialSeed =
-            seedFrom 5
+            seedFrom 1087
 
         env =
             initEnv mute
@@ -1820,7 +1820,33 @@ viewBalls balls =
 
 viewStar : Vec -> Svg msg
 viewStar p =
-    group [ fillH bonusHue, transform [ translate p ] ] [ starSvg ]
+    let
+        viewGlow i =
+            let
+                frac =
+                    toFloat i * 0.1
+
+                alpha =
+                    Ease.reverse Ease.inQuad (toFloat i / toFloat n)
+            in
+            group
+                [ S.fill "none"
+                , strokeH bonusHue
+                , transform [ scale (1 + (toFloat i * 1 / 10)) ]
+                , fade alpha
+                ]
+                [ starSvg ]
+
+        n =
+            --50
+            0
+    in
+    group [ fillH bonusHue, transform [ translate p ] ]
+        (starSvg
+            :: (List.range 1 n
+                    |> List.map viewGlow
+               )
+        )
 
 
 viewBonusBall : Float -> Vec -> Svg msg
