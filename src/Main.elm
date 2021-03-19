@@ -1763,7 +1763,7 @@ viewTarget target =
             viewSolidTarget position hp
 
         BonusBallTarget clock ->
-            viewBonusBall (bonusAnimPosition clock position)
+            viewBonusBall clock (bonusAnimPosition clock position)
 
         StarTarget clock ->
             viewStar (bonusAnimPosition clock position)
@@ -1823,8 +1823,8 @@ viewStar p =
     group [ fillH bonusHue, transform [ translate p ] ] [ starSvg ]
 
 
-viewBonusBall : Vec -> Svg msg
-viewBonusBall p =
+viewBonusBall : Float -> Vec -> Svg msg
+viewBonusBall clock p =
     let
         radius =
             gc.bonusR
@@ -1847,14 +1847,17 @@ viewBonusBall p =
                     offset / toFloat maxOffset
 
                 alpha =
-                    Ease.reverse Ease.inCirc frac
+                    Ease.reverse Ease.inQuad frac
             in
             [ Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius + offset), fade alpha ] []
             , Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius - offset |> atLeast 0), fade alpha ] []
             ]
 
         glowOffset =
-            strokeW * 2.5 |> round
+            (strokeW * 1.5)
+                * wave 60 clock
+                |> add strokeW
+                |> round
     in
     group
         [ transform [ translate p ]
