@@ -1832,14 +1832,29 @@ viewBonusBall p =
 
         innerRadius =
             radius - strokeW / 2
+
+        vc =
+            Svg.circle [ Px.r innerRadius ] []
+
+        vc2 frac =
+            [ Svg.circle [ Px.r innerRadius, transform [ scale (1 + frac) ], fade 0.1 ] []
+            , Svg.circle [ Px.r innerRadius, transform [ scale (1 - frac) ], fade 0.1 ] []
+            ]
     in
     group
-        [ strokeH bonusHue
-        , transform [ translate p ]
+        [ transform [ translate p ]
+        , strokeH bonusHue
         , Px.strokeWidth strokeW
         ]
-        [ Svg.circle [ Px.r innerRadius ] []
-        ]
+        (vc
+            :: ([ vc2 0.1
+                , vc2 0.2
+                , vc2 0.3
+                , vc2 0.4
+                ]
+                    |> List.concat
+               )
+        )
 
 
 viewBall : Vec -> Svg msg
