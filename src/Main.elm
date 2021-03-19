@@ -4,6 +4,7 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
+import Ease
 import Float.Extra
 import FontAwesome.Icon exposing (Icon)
 import FontAwesome.Solid as Icon
@@ -1846,14 +1847,14 @@ viewBonusBall p =
                     offset / toFloat maxOffset
 
                 alpha =
-                    1 - frac
+                    Ease.reverse Ease.inCirc frac
             in
             [ Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius + offset), fade alpha ] []
-            , Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius - offset), fade alpha ] []
+            , Svg.circle [ Px.strokeWidth 1, Px.r (innerRadius - offset |> atLeast 0), fade alpha ] []
             ]
 
         glowOffset =
-            strokeW * 2 |> round
+            strokeW * 2.5 |> round
     in
     group
         [ transform [ translate p ]
@@ -1861,7 +1862,7 @@ viewBonusBall p =
         , Px.strokeWidth strokeW
         ]
         (vc
-            :: (List.range 1 glowOffset
+            :: (List.range 0 glowOffset
                     --rangeF 1 glowOffset (round glowOffset)
                     |> List.concatMap (vc2 glowOffset)
                )
