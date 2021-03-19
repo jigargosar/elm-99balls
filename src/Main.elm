@@ -4,6 +4,7 @@ import Browser
 import Browser.Dom as Dom
 import Browser.Events
 import Color exposing (..)
+import Float.Extra
 import FontAwesome.Icon exposing (Icon)
 import FontAwesome.Solid as Icon
 import Html exposing (Attribute, Html, div, node)
@@ -1836,10 +1837,13 @@ viewBonusBall p =
         vc =
             Svg.circle [ Px.r innerRadius ] []
 
-        vc2 frac =
-            [ Svg.circle [ Px.r innerRadius, transform [ scale (1 + frac) ], fade 0.1 ] []
-            , Svg.circle [ Px.r innerRadius, transform [ scale (1 - frac) ], fade 0.1 ] []
+        vc2 offset =
+            [ Svg.circle [ Px.r (innerRadius + offset), fade 0.05 ] []
+            , Svg.circle [ Px.r (innerRadius - offset), fade 0.05 ] []
             ]
+
+        glowOffset =
+            strokeW * 1.5
     in
     group
         [ transform [ translate p ]
@@ -1847,14 +1851,14 @@ viewBonusBall p =
         , Px.strokeWidth strokeW
         ]
         (vc
-            :: ([ vc2 0.1
-                , vc2 0.2
-                , vc2 0.3
-                , vc2 0.4
-                ]
-                    |> List.concat
+            :: (rangeF 1 glowOffset (round (glowOffset / 2))
+                    |> List.concatMap vc2
                )
         )
+
+
+rangeF start end steps =
+    Float.Extra.range { start = start, end = end, steps = steps }
 
 
 viewBall : Vec -> Svg msg
