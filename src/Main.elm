@@ -1835,16 +1835,13 @@ viewBonusBall clock p =
         innerRadius =
             radius - strokeW / 2
 
-        vc =
-            Svg.circle [ Px.r innerRadius ] []
-
-        vc2 maxOffset n =
+        viewGlow n =
             let
                 offset =
                     toFloat n
 
                 frac =
-                    offset / toFloat maxOffset
+                    offset / toFloat glowOffset
 
                 alpha =
                     Ease.reverse Ease.inQuad frac
@@ -1858,16 +1855,18 @@ viewBonusBall clock p =
                 * wave 60 clock
                 |> add strokeW
                 |> round
+
+        glowView =
+            List.range 0 glowOffset
+                |> List.concatMap viewGlow
     in
     group
         [ transform [ translate p ]
         , strokeH bonusHue
         , Px.strokeWidth strokeW
         ]
-        (vc
-            :: (List.range 0 glowOffset
-                    |> List.concatMap (vc2 glowOffset)
-               )
+        (Svg.circle [ Px.r innerRadius ] []
+            :: glowView
         )
 
 
