@@ -651,6 +651,11 @@ round2 =
     mapEach round
 
 
+rangeF : Float -> Float -> Int -> List Float
+rangeF start end steps =
+    Float.Extra.range { start = start, end = end, steps = steps }
+
+
 toFloat2 : ( Int, Int ) -> ( Float, Float )
 toFloat2 =
     mapEach toFloat

@@ -1872,10 +1872,6 @@ viewBonusBall clock p =
         )
 
 
-rangeF start end steps =
-    Float.Extra.range { start = start, end = end, steps = steps }
-
-
 viewBall : Vec -> Svg msg
 viewBall p =
     let
