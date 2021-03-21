@@ -40,8 +40,9 @@ port saveStars : Int -> Cmd msg
 
 # Tasks
 
-  - mute btn
-      - try introducing session
+  - [x] mute btn
+
+  - [x] glow for bonus ball
 
   - start screen with logo/play/shop buttons.
       - star & hi score stats.
@@ -1823,9 +1824,6 @@ viewStar p =
     let
         viewGlow i =
             let
-                frac =
-                    toFloat i * 0.1
-
                 alpha =
                     Ease.reverse Ease.inQuad (toFloat i / toFloat n)
             in
